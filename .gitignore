@@ -1,0 +1,8 @@
+.gradle/
+build/
+bin/
+out/
+*.class
+*.log
+box2d_memory.txt
+vendor/box2d/build*/

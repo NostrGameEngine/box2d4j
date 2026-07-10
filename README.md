@@ -1,0 +1,251 @@
+# box2d4j
+
+Java 11 port of Box2D `v3.1.1`.
+
+The source in `vendor/box2d` is the upstream reference checkout used while
+porting and for parity tests. Java code intentionally keeps C-style `b2...`
+names and mutable data records where that preserves source parity.
+
+All 110 active upstream sample creators are available as headless Java entry
+points under `org.box2d4j.samples`. The test suite compiles the vendored C
+sources with Clang and compares world counters, graph colors, raw float state,
+events, queries, and simulation hashes against the Java port.
+
+## Graphical Sample Debugger
+
+Launch the jMonkeyEngine debugger with:
+
+```bash
+./gradlew runDebugger
+```
+
+The catalog contains the standalone HelloWorld tutorial plus all 110 active
+upstream samples. Use the toolbar or `P` to play/pause, `N` to advance one
+step, `R` to reset, and `F` to fit the world. Drag with the middle mouse button
+to pan, use the wheel to zoom, and scroll over the catalog to browse samples.
+Left-drag manipulates dynamic bodies or the active collision query. Debug draw
+toggles cover shapes, joints, contacts, AABBs, and constraint graph colors.
+Samples without a persistent `b2World` render a live geometric snapshot.
+
+World-based samples continue stepping indefinitely in the debugger after their
+finite headless parity horizon. The 59 interactive v3.1.1 samples expose their
+upstream actions, toggles, choices, numeric controls, and keyboard bindings in
+the paginated `Sample Controls` panel. This includes gameplay controls for
+Pinball, Gear Lift, Driving, Mover, and Drop; scene builders and launch/reset
+actions; and draggable collision queries. The normal `run()` methods remain
+finite for tests and C/Java parity probes.
+
+## Allocator
+
+Native-style allocations default to `ByteBuffer.allocateDirect`. Engines can
+install their own allocator globally before creating Box2D objects:
+
+```java
+B2.b2SetAllocator((size, alignment) -> engineAllocator.allocate(size, alignment));
+```
+
+An `IntFunction<ByteBuffer>` can be used when the engine allocator only needs
+the requested size:
+
+```java
+B2.b2SetAllocator(engineAllocator::allocate);
+```
+
+Box2D forwards a 32-byte-rounded size and 32-byte alignment to
+`B2Allocator`. The `IntFunction` adapter receives the rounded size.
+
+## Multithreading
+
+The core intentionally provides **no task-system implementation** and has no
+dependency on `ExecutorService`. It only exposes the Box2D callbacks on
+`b2WorldDef` and the optional Java-friendly `B2TaskScheduler` contract. With no
+hooks configured, a world runs serially on the calling thread.
+
+On a regular JVM, an application can bridge an engine-owned `ExecutorService`
+like this:
+
+```java
+final class ExecutorTaskScheduler implements B2TaskScheduler {
+    private final ExecutorService executor;
+    private final int workerCount;
+    private final ArrayBlockingQueue<Integer> workerIndices;
+
+    ExecutorTaskScheduler(ExecutorService executor, int workerCount) {
+        if (workerCount < 1 || workerCount > 64) {
+            throw new IllegalArgumentException("workerCount must be in [1, 64]");
+        }
+        this.executor = executor;
+        this.workerCount = workerCount;
+        this.workerIndices = new ArrayBlockingQueue<>(workerCount);
+        for (int i = 0; i < workerCount; ++i) {
+            workerIndices.add(i);
+        }
+    }
+
+    public int workerCount() {
+        return workerCount;
+    }
+
+    public Object enqueue(b2TaskCallback task, int itemCount, int minRange,
+                          Object taskContext) {
+        if (itemCount <= 0) {
+            return null;
+        }
+        if (workerCount == 1) {
+            task.invoke(0, itemCount, 0, taskContext);
+            return null;
+        }
+
+        int range = Math.max(1, minRange);
+        int taskCount = Math.min(workerCount, Math.max(1, itemCount / range));
+        List<Future<?>> futures = new ArrayList<>(taskCount);
+        int base = itemCount / taskCount;
+        int remainder = itemCount - base * taskCount;
+        int start = 0;
+        for (int taskIndex = 0; taskIndex < taskCount; ++taskIndex) {
+            int count = base + (taskIndex < remainder ? 1 : 0);
+            int rangeStart = start;
+            int rangeEnd = start + count;
+            futures.add(executor.submit(() -> {
+                int workerIndex;
+                try {
+                    workerIndex = workerIndices.take();
+                } catch (InterruptedException exception) {
+                    Thread.currentThread().interrupt();
+                    throw new IllegalStateException(exception);
+                }
+                try {
+                    task.invoke(rangeStart, rangeEnd, workerIndex, taskContext);
+                } finally {
+                    workerIndices.add(workerIndex);
+                }
+            }));
+            start = rangeEnd;
+        }
+        return futures;
+    }
+
+    public void finish(Object taskHandle) {
+        Throwable failure = null;
+        boolean interrupted = false;
+        for (Object item : (List<?>) taskHandle) {
+            boolean complete = false;
+            while (!complete) {
+                try {
+                    ((Future<?>) item).get();
+                    complete = true;
+                } catch (InterruptedException exception) {
+                    interrupted = true;
+                    if (failure == null) {
+                        failure = exception;
+                    }
+                } catch (ExecutionException exception) {
+                    if (failure == null) {
+                        failure = exception.getCause();
+                    }
+                    complete = true;
+                }
+            }
+        }
+        if (interrupted) {
+            Thread.currentThread().interrupt();
+        }
+        if (failure != null) {
+            throw new IllegalStateException("Box2D task failed", failure);
+        }
+    }
+}
+
+ExecutorService physicsExecutor = Executors.newFixedThreadPool(4);
+ExecutorTaskScheduler scheduler = new ExecutorTaskScheduler(physicsExecutor, 4);
+
+b2WorldDef worldDef = B2.b2DefaultWorldDef();
+worldDef.setTaskScheduler(scheduler);
+b2WorldId worldId = B2.b2CreateWorld(worldDef);
+```
+
+`setTaskScheduler` only wires the three C-style fields; it does not retain or
+own external resources. The application must shut down `physicsExecutor` at
+the appropriate engine lifecycle point. Platforms without a complete
+`ExecutorService`, including alternative runtimes such as TVM, can implement
+the same small interface using their native job system or assign
+`enqueueTask`, `finishTask`, and `userTaskContext` directly.
+
+Worker indices must be exclusive slots in `[0, workerCount)`, even when tree
+rebuild and narrow-phase tasks overlap. The callback should generally keep
+each range at least `minRange` elements long. `finish` is a barrier and must
+not return while any range in the handle is still running.
+
+Call `b2World_Step` from one simulation thread per world. Custom filter,
+pre-solve, friction, and restitution callbacks may run on task workers and
+must be thread-safe when multithreading is enabled. The default world remains
+single-threaded and requires no executor.
+
+The graphical sample viewer contains its own `ExecutorService` bridge under
+`src/debugger`; it is deliberately outside the core artifact. It defaults to
+half the available processors, capped at eight workers. Override it with:
+
+```bash
+./gradlew runDebugger -PdebuggerWorkers=4
+```
+
+## Build
+
+```bash
+./gradlew test
+```
+
+The CI workflow runs the same suite as two independent jobs:
+
+```bash
+./gradlew unitTest
+./gradlew parityTest
+```
+
+`unitTest` contains the Java unit, API-surface, catalog, and runtime tests.
+`parityTest` contains the C/C++ reference probes, multithreading parity checks,
+and sample parity tests.
+
+## Continuous integration and publishing
+
+`.github/workflows/ci.yml` runs on every push, pull request, and published
+GitHub release. It starts independent `build`, `unit-tests`, and
+`parity-tests` jobs. Publishing starts only after all three jobs succeed.
+
+Every non-tag push publishes `org.ngengine:box2d4j:3.1.1-SNAPSHOT` to the
+Maven Central snapshots repository. Pull requests are verified but never
+published. Publishing a release from the GitHub UI publishes its tag as the
+Maven version and closes/releases the Sonatype staging repository. A leading
+`v` is removed, so release tag `v3.1.1` publishes version `3.1.1`.
+
+Configure these GitHub Actions repository secrets:
+
+- `SONATYPE_USERNAME`: Maven Central/Sonatype token username
+- `SONATYPE_PASSWORD`: Maven Central/Sonatype token password
+- `GPG_PRIVATE_KEY`: ASCII-armored private signing key
+- `GPG_PASSPHRASE`: signing-key passphrase
+
+The publishing configuration uses the Gradle Nexus Publish Plugin and the
+same environment variable names for local publishing. `GROUP` can override
+the default `org.ngengine` group and `VERSION` can override the default
+snapshot version. For example:
+
+```bash
+SONATYPE_USERNAME=... \
+SONATYPE_PASSWORD=... \
+GPG_PRIVATE_KEY="$(cat private-key.asc)" \
+GPG_PASSPHRASE=... \
+./gradlew publishToSonatype
+```
+
+Run every headless sample:
+
+```bash
+./gradlew runSamples
+```
+
+If the Gradle wrapper is not present yet, use the installed Gradle:
+
+```bash
+gradle test
+```

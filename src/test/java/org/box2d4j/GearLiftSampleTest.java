@@ -1,0 +1,109 @@
+package org.box2d4j;
+
+import org.box2d4j.samples.GearLift;
+import org.junit.jupiter.api.Test;
+
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+final class GearLiftSampleTest {
+    private static final int PARITY_STEP_COUNT = 10;
+    private static final float BODY_TOLERANCE = 1.0e-6f;
+    private static final float JOINT_METRIC_TOLERANCE = 5.0e-6f;
+    private static final float JOINT_FORCE_TOLERANCE = 2.0e-5f;
+
+    @Test
+    void sampleMatchesUpstreamCGearLift() throws Exception {
+        String upstream = runProbe(PARITY_STEP_COUNT);
+        String[] parts = upstream.split("\\s+");
+        assertEquals("gearLift", parts[0]);
+
+        GearLift.Result result = GearLift.run(PARITY_STEP_COUNT);
+        assertEquals(Integer.parseInt(parts[1]), result.bodyCount);
+        assertEquals(Integer.parseInt(parts[2]), result.shapeCount);
+        assertEquals(Integer.parseInt(parts[3]), result.contactCount);
+        assertEquals(Integer.parseInt(parts[4]), result.jointCount);
+        assertEquals(Integer.parseInt(parts[5]), result.awakeBodyCount);
+        int bodyCount = Integer.parseInt(parts[6]);
+        int jointCount = Integer.parseInt(parts[7]);
+        assertEquals(bodyCount, result.bodies.length);
+        assertEquals(jointCount, result.joints.length);
+
+        int index = 8;
+        for (int i = 0; i < bodyCount; ++i) {
+            assertBody(parts, index, result.bodies[i]);
+            index += 8;
+        }
+        for (int i = 0; i < jointCount; ++i) {
+            assertJoint(parts, index, result.joints[i]);
+            index += 8;
+        }
+        assertEquals(parts.length, index);
+    }
+
+    private static void assertBody(String[] parts, int index, GearLift.BodyState body) {
+        assertEquals(Float.parseFloat(parts[index]), body.x, BODY_TOLERANCE);
+        assertEquals(Float.parseFloat(parts[index + 1]), body.y, BODY_TOLERANCE);
+        assertEquals(Float.parseFloat(parts[index + 2]), body.cos, BODY_TOLERANCE);
+        assertEquals(Float.parseFloat(parts[index + 3]), body.sin, BODY_TOLERANCE);
+        assertEquals(Float.parseFloat(parts[index + 4]), body.velocityX, BODY_TOLERANCE);
+        assertEquals(Float.parseFloat(parts[index + 5]), body.velocityY, BODY_TOLERANCE);
+        assertEquals(Float.parseFloat(parts[index + 6]), body.angularVelocity, BODY_TOLERANCE);
+        assertEquals(Integer.parseInt(parts[index + 7]), body.contactCapacity);
+    }
+
+    private static void assertJoint(String[] parts, int index, GearLift.JointState joint) {
+        assertEquals(Integer.parseInt(parts[index]), joint.type);
+        assertEquals(Float.parseFloat(parts[index + 1]), joint.linearSeparation, JOINT_METRIC_TOLERANCE);
+        assertEquals(Float.parseFloat(parts[index + 2]), joint.metricA, JOINT_METRIC_TOLERANCE);
+        assertEquals(Float.parseFloat(parts[index + 3]), joint.metricB, JOINT_FORCE_TOLERANCE);
+        assertEquals(Float.parseFloat(parts[index + 4]), joint.metricC, JOINT_METRIC_TOLERANCE);
+        assertEquals(Float.parseFloat(parts[index + 5]), joint.forceX, JOINT_FORCE_TOLERANCE);
+        assertEquals(Float.parseFloat(parts[index + 6]), joint.forceY, JOINT_FORCE_TOLERANCE);
+        assertEquals(Float.parseFloat(parts[index + 7]), joint.torque, JOINT_FORCE_TOLERANCE);
+    }
+
+    private static String runProbe(int stepCount) throws Exception {
+        Path root = new File(".").getCanonicalFile().toPath();
+        Path outputDir = root.resolve("build/parity");
+        Files.createDirectories(outputDir);
+        Path probe = outputDir.resolve("box2d_gear_lift_sample_probe");
+
+        List<String> sources = new ArrayList<>();
+        try (java.util.stream.Stream<Path> stream = Files.list(root.resolve("vendor/box2d/src"))) {
+            stream.filter(path -> path.getFileName().toString().endsWith(".c"))
+                .sorted()
+                .forEach(path -> sources.add(path.toString()));
+        }
+
+        List<String> command = new ArrayList<>();
+        command.add("clang");
+        command.add("-std=c17");
+        command.add("-O2");
+        command.add("-ffp-contract=off");
+        command.add("-I" + root.resolve("vendor/box2d/include"));
+        command.add("-I" + root.resolve("vendor/box2d/src"));
+        command.add("-I" + root.resolve("vendor/box2d/shared"));
+        command.addAll(sources);
+        command.add(root.resolve("vendor/box2d/shared/random.c").toString());
+        command.add(root.resolve("tools/parity/box2d_gear_lift_sample_probe.c").toString());
+        command.add("-o");
+        command.add(probe.toString());
+
+        Process compile = new ProcessBuilder(command).directory(root.toFile()).redirectErrorStream(true).start();
+        String compileOutput = new String(compile.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+        assertEquals(0, compile.waitFor(), compileOutput);
+
+        Process run = new ProcessBuilder(probe.toString(), Integer.toString(stepCount)).directory(root.toFile())
+            .redirectErrorStream(true).start();
+        String output = new String(run.getInputStream().readAllBytes(), StandardCharsets.UTF_8).trim();
+        assertEquals(0, run.waitFor(), output);
+        return output;
+    }
+}
