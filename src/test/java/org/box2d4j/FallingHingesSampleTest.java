@@ -50,6 +50,7 @@ final class FallingHingesSampleTest {
         command.addAll(sources);
         command.add(root.resolve("vendor/box2d/shared/determinism.c").toString());
         command.add(root.resolve("tools/parity/box2d_determinism_probe.c").toString());
+        command.add("-lm");
         command.add("-o");
         command.add(probe.toString());
 

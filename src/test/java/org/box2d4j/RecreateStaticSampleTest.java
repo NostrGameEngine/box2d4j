@@ -57,6 +57,7 @@ final class RecreateStaticSampleTest {
         command.add("-I" + root.resolve("vendor/box2d/src"));
         command.addAll(sources);
         command.add(root.resolve("tools/parity/box2d_recreate_static_sample_probe.c").toString());
+        command.add("-lm");
         command.add("-o");
         command.add(probe.toString());
 

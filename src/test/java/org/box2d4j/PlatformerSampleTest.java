@@ -81,6 +81,7 @@ final class PlatformerSampleTest {
         command.add("-I" + root.resolve("vendor/box2d/shared"));
         command.addAll(sources);
         command.add(root.resolve("tools/parity/box2d_platformer_sample_probe.c").toString());
+        command.add("-lm");
         command.add("-o");
         command.add(probe.toString());
 
