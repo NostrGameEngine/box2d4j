@@ -211,6 +211,7 @@ final class MultithreadingTest {
 
         List<String> compileC = new ArrayList<>();
         compileC.add("clang");
+        compileC.add("-D_POSIX_C_SOURCE=200809L");
         compileC.add("-std=c17");
         compileC.add("-O2");
         compileC.add("-ffp-contract=off");

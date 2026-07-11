@@ -77,6 +77,7 @@ final class DoorSampleTest {
 
         List<String> command = new ArrayList<>();
         command.add("clang");
+        command.add("-D_POSIX_C_SOURCE=200809L");
         command.add("-std=c17");
         command.add("-O2");
         command.add("-ffp-contract=off");
