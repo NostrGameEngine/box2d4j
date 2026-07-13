@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
@@ -20,7 +19,7 @@ import static org.box2d4j.B2.*;
 
 final class SampleSession implements AutoCloseable {
     private final SampleCatalog.Entry entry;
-    private final Semaphore permits = new Semaphore(0);
+    private final SimulationFrameGate frameGate = new SimulationFrameGate();
     private final AtomicReference<b2WorldId> worldId = new AtomicReference<>();
     private final AtomicReference<Object> result = new AtomicReference<>();
     private final AtomicReference<b2WorldId> retainedWorld = new AtomicReference<>();
@@ -37,7 +36,6 @@ final class SampleSession implements AutoCloseable {
     private final Thread thread;
     private final int workerCount;
 
-    private volatile boolean awaitingPermit;
     private volatile boolean playing = true;
     private volatile boolean cancelled;
     private volatile boolean finished;
@@ -218,22 +216,22 @@ final class SampleSession implements AutoCloseable {
     }
 
     void advance(float timePerFrame) {
-        if (!playing || finished || !awaitingPermit) {
+        if (!playing || finished || !frameGate.isAwaiting()) {
             return;
         }
         accumulator += timePerFrame;
         float period = 1.0f / targetHz;
         if (accumulator >= period) {
             accumulator %= period;
-            permits.release();
+            frameGate.grant();
         }
     }
 
     void stepOnce() {
         playing = false;
         accumulator = 0.0f;
-        if (awaitingPermit && !finished) {
-            permits.release();
+        if (!finished) {
+            frameGate.grant();
         }
     }
 
@@ -328,9 +326,6 @@ final class SampleSession implements AutoCloseable {
                 if (!cancelled) {
                     b2WorldId retained = copy(destroyedWorldId);
                     retainedWorld.set(retained);
-                    worldId.set(retained);
-                    finalFrame = false;
-                    version.incrementAndGet();
                 }
             }
 
@@ -368,7 +363,6 @@ final class SampleSession implements AutoCloseable {
             }
             worldId.set(null);
             taskScheduler.close();
-            awaitingPermit = false;
             finished = true;
             version.incrementAndGet();
         }
@@ -390,16 +384,12 @@ final class SampleSession implements AutoCloseable {
             return;
         }
         while (!cancelled) {
-            awaitingPermit = true;
-            version.incrementAndGet();
             try {
-                permits.acquire();
+                frameGate.publishAndAwait(version::incrementAndGet);
             } catch (InterruptedException exception) {
                 Thread.currentThread().interrupt();
                 cancelled = true;
                 return;
-            } finally {
-                awaitingPermit = false;
             }
             if (cancelled) {
                 return;
@@ -472,17 +462,15 @@ final class SampleSession implements AutoCloseable {
         if (cancelled && !abortWhenCancelled) {
             return;
         }
-        this.finalFrame = finalFrame;
-        worldId.set(new b2WorldId(nextWorldId.index1, nextWorldId.generation));
-        awaitingPermit = true;
-        version.incrementAndGet();
         try {
-            permits.acquire();
+            frameGate.publishAndAwait(() -> {
+                this.finalFrame = finalFrame;
+                worldId.set(new b2WorldId(nextWorldId.index1, nextWorldId.generation));
+                version.incrementAndGet();
+            });
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
             cancelled = true;
-        } finally {
-            awaitingPermit = false;
         }
         if (cancelled && abortWhenCancelled) {
             throw new SessionCancelled();
@@ -496,7 +484,7 @@ final class SampleSession implements AutoCloseable {
     @Override
     public void close() {
         cancelled = true;
-        permits.release();
+        frameGate.cancel();
         thread.interrupt();
         try {
             thread.join(2000L);

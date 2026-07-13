@@ -280,17 +280,7 @@ public final class Box2D4JDebugger extends SimpleApplication {
         }
         stateText.setText(state);
 
-        b2WorldId worldId = session.worldId();
-        if (worldId != null && b2World_IsValid(worldId)) {
-            b2Counters counters = b2World_GetCounters(worldId);
-            statsText.setText("Step " + session.stepCount()
-                + "   Bodies " + counters.bodyCount
-                + "   Shapes " + counters.shapeCount
-                + "   Contacts " + counters.contactCount
-                + "   Joints " + counters.jointCount
-                + "   Awake " + b2World_GetAwakeBodyCount(worldId)
-                + "   Workers " + session.workerCount());
-        } else if (lastBatch != null && resultSnapshot) {
+        if (lastBatch != null && resultSnapshot) {
             statsText.setText("Result snapshot   No persistent b2World");
         } else if (lastBatch != null) {
             statsText.setText("Step " + lastStepCount

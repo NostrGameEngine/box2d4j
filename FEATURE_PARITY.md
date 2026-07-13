@@ -47,10 +47,10 @@ for every possible simulation and callback sequence.
 
 ## Verification Snapshot
 
-- `unitTest`: 20 suites, 38 tests, zero failures/errors/skips.
+- `unitTest`: 21 suites, 39 tests, zero failures/errors/skips.
 - `parityTest`: 154 suites, 168 tests, zero failures/errors/skips. The native
   reference inventory is 153 C probes plus one C++ multithreading probe.
-- The two Gradle test tasks cover all 174 test classes without overlap. On the
+- The two Gradle test tasks cover all 175 test classes without overlap. On the
   current worktree, `parityTest --rerun-tasks` completed in 8m26s and
   `unitTest assemble --rerun-tasks` completed in 11s. The
   preceding 125-suite baseline also passed on the Ubuntu GitHub Actions runner
@@ -79,7 +79,7 @@ for every possible simulation and callback sequence.
 | Native-style allocation hook | Covered | Exact `b2AllocFcn`/`b2FreeFcn` pair plus `B2Allocator` and `IntFunction<ByteBuffer>` conveniences, with allocation/free invocation, 32-byte forwarding, accounting parity, and direct-buffer default |
 | Active sample catalog | Covered at tested horizons | 110 active upstream creators plus HelloWorld, with per-sample evidence in `PORTING_STATUS.md` |
 | Interactive sample controls | Covered for inventoried entries | 59 sample entries register actions, holds, toggles, choices, and numeric controls; not every arbitrary GUI action sequence has parity coverage |
-| Graphical debugger | Covered | jMonkeyEngine catalog, indefinite stepping, navigation, controls, counters, diagnostic toggles, labels, debugger-owned multithreading, and tested mouse-joint pick/drag/release lifecycle |
+| Graphical debugger | Covered | jMonkeyEngine catalog, indefinite stepping, navigation, controls, counters, diagnostic toggles, labels, debugger-owned multithreading, tested mouse-joint pick/drag/release lifecycle, and a binary frame gate that prevents rendering a locked world |
 | Debug draw diagnostics | Covered | Shapes, type-specific joints, revolute extras, island AABBs, contacts, bounds, mass, names, and graph colors have callback parity; debugger toggles expose joint extras and islands |
 | Profiling and counters | Covered with runtime adaptation | All 22 `b2Profile` fields are populated at their corresponding pipeline boundaries, including merge, preparation, integration, warm-start, solve/relax, restitution, and impulse-storage sub-phases; measured phases retain a positive minimum even when the JVM timer returns the same tick, while conditional phases not executed remain zero. A native activity mask verifies every solver phase observed in C is observed in Java. Static/dynamic tree heights have exact C parity; `taskCount` counts Java task stages and `stackUsed` is zero because the Java port has no C arena |
 | Memory statistics dump | Covered with runtime adaptation | Preserves upstream id-pool, world-array, broad-phase, solver-set, graph, and stack sections; Java-managed storage is marked `n/a` with live counts, tree/hash bytes remain concrete, and native-hook bytes have a dedicated section |
