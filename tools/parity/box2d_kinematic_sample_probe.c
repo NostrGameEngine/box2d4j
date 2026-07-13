@@ -5,9 +5,11 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-int main(void)
+int main(int argc, char** argv)
 {
+    int stepCount = argc > 1 ? atoi(argv[1]) : 120;
     b2WorldDef worldDef = b2DefaultWorldDef();
     b2WorldId worldId = b2CreateWorld(&worldDef);
 
@@ -24,7 +26,7 @@ int main(void)
     b2ShapeDef shapeDef = b2DefaultShapeDef();
     b2CreatePolygonShape(bodyId, &shapeDef, &box);
 
-    for (int i = 0; i < 120; ++i)
+    for (int i = 0; i < stepCount; ++i)
     {
         b2Vec2 point = {
             .x = 2.0f * amplitude * cosf(time),

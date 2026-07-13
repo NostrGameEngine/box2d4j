@@ -5,6 +5,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 enum
 {
@@ -49,8 +50,9 @@ static void print_body(b2BodyId bodyId)
            v.y);
 }
 
-int main(void)
+int main(int argc, char** argv)
 {
+    int stepCount = argc > 1 ? atoi(argv[1]) : 240;
     b2WorldDef worldDef = b2DefaultWorldDef();
     b2WorldId worldId = b2CreateWorld(&worldDef);
 
@@ -83,7 +85,7 @@ int main(void)
         x += 2.0f;
     }
 
-    for (int step = 0; step < 240; ++step)
+    for (int step = 0; step < stepCount; ++step)
     {
         b2World_Step(worldId, 1.0f / 60.0f, 4);
     }

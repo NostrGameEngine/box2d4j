@@ -13,12 +13,14 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 final class MoverSampleTest {
+    private static final int STEP_COUNT = 2400;
+
     @Test
     void sampleMatchesUpstreamCMover() throws Exception {
-        String[] parts = runProbe().split("\\s+");
+        String[] parts = runProbe(STEP_COUNT).split("\\s+");
         assertEquals("mover", parts[0]);
 
-        Mover.Result result = Mover.run();
+        Mover.Result result = Mover.run(STEP_COUNT);
         int index = 1;
         assertEquals(Integer.parseInt(parts[index++]), result.bodyCount);
         assertEquals(Integer.parseInt(parts[index++]), result.shapeCount);
@@ -82,7 +84,7 @@ final class MoverSampleTest {
         return index + 1;
     }
 
-    private static String runProbe() throws Exception {
+    private static String runProbe(int stepCount) throws Exception {
         Path root = new File(".").getCanonicalFile().toPath();
         Path outputDir = root.resolve("build/parity");
         Files.createDirectories(outputDir);
@@ -113,7 +115,8 @@ final class MoverSampleTest {
         String compileOutput = new String(compile.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
         assertEquals(0, compile.waitFor(), compileOutput);
 
-        Process run = new ProcessBuilder(probe.toString()).directory(root.toFile()).redirectErrorStream(true).start();
+        Process run = new ProcessBuilder(probe.toString(), Integer.toString(stepCount)).directory(root.toFile())
+            .redirectErrorStream(true).start();
         String output = new String(run.getInputStream().readAllBytes(), StandardCharsets.UTF_8).trim();
         assertEquals(0, run.waitFor(), output);
         return output;

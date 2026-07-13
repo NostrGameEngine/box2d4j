@@ -74,6 +74,9 @@ final class ChainParityTest {
         b2ChainId chainId = b2CreateChain(bodyId, chainDef);
 
         assertChainLine(lines[0], chainId, b2Chain_IsValid(chainId), b2Chain_GetSegmentCount(chainId));
+        b2WorldId chainWorld = b2Chain_GetWorld(chainId);
+        assertEquals(worldId.index1, chainWorld.index1);
+        assertEquals(worldId.generation, chainWorld.generation);
         b2ShapeId[] segments = new b2ShapeId[4];
         int segmentCount = b2Chain_GetSegments(chainId, segments, 4);
         assertEquals("segments " + segmentCount + " " + segments[0].index1 + " " + segments[1].index1, lines[1]);

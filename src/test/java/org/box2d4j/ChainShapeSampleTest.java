@@ -13,13 +13,15 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 final class ChainShapeSampleTest {
+    private static final int STEP_COUNT = 2400;
+
     @Test
     void sampleMatchesUpstreamCChainShape() throws Exception {
-        String upstream = runProbe();
+        String upstream = runProbe(STEP_COUNT);
         String[] parts = upstream.split("\\s+");
         assertEquals("chainShape", parts[0]);
 
-        ChainShape.Result result = ChainShape.run();
+        ChainShape.Result result = ChainShape.run(STEP_COUNT);
         int variantCount = Integer.parseInt(parts[1]);
         assertEquals(variantCount, result.variants.length);
 
@@ -47,7 +49,7 @@ final class ChainShapeSampleTest {
         assertEquals(Float.parseFloat(parts[index + 5]), body.angularVelocity, 0.0f);
     }
 
-    private static String runProbe() throws Exception {
+    private static String runProbe(int stepCount) throws Exception {
         Path root = new File(".").getCanonicalFile().toPath();
         Path outputDir = root.resolve("build/parity");
         Files.createDirectories(outputDir);
@@ -78,7 +80,8 @@ final class ChainShapeSampleTest {
         String compileOutput = new String(compile.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
         assertEquals(0, compile.waitFor(), compileOutput);
 
-        Process run = new ProcessBuilder(probe.toString()).directory(root.toFile()).redirectErrorStream(true).start();
+        Process run = new ProcessBuilder(probe.toString(), Integer.toString(stepCount)).directory(root.toFile())
+            .redirectErrorStream(true).start();
         String output = new String(run.getInputStream().readAllBytes(), StandardCharsets.UTF_8).trim();
         assertEquals(0, run.waitFor(), output);
         return output;

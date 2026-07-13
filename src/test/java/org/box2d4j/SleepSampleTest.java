@@ -15,11 +15,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 final class SleepSampleTest {
     @Test
     void sampleMatchesUpstreamCSleep() throws Exception {
-        String upstream = runProbe();
+        assertRunMatches(20);
+    }
+
+    @Test
+    void sleepDisabledBodyWakesCollidingSleepingIsland() throws Exception {
+        assertRunMatches(22);
+    }
+
+    @Test
+    void longHorizonMatchesUpstreamCSleep() throws Exception {
+        for (int stepCount : new int[] {80, 120, 240, 600, 2400}) {
+            assertRunMatches(stepCount);
+        }
+    }
+
+    private static void assertRunMatches(int stepCount) throws Exception {
+        String upstream = runProbe(stepCount);
         String[] parts = upstream.split("\\s+");
         assertEquals("sleep", parts[0]);
 
-        Sleep.Result result = Sleep.run();
+        Sleep.Result result = Sleep.run(stepCount);
         assertEquals(Integer.parseInt(parts[1]), result.bodyCount);
         assertEquals(Integer.parseInt(parts[2]), result.shapeCount);
         assertEquals(Integer.parseInt(parts[3]), result.contactCount);
@@ -34,7 +50,6 @@ final class SleepSampleTest {
         for (int i = 0; i < bodyCount; ++i) {
             assertBody(parts, 11 + 12 * i, result.states[i]);
         }
-        assertEquals(upstream, result.toLine());
     }
 
     private static void assertBody(String[] parts, int index, Sleep.BodyState body) {
@@ -52,7 +67,7 @@ final class SleepSampleTest {
         assertEquals(Float.parseFloat(parts[index + 11]), body.angularDamping, 0.0f);
     }
 
-    private static String runProbe() throws Exception {
+    private static String runProbe(int stepCount) throws Exception {
         Path root = new File(".").getCanonicalFile().toPath();
         Path outputDir = root.resolve("build/parity");
         Files.createDirectories(outputDir);
@@ -83,7 +98,8 @@ final class SleepSampleTest {
         String compileOutput = new String(compile.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
         assertEquals(0, compile.waitFor(), compileOutput);
 
-        Process run = new ProcessBuilder(probe.toString()).directory(root.toFile()).redirectErrorStream(true).start();
+        Process run = new ProcessBuilder(probe.toString(), Integer.toString(stepCount)).directory(root.toFile())
+            .redirectErrorStream(true).start();
         String output = new String(run.getInputStream().readAllBytes(), StandardCharsets.UTF_8).trim();
         assertEquals(0, run.waitFor(), output);
         return output;

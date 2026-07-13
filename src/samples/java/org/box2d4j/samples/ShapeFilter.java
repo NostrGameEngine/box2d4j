@@ -16,6 +16,8 @@ import java.util.Locale;
 import static org.box2d4j.B2.*;
 
 public final class ShapeFilter {
+    private static final int DEFAULT_STEP_COUNT = 120;
+
     private static final long GROUND = 0x00000001L;
     private static final long TEAM1 = 0x00000002L;
     private static final long TEAM2 = 0x00000004L;
@@ -26,6 +28,10 @@ public final class ShapeFilter {
     }
 
     public static Result run() {
+        return run(DEFAULT_STEP_COUNT);
+    }
+
+    public static Result run(int phaseStepCount) {
         b2WorldId worldId = b2CreateWorld(b2DefaultWorldDef());
 
         {
@@ -79,7 +85,7 @@ public final class ShapeFilter {
         bindFilter("filter.team1For3", "Team 1 for Player 3", shapes[2], TEAM1);
         bindFilter("filter.team2For3", "Team 2 for Player 3", shapes[2], TEAM2);
 
-        for (int step = 0; step < 120; ++step) {
+        for (int step = 0; step < phaseStepCount; ++step) {
             b2World_Step(worldId, 1.0f / 60.0f, 4);
         }
 
@@ -89,7 +95,7 @@ public final class ShapeFilter {
             setMaskBit(shapes[1], TEAM3, false);
             setMaskBit(shapes[2], TEAM2, false);
 
-            for (int step = 0; step < 120; ++step) {
+            for (int step = 0; step < phaseStepCount; ++step) {
                 b2World_Step(worldId, 1.0f / 60.0f, 4);
             }
         }
@@ -131,7 +137,8 @@ public final class ShapeFilter {
     }
 
     public static void main(String[] args) {
-        System.out.println(run().toLine());
+        int stepCount = args.length == 0 ? DEFAULT_STEP_COUNT : Integer.parseInt(args[0]);
+        System.out.println(run(stepCount).toLine());
     }
 
     public static final class Result {

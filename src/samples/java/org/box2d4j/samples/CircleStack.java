@@ -16,10 +16,16 @@ import java.util.Locale;
 import static org.box2d4j.B2.*;
 
 public final class CircleStack {
+    private static final int DEFAULT_STEP_COUNT = 180;
+
     private CircleStack() {
     }
 
     public static Result run() {
+        return run(DEFAULT_STEP_COUNT);
+    }
+
+    public static Result run(int stepCount) {
         b2WorldId worldId = b2CreateWorld(b2DefaultWorldDef());
         b2World_SetGravity(worldId, new b2Vec2(0.0f, -20.0f));
         b2World_SetContactTuning(worldId, 0.25f * 360.0f, 10.0f, 3.0f);
@@ -64,7 +70,7 @@ public final class CircleStack {
         int totalHits = 0;
         int pairChecksum = 0;
         float speedSum = 0.0f;
-        for (int step = 0; step < 180; ++step) {
+        for (int step = 0; step < stepCount; ++step) {
             b2World_Step(worldId, 1.0f / 60.0f, 4);
             b2ContactEvents events = b2World_GetContactEvents(worldId);
             totalHits += events.hitCount;
@@ -92,7 +98,8 @@ public final class CircleStack {
     }
 
     public static void main(String[] args) {
-        System.out.println(run().toLine());
+        int stepCount = args.length == 0 ? DEFAULT_STEP_COUNT : Integer.parseInt(args[0]);
+        System.out.println(run(stepCount).toLine());
     }
 
     public static final class Result {

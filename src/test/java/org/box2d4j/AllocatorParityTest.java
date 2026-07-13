@@ -16,23 +16,25 @@ import static org.box2d4j.B2.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 final class AllocatorParityTest {
     @Test
     void allocatorHookMatchesUpstreamC() throws Exception {
         String[] lines = runProbe().split("\\R");
         AtomicInteger allocCount = new AtomicInteger();
+        AtomicInteger freeCount = new AtomicInteger();
         AtomicInteger lastSize = new AtomicInteger();
         AtomicInteger lastAlignment = new AtomicInteger();
         int baseByteCount = b2GetByteCount();
 
         try {
-            b2SetAllocator((size, alignment) -> {
+            b2SetAllocator((b2AllocFcn) (size, alignment) -> {
                 allocCount.incrementAndGet();
                 lastSize.set(size);
                 lastAlignment.set(alignment);
                 return ByteBuffer.allocate(size);
-            });
+            }, memory -> freeCount.incrementAndGet());
 
             assertZeroLine(lines[0], allocCount.get(), b2GetByteCount() - baseByteCount);
 
@@ -41,14 +43,14 @@ final class AllocatorParityTest {
             assertAllocLine(lines[1], buffer.capacity(), lastSize.get(), lastAlignment.get(), allocCount.get(),
                 b2GetByteCount() - baseByteCount);
             b2Free(buffer, 65);
-            assertFreeLine(lines[2], 1, b2GetByteCount() - baseByteCount);
+            assertFreeLine(lines[2], freeCount.get(), b2GetByteCount() - baseByteCount);
 
             buffer = b2Alloc(32);
             assertNotNull(buffer);
             assertAllocLine(lines[3], buffer.capacity(), lastSize.get(), lastAlignment.get(), allocCount.get(),
                 b2GetByteCount() - baseByteCount);
             b2Free(buffer, 32);
-            assertFreeLine(lines[4], 2, b2GetByteCount() - baseByteCount);
+            assertFreeLine(lines[4], freeCount.get(), b2GetByteCount() - baseByteCount);
 
             AtomicInteger intFunctionSize = new AtomicInteger();
             IntFunction<ByteBuffer> intFunctionAllocator = size -> {
@@ -61,8 +63,15 @@ final class AllocatorParityTest {
             assertEquals(64, buffer.capacity());
             b2Free(buffer, 33);
             assertEquals(baseByteCount, b2GetByteCount());
+            assertEquals(2, freeCount.get(), "JVM convenience allocator must detach the previous free callback");
+
+            b2SetAllocator(null, null);
+            buffer = b2Alloc(1);
+            assertTrue(buffer.isDirect(), "null allocator pair must restore ByteBuffer.allocateDirect");
+            b2Free(buffer, 1);
+            assertEquals(baseByteCount, b2GetByteCount());
         } finally {
-            b2SetAllocator(ByteBuffer::allocateDirect);
+            b2SetAllocator(null, null);
             assertEquals(baseByteCount, b2GetByteCount());
         }
     }

@@ -14,10 +14,16 @@ import java.util.Locale;
 import static org.box2d4j.B2.*;
 
 public final class Friction {
+    private static final int DEFAULT_STEP_COUNT = 240;
+
     private Friction() {
     }
 
     public static Result run() {
+        return run(DEFAULT_STEP_COUNT);
+    }
+
+    public static Result run(int stepCount) {
         b2WorldId worldId = b2CreateWorld(b2DefaultWorldDef());
 
         {
@@ -62,7 +68,7 @@ public final class Friction {
             b2CreatePolygonShape(bodies[i], shapeDef, box);
         }
 
-        for (int step = 0; step < 240; ++step) {
+        for (int step = 0; step < stepCount; ++step) {
             b2World_Step(worldId, 1.0f / 60.0f, 4);
         }
 
@@ -84,7 +90,8 @@ public final class Friction {
     }
 
     public static void main(String[] args) {
-        System.out.println(run().toLine());
+        int stepCount = args.length == 0 ? DEFAULT_STEP_COUNT : Integer.parseInt(args[0]);
+        System.out.println(run(stepCount).toLine());
     }
 
     public static final class Result {

@@ -12,10 +12,16 @@ import java.util.Locale;
 import static org.box2d4j.B2.*;
 
 public final class HelloWorld {
+    private static final int DEFAULT_STEP_COUNT = 90;
+
     private HelloWorld() {
     }
 
     public static Result run() {
+        return run(DEFAULT_STEP_COUNT);
+    }
+
+    public static Result run(int stepCount) {
         b2WorldDef worldDef = b2DefaultWorldDef();
         worldDef.gravity = new b2Vec2(0.0f, -10.0f);
         b2WorldId worldId = b2CreateWorld(worldDef);
@@ -35,7 +41,7 @@ public final class HelloWorld {
         shapeDef.material.friction = 0.3f;
         b2CreatePolygonShape(bodyId, shapeDef, b2MakeBox(1.0f, 1.0f));
 
-        for (int i = 0; i < 90; ++i) {
+        for (int i = 0; i < stepCount; ++i) {
             b2World_Step(worldId, 1.0f / 60.0f, 4);
         }
 
@@ -46,7 +52,8 @@ public final class HelloWorld {
     }
 
     public static void main(String[] args) {
-        System.out.println(run().toLine());
+        int stepCount = args.length == 0 ? DEFAULT_STEP_COUNT : Integer.parseInt(args[0]);
+        System.out.println(run(stepCount).toLine());
     }
 
     public static final class Result {

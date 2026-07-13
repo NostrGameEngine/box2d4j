@@ -13,15 +13,19 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 final class DrivingSampleTest {
-    private static final float WHEEL_FORCE_TOLERANCE = 2.0e-5f;
+    private static final int STEP_COUNT = 2400;
 
     @Test
     void sampleMatchesUpstreamCDriving() throws Exception {
-        String upstream = runProbe();
+        Driving.Result result = Driving.run(STEP_COUNT);
+        assertMatches(runProbe(STEP_COUNT, false), result, 0.0f);
+        assertMatches(runProbe(STEP_COUNT, true), result, 0.0f);
+    }
+
+    private static void assertMatches(String upstream, Driving.Result result, float wheelForceTolerance) {
         String[] parts = upstream.split("\\s+");
         assertEquals("driving", parts[0]);
 
-        Driving.Result result = Driving.run();
         assertEquals(Integer.parseInt(parts[1]), result.bodyCount);
         assertEquals(Integer.parseInt(parts[2]), result.shapeCount);
         assertEquals(Integer.parseInt(parts[3]), result.contactCount);
@@ -52,7 +56,7 @@ final class DrivingSampleTest {
             index += 8;
         }
         for (Driving.AxleState axle : result.axles) {
-            assertAxle(parts, index, axle);
+            assertAxle(parts, index, axle, wheelForceTolerance);
             index += 9;
         }
         assertEquals(parts.length, index);
@@ -69,23 +73,24 @@ final class DrivingSampleTest {
         assertEquals(Integer.parseInt(parts[index + 7]), body.contactCapacity);
     }
 
-    private static void assertAxle(String[] parts, int index, Driving.AxleState axle) {
+    private static void assertAxle(String[] parts, int index, Driving.AxleState axle, float wheelForceTolerance) {
         assertEquals(Float.parseFloat(parts[index]), axle.motorSpeed, 0.0f);
         assertEquals(Float.parseFloat(parts[index + 1]), axle.maxMotorTorque, 0.0f);
         assertEquals(Float.parseFloat(parts[index + 2]), axle.motorTorque, 0.0f);
         assertEquals(Float.parseFloat(parts[index + 3]), axle.springHertz, 0.0f);
         assertEquals(Float.parseFloat(parts[index + 4]), axle.dampingRatio, 0.0f);
         assertEquals(Float.parseFloat(parts[index + 5]), axle.linearSeparation, 0.0f);
-        assertEquals(Float.parseFloat(parts[index + 6]), axle.forceX, WHEEL_FORCE_TOLERANCE);
-        assertEquals(Float.parseFloat(parts[index + 7]), axle.forceY, WHEEL_FORCE_TOLERANCE);
+        assertEquals(Float.parseFloat(parts[index + 6]), axle.forceX, wheelForceTolerance);
+        assertEquals(Float.parseFloat(parts[index + 7]), axle.forceY, wheelForceTolerance);
         assertEquals(Float.parseFloat(parts[index + 8]), axle.torque, 0.0f);
     }
 
-    private static String runProbe() throws Exception {
+    private static String runProbe(int stepCount, boolean disableSimd) throws Exception {
         Path root = new File(".").getCanonicalFile().toPath();
         Path outputDir = root.resolve("build/parity");
         Files.createDirectories(outputDir);
-        Path probe = outputDir.resolve("box2d_driving_sample_probe");
+        Path probe = outputDir.resolve(disableSimd
+            ? "box2d_driving_scalar_sample_probe" : "box2d_driving_sample_probe");
 
         List<String> sources = new ArrayList<>();
         try (java.util.stream.Stream<Path> stream = Files.list(root.resolve("vendor/box2d/src"))) {
@@ -97,6 +102,9 @@ final class DrivingSampleTest {
         List<String> command = new ArrayList<>();
         command.add("clang");
         command.add("-D_POSIX_C_SOURCE=200809L");
+        if (disableSimd) {
+            command.add("-DBOX2D_DISABLE_SIMD");
+        }
         command.add("-std=c17");
         command.add("-O2");
         command.add("-ffp-contract=off");
@@ -112,7 +120,8 @@ final class DrivingSampleTest {
         String compileOutput = new String(compile.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
         assertEquals(0, compile.waitFor(), compileOutput);
 
-        Process run = new ProcessBuilder(probe.toString()).directory(root.toFile()).redirectErrorStream(true).start();
+        Process run = new ProcessBuilder(probe.toString(), Integer.toString(stepCount)).directory(root.toFile())
+            .redirectErrorStream(true).start();
         String output = new String(run.getInputStream().readAllBytes(), StandardCharsets.UTF_8).trim();
         assertEquals(0, run.waitFor(), output);
         return output;

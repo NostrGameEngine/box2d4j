@@ -29,6 +29,10 @@ public final class BodyType {
     }
 
     public static Result run(int stepCount) {
+        return runScript(stepCount, 5);
+    }
+
+    public static Result runScript(int stepCount, int scriptPhaseCount) {
         b2WorldId worldId = b2CreateWorld(b2DefaultWorldDef());
         Scene scene = createScene(worldId);
         boolean interactive = SampleRuntime.isActive();
@@ -38,7 +42,7 @@ public final class BodyType {
             SampleRuntime.toggle("bodyType.enabled", "Enable", scene.enabled, scene::setEnabled);
             SampleRuntime.beforeStep(scene::step);
         } else {
-            scene.applyGuiScript();
+            scene.applyGuiScript(scriptPhaseCount);
         }
 
         for (int step = 0; step < stepCount; ++step) {
@@ -218,7 +222,8 @@ public final class BodyType {
 
     public static void main(String[] args) {
         int stepCount = args.length == 0 ? DEFAULT_STEP_COUNT : Integer.parseInt(args[0]);
-        System.out.println(run(stepCount).toLine());
+        int scriptPhaseCount = args.length < 2 ? 5 : Integer.parseInt(args[1]);
+        System.out.println(runScript(stepCount, scriptPhaseCount).toLine());
     }
 
     private static final class Scene {
@@ -234,12 +239,22 @@ public final class BodyType {
             this.bodies = bodies;
         }
 
-        void applyGuiScript() {
-            setType(b2_kinematicBody);
-            setEnabled(false);
-            setEnabled(true);
-            setType(b2_staticBody);
-            setType(b2_dynamicBody);
+        void applyGuiScript(int phaseCount) {
+            if (phaseCount >= 1) {
+                setType(b2_kinematicBody);
+            }
+            if (phaseCount >= 2) {
+                setEnabled(false);
+            }
+            if (phaseCount >= 3) {
+                setEnabled(true);
+            }
+            if (phaseCount >= 4) {
+                setType(b2_staticBody);
+            }
+            if (phaseCount >= 5) {
+                setType(b2_dynamicBody);
+            }
         }
 
         void setType(int nextType) {

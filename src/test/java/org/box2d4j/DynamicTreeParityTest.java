@@ -51,6 +51,17 @@ final class DynamicTreeParityTest {
         assertEquals(0, run.waitFor());
 
         b2DynamicTree tree = b2DynamicTree_Create();
+        int isolated = b2DynamicTree_CreateProxy(tree,
+            new b2AABB(new b2Vec2(0.0f, 0.0f), new b2Vec2(1.0f, 1.0f)), 0x1L, -1L);
+        b2AABB isolatedBounds = b2DynamicTree_GetAABB(tree, isolated);
+        assertEquals(0.0f, isolatedBounds.lowerBound.x, 0.0f);
+        assertEquals(1.0f, isolatedBounds.upperBound.y, 0.0f);
+        b2DynamicTree_SetCategoryBits(tree, isolated, 0x8L);
+        assertEquals(0x8L, b2DynamicTree_GetCategoryBits(tree, isolated));
+        b2DynamicTree_ValidateNoEnlarged(tree);
+        b2DynamicTree_Destroy(tree);
+
+        tree = b2DynamicTree_Create();
         int a = b2DynamicTree_CreateProxy(tree, new b2AABB(new b2Vec2(0.0f, 0.0f), new b2Vec2(1.0f, 1.0f)), 0x1L, 101L);
         int b = b2DynamicTree_CreateProxy(tree, new b2AABB(new b2Vec2(2.0f, 0.0f), new b2Vec2(3.0f, 1.0f)), 0x2L, 202L);
         int c = b2DynamicTree_CreateProxy(tree, new b2AABB(new b2Vec2(0.5f, 0.5f), new b2Vec2(1.5f, 1.5f)), 0x1L, 303L);

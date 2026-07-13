@@ -5,6 +5,7 @@
 
 #include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 static int parse_path(const char* svgPath, b2Vec2 offset, b2Vec2* points, int capacity, float scale)
 {
@@ -121,8 +122,9 @@ static void print_body(b2BodyId bodyId)
            b2Body_GetAngularVelocity(bodyId));
 }
 
-int main(void)
+int main(int argc, char** argv)
 {
+    int stepCount = argc > 1 ? atoi(argv[1]) : 240;
     b2WorldDef worldDef = b2DefaultWorldDef();
     b2WorldId worldId = b2CreateWorld(&worldDef);
 
@@ -172,7 +174,7 @@ int main(void)
 
     b2BodyId bodies[200];
     int bodyCount = 0;
-    for (int step = 0; step < 240; ++step)
+    for (int step = 0; step < stepCount; ++step)
     {
         if (step % 25 == 0 && bodyCount < 200)
         {

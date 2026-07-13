@@ -13,15 +13,19 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 final class ScissorLiftSampleTest {
-    private static final float JOINT_FORCE_TOLERANCE = 5.0e-4f;
+    private static final int STEP_COUNT = 2400;
 
     @Test
     void sampleMatchesUpstreamCScissorLift() throws Exception {
-        String upstream = runProbe();
+        ScissorLift.Result result = ScissorLift.run(STEP_COUNT);
+        assertMatches(runProbe(STEP_COUNT, false), result, 0.0f);
+        assertMatches(runProbe(STEP_COUNT, true), result, 0.0f);
+    }
+
+    private static void assertMatches(String upstream, ScissorLift.Result result, float jointForceTolerance) {
         String[] parts = upstream.split("\\s+");
         assertEquals("scissorLift", parts[0]);
 
-        ScissorLift.Result result = ScissorLift.run();
         assertEquals(Integer.parseInt(parts[1]), result.bodyCount);
         assertEquals(Integer.parseInt(parts[2]), result.shapeCount);
         assertEquals(Integer.parseInt(parts[3]), result.contactCount);
@@ -38,7 +42,7 @@ final class ScissorLiftSampleTest {
             index += 8;
         }
         for (int i = 0; i < jointCount; ++i) {
-            assertJoint(parts, index, result.joints[i]);
+            assertJoint(parts, index, result.joints[i], jointForceTolerance);
             index += 8;
         }
         assertEquals(parts.length, index);
@@ -55,22 +59,23 @@ final class ScissorLiftSampleTest {
         assertEquals(Integer.parseInt(parts[index + 7]), body.contactCapacity);
     }
 
-    private static void assertJoint(String[] parts, int index, ScissorLift.JointState joint) {
+    private static void assertJoint(String[] parts, int index, ScissorLift.JointState joint, float jointForceTolerance) {
         assertEquals(Integer.parseInt(parts[index]), joint.type);
         assertEquals(Float.parseFloat(parts[index + 1]), joint.linearSeparation, 0.0f);
         assertEquals(Float.parseFloat(parts[index + 2]), joint.metricA, 0.0f);
         assertEquals(Float.parseFloat(parts[index + 3]), joint.metricB, 0.0f);
         assertEquals(Float.parseFloat(parts[index + 4]), joint.metricC, 0.0f);
-        assertEquals(Float.parseFloat(parts[index + 5]), joint.forceX, JOINT_FORCE_TOLERANCE);
-        assertEquals(Float.parseFloat(parts[index + 6]), joint.forceY, JOINT_FORCE_TOLERANCE);
+        assertEquals(Float.parseFloat(parts[index + 5]), joint.forceX, jointForceTolerance);
+        assertEquals(Float.parseFloat(parts[index + 6]), joint.forceY, jointForceTolerance);
         assertEquals(Float.parseFloat(parts[index + 7]), joint.torque, 0.0f);
     }
 
-    private static String runProbe() throws Exception {
+    private static String runProbe(int stepCount, boolean disableSimd) throws Exception {
         Path root = new File(".").getCanonicalFile().toPath();
         Path outputDir = root.resolve("build/parity");
         Files.createDirectories(outputDir);
-        Path probe = outputDir.resolve("box2d_scissor_lift_sample_probe");
+        Path probe = outputDir.resolve(disableSimd
+            ? "box2d_scissor_lift_scalar_sample_probe" : "box2d_scissor_lift_sample_probe");
 
         List<String> sources = new ArrayList<>();
         try (java.util.stream.Stream<Path> stream = Files.list(root.resolve("vendor/box2d/src"))) {
@@ -82,6 +87,9 @@ final class ScissorLiftSampleTest {
         List<String> command = new ArrayList<>();
         command.add("clang");
         command.add("-D_POSIX_C_SOURCE=200809L");
+        if (disableSimd) {
+            command.add("-DBOX2D_DISABLE_SIMD");
+        }
         command.add("-std=c17");
         command.add("-O2");
         command.add("-ffp-contract=off");
@@ -97,7 +105,8 @@ final class ScissorLiftSampleTest {
         String compileOutput = new String(compile.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
         assertEquals(0, compile.waitFor(), compileOutput);
 
-        Process run = new ProcessBuilder(probe.toString()).directory(root.toFile()).redirectErrorStream(true).start();
+        Process run = new ProcessBuilder(probe.toString(), Integer.toString(stepCount)).directory(root.toFile())
+            .redirectErrorStream(true).start();
         String output = new String(run.getInputStream().readAllBytes(), StandardCharsets.UTF_8).trim();
         assertEquals(0, run.waitFor(), output);
         return output;

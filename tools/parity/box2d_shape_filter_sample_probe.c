@@ -4,6 +4,7 @@
 #include "box2d/math_functions.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 enum CollisionBits
 {
@@ -33,8 +34,9 @@ static void print_body(b2BodyId bodyId)
            v.y);
 }
 
-int main(void)
+int main(int argc, char** argv)
 {
+    int phaseStepCount = argc > 1 ? atoi(argv[1]) : 120;
     b2WorldDef worldDef = b2DefaultWorldDef();
     b2WorldId worldId = b2CreateWorld(&worldDef);
 
@@ -82,7 +84,7 @@ int main(void)
         shapes[2] = b2CreatePolygonShape(bodies[2], &shapeDef, &box);
     }
 
-    for (int step = 0; step < 120; ++step)
+    for (int step = 0; step < phaseStepCount; ++step)
     {
         b2World_Step(worldId, 1.0f / 60.0f, 4);
     }
@@ -100,7 +102,7 @@ int main(void)
     filter3.maskBits &= ~TEAM2;
     b2Shape_SetFilter(shapes[2], filter3);
 
-    for (int step = 0; step < 120; ++step)
+    for (int step = 0; step < phaseStepCount; ++step)
     {
         b2World_Step(worldId, 1.0f / 60.0f, 4);
     }

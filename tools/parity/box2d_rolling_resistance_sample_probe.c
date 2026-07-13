@@ -4,6 +4,7 @@
 #include "box2d/math_functions.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 static void print_body(b2BodyId bodyId)
 {
@@ -18,8 +19,9 @@ static void print_body(b2BodyId bodyId)
            b2Body_GetAngularVelocity(bodyId));
 }
 
-int main(void)
+int main(int argc, char** argv)
 {
+    int stepCount = argc > 1 ? atoi(argv[1]) : 240;
     b2WorldDef worldDef = b2DefaultWorldDef();
     b2WorldId worldId = b2CreateWorld(&worldDef);
 
@@ -47,7 +49,7 @@ int main(void)
         b2CreateCircleShape(bodies[i], &shapeDef, &circle);
     }
 
-    for (int step = 0; step < 240; ++step)
+    for (int step = 0; step < stepCount; ++step)
     {
         b2World_Step(worldId, 1.0f / 60.0f, 4);
     }

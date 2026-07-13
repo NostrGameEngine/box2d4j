@@ -15,10 +15,16 @@ import java.util.Locale;
 import static org.box2d4j.B2.*;
 
 public final class BadBody {
+    private static final int DEFAULT_STEP_COUNT = 120;
+
     private BadBody() {
     }
 
     public static Result run() {
+        return run(DEFAULT_STEP_COUNT);
+    }
+
+    public static Result run(int stepCount) {
         b2WorldId worldId = b2CreateWorld(b2DefaultWorldDef());
 
         {
@@ -58,7 +64,7 @@ public final class BadBody {
             b2CreateCapsuleShape(normalBodyId, shapeDef, capsule);
         }
 
-        for (int step = 0; step < 120; ++step) {
+        for (int step = 0; step < stepCount; ++step) {
             b2World_Step(worldId, 1.0f / 60.0f, 4);
             b2Body_ApplyForceToCenter(badBodyId, new b2Vec2(0.0f, 10.0f), true);
         }
@@ -80,7 +86,8 @@ public final class BadBody {
     }
 
     public static void main(String[] args) {
-        System.out.println(run().toLine());
+        int stepCount = args.length == 0 ? DEFAULT_STEP_COUNT : Integer.parseInt(args[0]);
+        System.out.println(run(stepCount).toLine());
     }
 
     public static final class Result {

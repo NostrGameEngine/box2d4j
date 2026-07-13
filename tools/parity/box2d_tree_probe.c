@@ -76,6 +76,22 @@ int main(void)
 {
     b2DynamicTree tree = b2DynamicTree_Create();
 
+    int isolated = b2DynamicTree_CreateProxy(&tree, (b2AABB){{0.0f, 0.0f}, {1.0f, 1.0f}}, 0x1u, UINT64_MAX);
+    b2AABB isolatedBounds = b2DynamicTree_GetAABB(&tree, isolated);
+    if (isolatedBounds.lowerBound.x != 0.0f || isolatedBounds.upperBound.y != 1.0f)
+    {
+        return 2;
+    }
+    b2DynamicTree_SetCategoryBits(&tree, isolated, 0x8u);
+    if (b2DynamicTree_GetCategoryBits(&tree, isolated) != 0x8u)
+    {
+        return 3;
+    }
+    b2DynamicTree_ValidateNoEnlarged(&tree);
+    b2DynamicTree_Destroy(&tree);
+
+    tree = b2DynamicTree_Create();
+
     int a = b2DynamicTree_CreateProxy(&tree, (b2AABB){{0.0f, 0.0f}, {1.0f, 1.0f}}, 0x1u, 101u);
     int b = b2DynamicTree_CreateProxy(&tree, (b2AABB){{2.0f, 0.0f}, {3.0f, 1.0f}}, 0x2u, 202u);
     int c = b2DynamicTree_CreateProxy(&tree, (b2AABB){{0.5f, 0.5f}, {1.5f, 1.5f}}, 0x1u, 303u);

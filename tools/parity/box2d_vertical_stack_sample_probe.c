@@ -71,7 +71,7 @@ int main(void)
         }
     }
 
-    for (int step = 0; step < 240; ++step)
+    for (int step = 0; step < 2400; ++step)
     {
         b2World_Step(worldId, 1.0f / 60.0f, 4);
     }

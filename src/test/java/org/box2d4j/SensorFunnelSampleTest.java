@@ -13,13 +13,15 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 final class SensorFunnelSampleTest {
+    private static final int STEP_COUNT = 2400;
+
     @Test
     void sampleMatchesUpstreamCSensorFunnel() throws Exception {
         String upstream = runProbe();
         String[] parts = upstream.split("\\s+");
         assertEquals("sensorFunnel", parts[0]);
 
-        SensorFunnel.Result result = SensorFunnel.run();
+        SensorFunnel.Result result = SensorFunnel.run(STEP_COUNT);
         assertEquals(Integer.parseInt(parts[1]), result.bodyCount);
         assertEquals(Integer.parseInt(parts[2]), result.shapeCount);
         assertEquals(Integer.parseInt(parts[3]), result.contactCount);
@@ -94,7 +96,8 @@ final class SensorFunnelSampleTest {
         String compileOutput = new String(compile.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
         assertEquals(0, compile.waitFor(), compileOutput);
 
-        Process run = new ProcessBuilder(probe.toString()).directory(root.toFile()).redirectErrorStream(true).start();
+        Process run = new ProcessBuilder(probe.toString(), Integer.toString(STEP_COUNT))
+            .directory(root.toFile()).redirectErrorStream(true).start();
         String output = new String(run.getInputStream().readAllBytes(), StandardCharsets.UTF_8).trim();
         assertEquals(0, run.waitFor(), output);
         return output;

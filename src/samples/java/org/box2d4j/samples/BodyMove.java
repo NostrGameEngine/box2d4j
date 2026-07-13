@@ -20,7 +20,7 @@ import java.util.Locale;
 import static org.box2d4j.B2.*;
 
 public final class BodyMove {
-    private static final int DEFAULT_STEP_COUNT = 108;
+    private static final int DEFAULT_STEP_COUNT = 113;
     private static final int MAX_COUNT = 50;
     private static final int RAND_LIMIT = 32767;
     private static final int RAND_SEED = 12345;

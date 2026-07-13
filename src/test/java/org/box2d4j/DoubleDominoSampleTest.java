@@ -13,6 +13,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 final class DoubleDominoSampleTest {
+    private static final int LONG_HORIZON_STEP_COUNT = 2400;
+
     @Test
     void sampleMatchesUpstreamCDoubleDomino() throws Exception {
         String upstream = runProbe();
@@ -37,11 +39,11 @@ final class DoubleDominoSampleTest {
 
     @Test
     void longHorizonStateMatchesUpstreamCDoubleDomino() throws Exception {
-        String upstream = runProbe(240);
+        String upstream = runProbe(LONG_HORIZON_STEP_COUNT);
         String[] parts = upstream.split("\\s+");
         assertEquals("doubleDomino", parts[0]);
 
-        DoubleDomino.Result result = DoubleDomino.run(240);
+        DoubleDomino.Result result = DoubleDomino.run(LONG_HORIZON_STEP_COUNT);
         assertEquals(Integer.parseInt(parts[1]), result.bodyCount);
         assertEquals(Integer.parseInt(parts[2]), result.shapeCount);
         assertEquals(Integer.parseInt(parts[3]), result.contactCount);

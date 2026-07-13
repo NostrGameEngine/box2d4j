@@ -68,6 +68,16 @@ final class ShapeQueryParityTest {
         b2ShapeId circleShapeId = b2CreateCircleShape(bodyId, shapeDef, new b2Circle(new b2Vec2(0.15f, -0.25f), 0.32f));
         b2ShapeId segmentShapeId = b2CreateSegmentShape(bodyId, shapeDef,
             new b2Segment(new b2Vec2(-0.7f, -0.4f), new b2Vec2(0.8f, -0.1f)));
+        b2ChainDef chainDef = b2DefaultChainDef();
+        chainDef.points = new b2Vec2[] {
+            new b2Vec2(-1.5f, 0.4f), new b2Vec2(-0.75f, 0.1f),
+            new b2Vec2(0.75f, 0.1f), new b2Vec2(1.5f, 0.4f)
+        };
+        chainDef.count = chainDef.points.length;
+        b2ChainId chainId = b2CreateChain(bodyId, chainDef);
+        b2ShapeId[] chainSegments = new b2ShapeId[1];
+        assertEquals(1, b2Chain_GetSegments(chainId, chainSegments, chainSegments.length));
+        b2ShapeId chainShapeId = chainSegments[0];
 
         int index = 0;
         index = assertShapeQueries(lines, index, "poly", polygonShapeId, new b2Vec2(1.35f, -0.25f),
@@ -78,6 +88,22 @@ final class ShapeQueryParityTest {
             new b2RayCastInput(new b2Vec2(0.4f, -1.1f), new b2Vec2(2.0f, 0.8f), 1.0f));
         index = assertShapeQueries(lines, index, "segment", segmentShapeId, new b2Vec2(1.0f, -0.8f),
             new b2RayCastInput(new b2Vec2(0.3f, -1.0f), new b2Vec2(1.6f, 1.0f), 1.0f));
+        assertRayLine(lines[index++], "ray-chain-front", b2Shape_RayCast(chainShapeId,
+            new b2RayCastInput(new b2Vec2(1.25f, -1.5f), new b2Vec2(0.0f, 2.5f), 1.0f)));
+        assertRayLine(lines[index++], "ray-chain-back", b2Shape_RayCast(chainShapeId,
+            new b2RayCastInput(new b2Vec2(1.25f, 0.5f), new b2Vec2(0.0f, -2.5f), 1.0f)));
+
+        b2ShapeId[] shapeIds = {polygonShapeId, capsuleShapeId, circleShapeId, segmentShapeId, chainShapeId};
+        for (int i = 0; i < 512; ++i) {
+            String[] parts = lines[index++].split("\\s+");
+            assertEquals("fuzz-ray", parts[0]);
+            int shapeIndex = Integer.parseInt(parts[1]);
+            b2RayCastInput input = new b2RayCastInput(
+                new b2Vec2(Float.parseFloat(parts[2]), Float.parseFloat(parts[3])),
+                new b2Vec2(Float.parseFloat(parts[4]), Float.parseFloat(parts[5])),
+                Float.parseFloat(parts[6]));
+            assertRayParts(parts, 7, "fuzz-ray-" + i, b2Shape_RayCast(shapeIds[shapeIndex], input));
+        }
         assertEquals(lines.length, index);
 
         b2DestroyWorld(worldId);
@@ -121,12 +147,16 @@ final class ShapeQueryParityTest {
     private static void assertRayLine(String line, String label, b2CastOutput output) {
         String[] parts = line.split("\\s+");
         assertEquals(label, parts[0]);
-        assertEquals(Integer.parseInt(parts[1]) != 0, output.hit);
-        assertEquals(Float.parseFloat(parts[2]), output.point.x, 0.0f);
-        assertEquals(Float.parseFloat(parts[3]), output.point.y, 0.0f);
-        assertEquals(Float.parseFloat(parts[4]), output.normal.x, 0.0f);
-        assertEquals(Float.parseFloat(parts[5]), output.normal.y, 0.0f);
-        assertEquals(Float.parseFloat(parts[6]), output.fraction, 0.0f);
-        assertEquals(Integer.parseInt(parts[7]), output.iterations);
+        assertRayParts(parts, 1, label, output);
+    }
+
+    private static void assertRayParts(String[] parts, int offset, String label, b2CastOutput output) {
+        assertEquals(Integer.parseInt(parts[offset]) != 0, output.hit, label + " hit");
+        assertEquals(Float.parseFloat(parts[offset + 1]), output.point.x, 0.0f, label + " point.x");
+        assertEquals(Float.parseFloat(parts[offset + 2]), output.point.y, 0.0f, label + " point.y");
+        assertEquals(Float.parseFloat(parts[offset + 3]), output.normal.x, 0.0f, label + " normal.x");
+        assertEquals(Float.parseFloat(parts[offset + 4]), output.normal.y, 0.0f, label + " normal.y");
+        assertEquals(Float.parseFloat(parts[offset + 5]), output.fraction, 0.0f, label + " fraction");
+        assertEquals(Integer.parseInt(parts[offset + 6]), output.iterations, label + " iterations");
     }
 }

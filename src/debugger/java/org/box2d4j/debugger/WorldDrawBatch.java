@@ -14,6 +14,7 @@ final class WorldDrawBatch {
     final IntList fillColors = new IntList();
     final FloatList lineVertices = new FloatList();
     final IntList lineColors = new IntList();
+    final java.util.ArrayList<Label> labels = new java.util.ArrayList<>();
     final Bounds bounds = new Bounds();
 
     static WorldDrawBatch capture(b2WorldId worldId, DrawOptions options, float pointSize) {
@@ -22,6 +23,7 @@ final class WorldDrawBatch {
         draw.drawShapes = options.shapes;
         draw.drawJoints = options.joints;
         draw.drawJointExtras = options.jointExtras;
+        draw.drawIslands = options.islands;
         draw.drawBounds = options.bounds;
         draw.drawContacts = options.contacts;
         draw.drawGraphColors = options.graphColors;
@@ -37,8 +39,7 @@ final class WorldDrawBatch {
         draw.DrawSegmentFcn = batch::line;
         draw.DrawTransformFcn = transform -> batch.transform(transform, pointSize);
         draw.DrawPointFcn = (point, size, color) -> batch.point(point, Math.max(pointSize, 0.02f), color);
-        draw.DrawStringFcn = (point, text, color) -> {
-        };
+        draw.DrawStringFcn = (point, text, color) -> batch.label(point, text, color);
         b2World_Draw(worldId, draw);
         return batch;
     }
@@ -159,16 +160,36 @@ final class WorldDrawBatch {
         bounds.include(x2, y2);
     }
 
+    private void label(b2Vec2 point, String text, int color) {
+        labels.add(new Label(point.x, point.y, text, color));
+        bounds.include(point.x, point.y);
+    }
+
     static final class DrawOptions {
         boolean shapes = true;
         boolean joints = true;
         boolean jointExtras;
+        boolean islands;
         boolean bounds;
         boolean contacts;
         boolean graphColors;
         boolean contactNormals;
         boolean contactImpulses;
         boolean frictionImpulses;
+    }
+
+    static final class Label {
+        final float x;
+        final float y;
+        final String text;
+        final int color;
+
+        Label(float x, float y, String text, int color) {
+            this.x = x;
+            this.y = y;
+            this.text = text;
+            this.color = color;
+        }
     }
 
     static final class Bounds {

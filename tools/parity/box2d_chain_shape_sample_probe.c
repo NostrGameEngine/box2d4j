@@ -4,6 +4,7 @@
 #include "box2d/math_functions.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 static void print_body(b2BodyId bodyId)
 {
@@ -88,7 +89,7 @@ static b2BodyId create_body(b2WorldId worldId, int shapeType, b2ChainId* chainId
     return bodyId;
 }
 
-static void run_variant(int shapeType)
+static void run_variant(int shapeType, int stepCount)
 {
     b2WorldDef worldDef = b2DefaultWorldDef();
     b2WorldId worldId = b2CreateWorld(&worldDef);
@@ -96,7 +97,7 @@ static void run_variant(int shapeType)
     b2ChainId chainId;
     b2BodyId bodyId = create_body(worldId, shapeType, &chainId);
 
-    for (int step = 0; step < 240; ++step)
+    for (int step = 0; step < stepCount; ++step)
     {
         b2World_Step(worldId, 1.0f / 60.0f, 4);
     }
@@ -114,12 +115,13 @@ static void run_variant(int shapeType)
     b2DestroyWorld(worldId);
 }
 
-int main(void)
+int main(int argc, char** argv)
 {
+    int stepCount = argc > 1 ? atoi(argv[1]) : 240;
     printf("chainShape 3");
-    run_variant(0);
-    run_variant(1);
-    run_variant(2);
+    run_variant(0, stepCount);
+    run_variant(1, stepCount);
+    run_variant(2, stepCount);
     printf("\n");
     return 0;
 }

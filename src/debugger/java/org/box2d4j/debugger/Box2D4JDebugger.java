@@ -143,6 +143,7 @@ public final class Box2D4JDebugger extends SimpleApplication {
         debugRenderer = new JmeDebugRenderer(assetManager);
         guiNode.attachChild(debugRenderer.fillGeometry());
         guiNode.attachChild(debugRenderer.lineGeometry());
+        guiNode.attachChild(debugRenderer.labelNode());
         guiNode.attachChild(uiNode);
         configureInput();
         configureScreenshot();
@@ -569,12 +570,16 @@ public final class Box2D4JDebugger extends SimpleApplication {
             () -> toggleOption("contacts"));
         addToggle(contentWidth + 184.0f, optionsTop - 60.0f, 158.0f, "AABBs", drawOptions.bounds,
             () -> toggleOption("bounds"));
-        addToggle(contentWidth + 16.0f, optionsTop - 92.0f, 326.0f, "Graph Colors", drawOptions.graphColors,
+        addToggle(contentWidth + 16.0f, optionsTop - 92.0f, 158.0f, "Joint Extras", drawOptions.jointExtras,
+            () -> toggleOption("jointExtras"));
+        addToggle(contentWidth + 184.0f, optionsTop - 92.0f, 158.0f, "Islands", drawOptions.islands,
+            () -> toggleOption("islands"));
+        addToggle(contentWidth + 16.0f, optionsTop - 124.0f, 326.0f, "Graph Colors", drawOptions.graphColors,
             () -> toggleOption("graph"));
 
         List<SampleRuntime.Binding> bindings = session == null ? new ArrayList<>() : session.bindings();
         if (!bindings.isEmpty()) {
-            float controlsTop = optionsTop - 112.0f;
+            float controlsTop = optionsTop - 144.0f;
             int maxOffset = Math.max(0, bindings.size() - VISIBLE_SAMPLE_CONTROLS);
             controlOffset = Math.max(0, Math.min(maxOffset, controlOffset));
             int controlEnd = Math.min(bindings.size(), controlOffset + VISIBLE_SAMPLE_CONTROLS);
@@ -740,6 +745,13 @@ public final class Box2D4JDebugger extends SimpleApplication {
                 break;
             case "bounds":
                 drawOptions.bounds = !drawOptions.bounds;
+                break;
+            case "jointExtras":
+                drawOptions.jointExtras = !drawOptions.jointExtras;
+                drawOptions.joints = drawOptions.joints || drawOptions.jointExtras;
+                break;
+            case "islands":
+                drawOptions.islands = !drawOptions.islands;
                 break;
             case "graph":
                 drawOptions.graphColors = !drawOptions.graphColors;

@@ -208,12 +208,8 @@ public final class SensorFunnel {
                     0.5f, index + 1);
                 for (b2BodyId bodyId : human.bodies) {
                     b2Body_SetUserData(bodyId, element);
-                    b2ShapeId[] shapeIds = new b2ShapeId[2];
-                    int shapeCount = b2Body_GetShapes(bodyId, shapeIds, shapeIds.length);
-                    for (int shapeIndex = 0; shapeIndex < shapeCount; ++shapeIndex) {
-                        b2Shape_EnableSensorEvents(shapeIds[shapeIndex], true);
-                    }
                 }
+                human.enableSensorEvents(true);
                 humans[index] = human;
             }
 

@@ -79,6 +79,10 @@ final class BodyAccessParityTest {
             b2Body_GetGravityScale(bodyId), b2Body_GetShapeCount(bodyId), b2Body_IsValid(bodyId),
             b2Shape_IsValid(circleId));
         assertSame(userData, b2Body_GetUserData(bodyId));
+        b2Body_SetBullet(bodyId, false);
+        assertEquals(false, b2Body_IsBullet(bodyId));
+        b2Body_SetBullet(bodyId, true);
+        assertEquals(true, b2Body_IsBullet(bodyId));
 
         b2ShapeId[] shapes = new b2ShapeId[2];
         int shapeCount = b2Body_GetShapes(bodyId, shapes, 2);
@@ -124,6 +128,30 @@ final class BodyAccessParityTest {
         b2Body_Enable(bodyId);
         assertEnabledLine(lines[17], "enabled1", b2Body_IsEnabled(bodyId));
 
+        b2DestroyWorld(worldId);
+
+        b2WorldDef teleportWorldDef = b2DefaultWorldDef();
+        teleportWorldDef.gravity = b2Vec2_zero.copy();
+        worldId = b2CreateWorld(teleportWorldDef);
+        bodyDef = b2DefaultBodyDef();
+        bodyDef.type = b2_dynamicBody;
+        b2BodyId movingBody = b2CreateBody(worldId, bodyDef);
+        bodyDef.position = new b2Vec2(10.0f, 0.0f);
+        b2BodyId otherBody = b2CreateBody(worldId, bodyDef);
+        shapeDef = b2DefaultShapeDef();
+        b2Circle teleportCircle = new b2Circle(new b2Vec2(), 0.5f);
+        b2CreateCircleShape(movingBody, shapeDef, teleportCircle);
+        b2CreateCircleShape(otherBody, shapeDef, teleportCircle);
+        b2Body_SetTransform(movingBody, new b2Vec2(5.0f, 0.0f), b2Rot_identity);
+        int[] hitCount = {0};
+        b2TreeStats stats = b2World_OverlapAABB(worldId,
+            new b2AABB(new b2Vec2(-1.0f, -1.0f), new b2Vec2(1.0f, 1.0f)),
+            b2DefaultQueryFilter(), shape -> {
+                hitCount[0] += 1;
+                return true;
+            });
+        assertTreeLine(lines[18], stats, hitCount[0]);
+        assertEquals(19, lines.length);
         b2DestroyWorld(worldId);
     }
 
@@ -234,5 +262,13 @@ final class BodyAccessParityTest {
         String[] parts = line.split("\\s+");
         assertEquals(label, parts[0]);
         assertEquals(Integer.parseInt(parts[1]) != 0, enabled);
+    }
+
+    private static void assertTreeLine(String line, b2TreeStats stats, int hitCount) {
+        String[] parts = line.split("\\s+");
+        assertEquals("teleportTree", parts[0]);
+        assertEquals(Integer.parseInt(parts[1]), stats.nodeVisits);
+        assertEquals(Integer.parseInt(parts[2]), stats.leafVisits);
+        assertEquals(Integer.parseInt(parts[3]), hitCount);
     }
 }

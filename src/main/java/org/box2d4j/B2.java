@@ -16,6 +16,7 @@ public final class B2 {
     public static final int b2_staticBody = 0;
     public static final int b2_kinematicBody = 1;
     public static final int b2_dynamicBody = 2;
+    public static final int b2_bodyTypeCount = 3;
     public static final int b2_circleShape = 0;
     public static final int b2_capsuleShape = 1;
     public static final int b2_segmentShape = 2;
@@ -43,6 +44,7 @@ public final class B2 {
     private static final int B2_GRAPH_COLOR_COUNT = 12;
     private static final int B2_OVERFLOW_INDEX = B2_GRAPH_COLOR_COUNT - 1;
     private static final int B2_MAX_WORKERS = 64;
+    private static final int B2_SECRET_COOKIE = 1152023;
     public static final int b2_colorRed = 0xFF0000;
     public static final int b2_colorGreen = 0x008000;
     public static final int b2_colorBlue = 0x0000FF;
@@ -86,6 +88,108 @@ public final class B2 {
     public static final int b2_colorOrange = 0xFFA500;
     public static final int b2_colorSalmon = 0xFA8072;
     public static final int b2_colorOrangeRed = 0xFF4500;
+    public static final int b2_colorAliceBlue = 0xF0F8FF;
+    public static final int b2_colorAntiqueWhite = 0xFAEBD7;
+    public static final int b2_colorAqua = 0x00FFFF;
+    public static final int b2_colorAquamarine = 0x7FFFD4;
+    public static final int b2_colorAzure = 0xF0FFFF;
+    public static final int b2_colorBeige = 0xF5F5DC;
+    public static final int b2_colorBisque = 0xFFE4C4;
+    public static final int b2_colorBlanchedAlmond = 0xFFEBCD;
+    public static final int b2_colorBrown = 0xA52A2A;
+    public static final int b2_colorBurlywood = 0xDEB887;
+    public static final int b2_colorCadetBlue = 0x5F9EA0;
+    public static final int b2_colorChartreuse = 0x7FFF00;
+    public static final int b2_colorCornflowerBlue = 0x6495ED;
+    public static final int b2_colorCornsilk = 0xFFF8DC;
+    public static final int b2_colorCrimson = 0xDC143C;
+    public static final int b2_colorDarkOliveGreen = 0x556B2F;
+    public static final int b2_colorDarkOrange = 0xFF8C00;
+    public static final int b2_colorDarkOrchid = 0x9932CC;
+    public static final int b2_colorDarkRed = 0x8B0000;
+    public static final int b2_colorDarkSalmon = 0xE9967A;
+    public static final int b2_colorDarkSlateBlue = 0x483D8B;
+    public static final int b2_colorDarkSlateGray = 0x2F4F4F;
+    public static final int b2_colorDarkTurquoise = 0x00CED1;
+    public static final int b2_colorDarkViolet = 0x9400D3;
+    public static final int b2_colorDeepPink = 0xFF1493;
+    public static final int b2_colorDeepSkyBlue = 0x00BFFF;
+    public static final int b2_colorDodgerBlue = 0x1E90FF;
+    public static final int b2_colorFireBrick = 0xB22222;
+    public static final int b2_colorFloralWhite = 0xFFFAF0;
+    public static final int b2_colorForestGreen = 0x228B22;
+    public static final int b2_colorFuchsia = 0xFF00FF;
+    public static final int b2_colorGhostWhite = 0xF8F8FF;
+    public static final int b2_colorGreenYellow = 0xADFF2F;
+    public static final int b2_colorHoneyDew = 0xF0FFF0;
+    public static final int b2_colorHotPink = 0xFF69B4;
+    public static final int b2_colorIndianRed = 0xCD5C5C;
+    public static final int b2_colorIndigo = 0x4B0082;
+    public static final int b2_colorIvory = 0xFFFFF0;
+    public static final int b2_colorKhaki = 0xF0E68C;
+    public static final int b2_colorLavender = 0xE6E6FA;
+    public static final int b2_colorLavenderBlush = 0xFFF0F5;
+    public static final int b2_colorLawnGreen = 0x7CFC00;
+    public static final int b2_colorLemonChiffon = 0xFFFACD;
+    public static final int b2_colorLightBlue = 0xADD8E6;
+    public static final int b2_colorLightCoral = 0xF08080;
+    public static final int b2_colorLightCyan = 0xE0FFFF;
+    public static final int b2_colorLightGoldenRodYellow = 0xFAFAD2;
+    public static final int b2_colorLightGreen = 0x90EE90;
+    public static final int b2_colorLightPink = 0xFFB6C1;
+    public static final int b2_colorLightSalmon = 0xFFA07A;
+    public static final int b2_colorLightSeaGreen = 0x20B2AA;
+    public static final int b2_colorLightSkyBlue = 0x87CEFA;
+    public static final int b2_colorLightYellow = 0xFFFFE0;
+    public static final int b2_colorLimeGreen = 0x32CD32;
+    public static final int b2_colorLinen = 0xFAF0E6;
+    public static final int b2_colorMaroon = 0x800000;
+    public static final int b2_colorMediumAquaMarine = 0x66CDAA;
+    public static final int b2_colorMediumBlue = 0x0000CD;
+    public static final int b2_colorMediumOrchid = 0xBA55D3;
+    public static final int b2_colorMediumPurple = 0x9370DB;
+    public static final int b2_colorMediumSeaGreen = 0x3CB371;
+    public static final int b2_colorMediumSlateBlue = 0x7B68EE;
+    public static final int b2_colorMediumSpringGreen = 0x00FA9A;
+    public static final int b2_colorMediumTurquoise = 0x48D1CC;
+    public static final int b2_colorMediumVioletRed = 0xC71585;
+    public static final int b2_colorMidnightBlue = 0x191970;
+    public static final int b2_colorMintCream = 0xF5FFFA;
+    public static final int b2_colorMistyRose = 0xFFE4E1;
+    public static final int b2_colorMoccasin = 0xFFE4B5;
+    public static final int b2_colorNavajoWhite = 0xFFDEAD;
+    public static final int b2_colorNavy = 0x000080;
+    public static final int b2_colorOldLace = 0xFDF5E6;
+    public static final int b2_colorOlive = 0x808000;
+    public static final int b2_colorOliveDrab = 0x6B8E23;
+    public static final int b2_colorOrchid = 0xDA70D6;
+    public static final int b2_colorPaleGoldenRod = 0xEEE8AA;
+    public static final int b2_colorPaleTurquoise = 0xAFEEEE;
+    public static final int b2_colorPaleVioletRed = 0xDB7093;
+    public static final int b2_colorPapayaWhip = 0xFFEFD5;
+    public static final int b2_colorPeachPuff = 0xFFDAB9;
+    public static final int b2_colorPeru = 0xCD853F;
+    public static final int b2_colorPlum = 0xDDA0DD;
+    public static final int b2_colorPowderBlue = 0xB0E0E6;
+    public static final int b2_colorPurple = 0x800080;
+    public static final int b2_colorRebeccaPurple = 0x663399;
+    public static final int b2_colorRosyBrown = 0xBC8F8F;
+    public static final int b2_colorSandyBrown = 0xF4A460;
+    public static final int b2_colorSeaGreen = 0x2E8B57;
+    public static final int b2_colorSeaShell = 0xFFF5EE;
+    public static final int b2_colorSienna = 0xA0522D;
+    public static final int b2_colorSilver = 0xC0C0C0;
+    public static final int b2_colorSkyBlue = 0x87CEEB;
+    public static final int b2_colorSlateBlue = 0x6A5ACD;
+    public static final int b2_colorSnow = 0xFFFAFA;
+    public static final int b2_colorSpringGreen = 0x00FF7F;
+    public static final int b2_colorTan = 0xD2B48C;
+    public static final int b2_colorTeal = 0x008080;
+    public static final int b2_colorThistle = 0xD8BFD8;
+    public static final int b2_colorTomato = 0xFF6347;
+    public static final int b2_colorWhiteSmoke = 0xF5F5F5;
+    public static final int b2_colorYellowGreen = 0x9ACD32;
+    public static final int b2_colorBox2DRed = 0xDC3132;
 
     public static final b2Vec2 b2Vec2_zero = new b2Vec2(0.0f, 0.0f);
     public static final b2Rot b2Rot_identity = new b2Rot(1.0f, 0.0f);
@@ -96,12 +200,15 @@ public final class B2 {
     public static final b2ShapeId b2_nullShapeId = new b2ShapeId();
     public static final b2ChainId b2_nullChainId = new b2ChainId();
     public static final b2JointId b2_nullJointId = new b2JointId();
+    public static final b2SimplexCache b2_emptySimplexCache = new b2SimplexCache();
 
     private static final AtomicInteger BYTE_COUNT = new AtomicInteger();
     private static final WorldSlot[] WORLDS = new WorldSlot[B2_MAX_WORLDS];
     private static final int[] WORLD_GENERATIONS = new int[B2_MAX_WORLDS];
-    private static volatile B2Allocator allocator = (size, alignment) -> ByteBuffer.allocateDirect(size);
-    private static volatile B2AssertHandler assertHandler = (condition, fileName, lineNumber) -> {
+    private static volatile b2AllocFcn allocator = (size, alignment) -> ByteBuffer.allocateDirect(size);
+    private static volatile b2FreeFcn freeFcn = memory -> {
+    };
+    private static volatile b2AssertFcn assertHandler = (condition, fileName, lineNumber) -> {
         System.err.printf("BOX2D ASSERTION: %s, %s, line %d%n", condition, fileName, lineNumber);
         return 1;
     };
@@ -127,6 +234,7 @@ public final class B2 {
         final java.util.ArrayList<ContactSlot> contacts = new java.util.ArrayList<>();
         final java.util.ArrayList<Integer> freeContactIndices = new java.util.ArrayList<>();
         final java.util.ArrayList<ContactSlot> contactUpdateOrder = new java.util.ArrayList<>();
+        final java.util.ArrayList<ContactSlot> awakeNonTouchingContacts = new java.util.ArrayList<>();
         final java.util.ArrayList<ContactSlot>[] contactGraphColors = b2CreateContactGraphColors();
         final java.util.ArrayList<JointSlot>[] jointGraphColors = b2CreateJointGraphColors();
         final java.util.HashSet<Integer>[] graphBodySets = b2CreateGraphBodySets();
@@ -139,9 +247,13 @@ public final class B2 {
         Object userData;
         b2Profile profile = new b2Profile();
         int stepCount;
+        int taskCount;
         float invH;
+        boolean locked;
         b2SensorEvents sensorEvents = new b2SensorEvents();
+        final java.util.ArrayList<b2SensorEndTouchEvent> pendingSensorEndEvents = new java.util.ArrayList<>();
         b2ContactEvents contactEvents = new b2ContactEvents();
+        final java.util.ArrayList<b2ContactEndTouchEvent> pendingContactEndEvents = new java.util.ArrayList<>();
         b2BodyEvents bodyEvents = new b2BodyEvents();
         final java.util.HashMap<Integer, SensorOverlapState> sensorOverlaps = new java.util.HashMap<>();
         b2CustomFilterFcn customFilterFcn;
@@ -150,9 +262,10 @@ public final class B2 {
         Object preSolveContext;
         final b2BroadPhase broadPhase = new b2BroadPhase();
         final java.util.HashMap<Integer, Integer> sleepIslandParents = new java.util.HashMap<>();
+        final java.util.HashMap<Integer, java.util.ArrayList<BodySlot>> sleepIslandBodies = new java.util.HashMap<>();
         final java.util.HashMap<Integer, java.util.ArrayList<ContactSlot>> sleepIslandContacts = new java.util.HashMap<>();
         final java.util.HashMap<Integer, java.util.ArrayList<JointSlot>> sleepIslandJoints = new java.util.HashMap<>();
-        final java.util.HashSet<Integer> sleepingIslandRoots = new java.util.HashSet<>();
+        final java.util.LinkedHashSet<Integer> sleepingIslandRoots = new java.util.LinkedHashSet<>();
         final java.util.HashSet<Integer> sleepIslandConstraintRemoved = new java.util.HashSet<>();
         int nextSleepIslandId = 1;
         int splitSleepIslandId = B2_NULL_INDEX;
@@ -289,6 +402,7 @@ public final class B2 {
         b2Vec2 localAnchorB = new b2Vec2();
         b2Vec2 localAxisA = new b2Vec2();
         float referenceAngle;
+        float drawSize = 0.25f;
         float constraintHertz = 60.0f;
         float constraintDampingRatio = 2.0f;
         float distanceLength;
@@ -354,6 +468,7 @@ public final class B2 {
         boolean prismaticEnableSpring;
         boolean prismaticEnableLimit;
         boolean prismaticEnableMotor;
+        b2Vec2 wheelAxisA = new b2Vec2();
         float wheelPerpImpulse;
         float wheelMotorImpulse;
         float wheelSpringImpulse;
@@ -373,13 +488,20 @@ public final class B2 {
     private static final class ContactSlot {
         int index;
         boolean alive = true;
+        boolean enableContactEvents;
+        boolean enablePreSolveEvents;
         ShapeSlot shapeA;
         ShapeSlot shapeB;
         b2Manifold manifold = new b2Manifold();
+        float friction;
+        float restitution;
+        float rollingResistance;
+        float tangentSpeed;
         boolean touching;
         int sleepIslandId = B2_NULL_INDEX;
         int colorIndex = B2_NULL_INDEX;
         int localIndex = B2_NULL_INDEX;
+        int nonTouchingIndex = B2_NULL_INDEX;
     }
 
     private static final class SolverBodyState {
@@ -586,11 +708,23 @@ public final class B2 {
 
     public static void b2SetAllocator(B2Allocator allocator) {
         B2.allocator = Objects.requireNonNull(allocator, "allocator");
+        B2.freeFcn = memory -> {
+        };
     }
 
     public static void b2SetAllocator(IntFunction<ByteBuffer> allocator) {
         Objects.requireNonNull(allocator, "allocator");
         B2.allocator = (size, alignment) -> allocator.apply(size);
+        B2.freeFcn = memory -> {
+        };
+    }
+
+    public static void b2SetAllocator(b2AllocFcn allocFcn, b2FreeFcn freeFcn) {
+        B2.allocator = allocFcn != null
+            ? allocFcn
+            : (size, alignment) -> ByteBuffer.allocateDirect(size);
+        B2.freeFcn = freeFcn != null ? freeFcn : memory -> {
+        };
     }
 
     public static ByteBuffer b2Alloc(int size) {
@@ -599,7 +733,7 @@ public final class B2 {
         }
         int size32 = ((size - 1) | 0x1F) + 1;
         BYTE_COUNT.addAndGet(size);
-        ByteBuffer buffer = allocator.allocate(size32, 32);
+        ByteBuffer buffer = allocator.invoke(size32, 32);
         if (buffer == null) {
             throw new OutOfMemoryError("Box2D allocator returned null");
         }
@@ -608,6 +742,7 @@ public final class B2 {
 
     public static void b2Free(ByteBuffer buffer, int size) {
         if (buffer != null) {
+            freeFcn.invoke(buffer);
             BYTE_COUNT.addAndGet(-size);
         }
     }
@@ -616,18 +751,23 @@ public final class B2 {
         return BYTE_COUNT.get();
     }
 
-    public static void b2SetAssertFcn(B2AssertHandler assertFcn) {
+    public static void b2SetAssertFcn(b2AssertFcn assertFcn) {
         assertHandler = Objects.requireNonNull(assertFcn, "assertFcn");
     }
 
     public static int b2InternalAssertFcn(String condition, String fileName, int lineNumber) {
-        return assertHandler.assertFailed(condition, fileName, lineNumber);
+        return assertHandler.invoke(condition, fileName, lineNumber);
     }
 
     public static void b2Assert(boolean condition, String expression) {
         if (!condition && b2InternalAssertFcn(expression, "", 0) != 0) {
             throw new AssertionError(expression);
         }
+    }
+
+    private static void b2CheckDef(int internalValue) {
+        b2Assert(internalValue == B2_SECRET_COOKIE,
+            "definition was initialized by the matching b2Default...Def function");
     }
 
     public static b2Version b2GetVersion() {
@@ -647,8 +787,7 @@ public final class B2 {
         def.enableContinuous = true;
         def.frictionCallback = null;
         def.restitutionCallback = null;
-        def.workerCount = 1;
-        def.internalValue = 0xFACEB00C;
+        def.internalValue = B2_SECRET_COOKIE;
         return def;
     }
 
@@ -661,7 +800,7 @@ public final class B2 {
         def.enableSleep = true;
         def.isAwake = true;
         def.isEnabled = true;
-        def.internalValue = 0xB0D1DEF;
+        def.internalValue = B2_SECRET_COOKIE;
         return def;
     }
 
@@ -695,7 +834,7 @@ public final class B2 {
         def.material = b2DefaultSurfaceMaterial();
         def.invokeContactCreation = true;
         def.updateBodyMass = true;
-        def.internalValue = 0x5A9EDEF;
+        def.internalValue = B2_SECRET_COOKIE;
         return def;
     }
 
@@ -704,7 +843,7 @@ public final class B2 {
         def.materials = new b2SurfaceMaterial[] {b2DefaultSurfaceMaterial()};
         def.materialCount = 1;
         def.filter = b2DefaultFilter();
-        def.internalValue = 0xC1A1DEF;
+        def.internalValue = B2_SECRET_COOKIE;
         return def;
     }
 
@@ -712,7 +851,7 @@ public final class B2 {
         b2DistanceJointDef def = new b2DistanceJointDef();
         def.length = 1.0f;
         def.maxLength = B2_HUGE();
-        def.internalValue = 1152023;
+        def.internalValue = B2_SECRET_COOKIE;
         return def;
     }
 
@@ -721,7 +860,7 @@ public final class B2 {
         def.maxForce = 1.0f;
         def.maxTorque = 1.0f;
         def.correctionFactor = 0.3f;
-        def.internalValue = 1152023;
+        def.internalValue = B2_SECRET_COOKIE;
         return def;
     }
 
@@ -730,33 +869,33 @@ public final class B2 {
         def.hertz = 4.0f;
         def.dampingRatio = 1.0f;
         def.maxForce = 1.0f;
-        def.internalValue = 1152023;
+        def.internalValue = B2_SECRET_COOKIE;
         return def;
     }
 
     public static b2FilterJointDef b2DefaultFilterJointDef() {
         b2FilterJointDef def = new b2FilterJointDef();
-        def.internalValue = 1152023;
+        def.internalValue = B2_SECRET_COOKIE;
         return def;
     }
 
     public static b2PrismaticJointDef b2DefaultPrismaticJointDef() {
         b2PrismaticJointDef def = new b2PrismaticJointDef();
         def.localAxisA = new b2Vec2(1.0f, 0.0f);
-        def.internalValue = 1152023;
+        def.internalValue = B2_SECRET_COOKIE;
         return def;
     }
 
     public static b2RevoluteJointDef b2DefaultRevoluteJointDef() {
         b2RevoluteJointDef def = new b2RevoluteJointDef();
         def.drawSize = 0.25f;
-        def.internalValue = 1152023;
+        def.internalValue = B2_SECRET_COOKIE;
         return def;
     }
 
     public static b2WeldJointDef b2DefaultWeldJointDef() {
         b2WeldJointDef def = new b2WeldJointDef();
-        def.internalValue = 1152023;
+        def.internalValue = B2_SECRET_COOKIE;
         return def;
     }
 
@@ -766,15 +905,13 @@ public final class B2 {
         def.enableSpring = true;
         def.hertz = 1.0f;
         def.dampingRatio = 0.7f;
-        def.internalValue = 1152023;
+        def.internalValue = B2_SECRET_COOKIE;
         return def;
     }
 
     public static b2ExplosionDef b2DefaultExplosionDef() {
         b2ExplosionDef def = new b2ExplosionDef();
         def.maskBits = B2_DEFAULT_MASK_BITS;
-        def.radius = 1.0f;
-        def.falloff = 1.0f;
         return def;
     }
 
@@ -800,6 +937,26 @@ public final class B2 {
 
     public static boolean B2_IS_NULL(b2JointId id) {
         return id.index1 == 0;
+    }
+
+    public static boolean B2_IS_NON_NULL(b2WorldId id) {
+        return id.index1 != 0;
+    }
+
+    public static boolean B2_IS_NON_NULL(b2BodyId id) {
+        return id.index1 != 0;
+    }
+
+    public static boolean B2_IS_NON_NULL(b2ShapeId id) {
+        return id.index1 != 0;
+    }
+
+    public static boolean B2_IS_NON_NULL(b2ChainId id) {
+        return id.index1 != 0;
+    }
+
+    public static boolean B2_IS_NON_NULL(b2JointId id) {
+        return id.index1 != 0;
     }
 
     public static boolean B2_ID_EQUALS(b2BodyId id1, b2BodyId id2) {
@@ -2187,6 +2344,14 @@ public final class B2 {
     }
 
     public static int b2DynamicTree_CreateProxy(b2DynamicTree tree, b2AABB aabb, long categoryBits, long userData) {
+        b2Assert(-B2_HUGE() < aabb.lowerBound.x && aabb.lowerBound.x < B2_HUGE(),
+            "-B2_HUGE < aabb.lowerBound.x < B2_HUGE");
+        b2Assert(-B2_HUGE() < aabb.lowerBound.y && aabb.lowerBound.y < B2_HUGE(),
+            "-B2_HUGE < aabb.lowerBound.y < B2_HUGE");
+        b2Assert(-B2_HUGE() < aabb.upperBound.x && aabb.upperBound.x < B2_HUGE(),
+            "-B2_HUGE < aabb.upperBound.x < B2_HUGE");
+        b2Assert(-B2_HUGE() < aabb.upperBound.y && aabb.upperBound.y < B2_HUGE(),
+            "-B2_HUGE < aabb.upperBound.y < B2_HUGE");
         int proxyId = b2AllocateNode(tree);
         b2TreeNode node = tree.nodes[proxyId];
         node.aabb = aabb.copy();
@@ -2200,8 +2365,11 @@ public final class B2 {
     }
 
     public static void b2DynamicTree_DestroyProxy(b2DynamicTree tree, int proxyId) {
+        b2Assert(0 <= proxyId && proxyId < tree.nodeCapacity, "proxy id is in range");
+        b2Assert(b2IsLeaf(tree.nodes[proxyId]), "proxy is a leaf");
         b2RemoveLeaf(tree, proxyId);
         b2FreeNode(tree, proxyId);
+        b2Assert(tree.proxyCount > 0, "tree.proxyCount > 0");
         tree.proxyCount -= 1;
     }
 
@@ -2210,6 +2378,11 @@ public final class B2 {
     }
 
     public static void b2DynamicTree_MoveProxy(b2DynamicTree tree, int proxyId, b2AABB aabb) {
+        b2Assert(b2IsValidAABB(aabb), "aabb is valid");
+        b2Assert(aabb.upperBound.x - aabb.lowerBound.x < B2_HUGE(), "aabb width < B2_HUGE");
+        b2Assert(aabb.upperBound.y - aabb.lowerBound.y < B2_HUGE(), "aabb height < B2_HUGE");
+        b2Assert(0 <= proxyId && proxyId < tree.nodeCapacity, "proxy id is in range");
+        b2Assert(b2IsLeaf(tree.nodes[proxyId]), "proxy is a leaf");
         b2RemoveLeaf(tree, proxyId);
         tree.nodes[proxyId].aabb = aabb.copy();
         b2InsertLeaf(tree, proxyId, false);
@@ -2217,6 +2390,12 @@ public final class B2 {
 
     public static void b2DynamicTree_EnlargeProxy(b2DynamicTree tree, int proxyId, b2AABB aabb) {
         b2TreeNode[] nodes = tree.nodes;
+        b2Assert(b2IsValidAABB(aabb), "aabb is valid");
+        b2Assert(aabb.upperBound.x - aabb.lowerBound.x < B2_HUGE(), "aabb width < B2_HUGE");
+        b2Assert(aabb.upperBound.y - aabb.lowerBound.y < B2_HUGE(), "aabb height < B2_HUGE");
+        b2Assert(0 <= proxyId && proxyId < tree.nodeCapacity, "proxy id is in range");
+        b2Assert(b2IsLeaf(nodes[proxyId]), "proxy is a leaf");
+        b2Assert(!b2AABB_Contains(nodes[proxyId].aabb, aabb), "proxy aabb does not contain enlarged aabb");
         nodes[proxyId].aabb = aabb.copy();
         int parentIndex = nodes[proxyId].parent;
         while (parentIndex != B2_NULL_INDEX) {
@@ -2238,6 +2417,8 @@ public final class B2 {
 
     public static void b2DynamicTree_SetCategoryBits(b2DynamicTree tree, int proxyId, long categoryBits) {
         b2TreeNode[] nodes = tree.nodes;
+        b2Assert(0 <= proxyId && proxyId < tree.nodeCapacity, "proxy id is in range");
+        b2Assert(b2IsLeaf(nodes[proxyId]), "proxy is a leaf");
         nodes[proxyId].categoryBits = categoryBits;
         int nodeIndex = nodes[proxyId].parent;
         while (nodeIndex != B2_NULL_INDEX) {
@@ -2248,6 +2429,7 @@ public final class B2 {
     }
 
     public static long b2DynamicTree_GetCategoryBits(b2DynamicTree tree, int proxyId) {
+        b2Assert(0 <= proxyId && proxyId < tree.nodeCapacity, "proxy id is in range");
         return tree.nodes[proxyId].categoryBits;
     }
 
@@ -2276,10 +2458,12 @@ public final class B2 {
     }
 
     public static long b2DynamicTree_GetUserData(b2DynamicTree tree, int proxyId) {
+        b2Assert(0 <= proxyId && proxyId < tree.nodeCapacity, "proxy id is in range");
         return tree.nodes[proxyId].userData;
     }
 
     public static b2AABB b2DynamicTree_GetAABB(b2DynamicTree tree, int proxyId) {
+        b2Assert(0 <= proxyId && proxyId < tree.nodeCapacity, "proxy id is in range");
         return tree.nodes[proxyId].aabb.copy();
     }
 
@@ -2287,7 +2471,7 @@ public final class B2 {
         return 72 + 40 * tree.nodeCapacity + tree.rebuildCapacity * (4 + 16 + 8 + 4);
     }
 
-    public static b2TreeStats b2DynamicTree_Query(b2DynamicTree tree, b2AABB aabb, long maskBits, b2TreeQueryCallback callback) {
+    public static b2TreeStats b2DynamicTree_Query(b2DynamicTree tree, b2AABB aabb, long maskBits, b2TreeQueryCallbackFcn callback) {
         b2TreeStats result = new b2TreeStats();
         if (tree.nodeCount == 0) {
             return result;
@@ -2316,7 +2500,7 @@ public final class B2 {
     }
 
     public static b2TreeStats b2DynamicTree_RayCast(b2DynamicTree tree, b2RayCastInput input, long maskBits,
-                                                     b2TreeRayCastCallback callback) {
+                                                     b2TreeRayCastCallbackFcn callback) {
         b2TreeStats result = new b2TreeStats();
         if (tree.nodeCount == 0) {
             return result;
@@ -2380,7 +2564,7 @@ public final class B2 {
     }
 
     public static b2TreeStats b2DynamicTree_ShapeCast(b2DynamicTree tree, b2ShapeCastInput input, long maskBits,
-                                                       b2TreeShapeCastCallback callback) {
+                                                       b2TreeShapeCastCallbackFcn callback) {
         b2TreeStats stats = new b2TreeStats();
         if (tree.nodeCount == 0 || input.proxy.count == 0) {
             return stats;
@@ -2844,6 +3028,7 @@ public final class B2 {
     }
 
     public static b2Polygon b2MakePolygon(b2Hull hull, float radius) {
+        b2Assert(b2ValidateHull(hull), "b2ValidateHull(hull)");
         if (hull.count < 3) {
             return b2MakeSquare(0.5f);
         }
@@ -2856,6 +3041,8 @@ public final class B2 {
         for (int i = 0; i < shape.count; ++i) {
             int i2 = i + 1 < shape.count ? i + 1 : 0;
             b2Vec2 edge = b2Sub(shape.vertices[i2], shape.vertices[i]);
+            b2Assert(b2Dot(edge, edge) > Math.ulp(1.0f) * Math.ulp(1.0f),
+                "b2Dot(edge, edge) > FLT_EPSILON * FLT_EPSILON");
             shape.normals[i].set(b2Normalize(b2CrossVS(edge, 1.0f)));
         }
         shape.centroid = b2ComputePolygonCentroid(shape.vertices, shape.count);
@@ -2867,8 +3054,27 @@ public final class B2 {
     }
 
     public static b2Polygon b2MakeOffsetRoundedPolygon(b2Hull hull, b2Vec2 position, b2Rot rotation, float radius) {
-        b2Polygon shape = b2MakePolygon(hull, radius);
-        return b2TransformPolygon(new b2Transform(position, rotation), shape);
+        b2Assert(b2ValidateHull(hull), "b2ValidateHull(hull)");
+        if (hull.count < 3) {
+            return b2MakeSquare(0.5f);
+        }
+
+        b2Transform transform = new b2Transform(position, rotation);
+        b2Polygon shape = new b2Polygon();
+        shape.count = hull.count;
+        shape.radius = radius;
+        for (int i = 0; i < shape.count; ++i) {
+            shape.vertices[i].set(b2TransformPoint(transform, hull.points[i]));
+        }
+        for (int i = 0; i < shape.count; ++i) {
+            int i2 = i + 1 < shape.count ? i + 1 : 0;
+            b2Vec2 edge = b2Sub(shape.vertices[i2], shape.vertices[i]);
+            b2Assert(b2Dot(edge, edge) > Math.ulp(1.0f) * Math.ulp(1.0f),
+                "b2Dot(edge, edge) > FLT_EPSILON * FLT_EPSILON");
+            shape.normals[i].set(b2Normalize(b2CrossVS(edge, 1.0f)));
+        }
+        shape.centroid = b2ComputePolygonCentroid(shape.vertices, shape.count);
+        return shape;
     }
 
     public static b2Polygon b2MakeSquare(float halfWidth) {
@@ -2876,6 +3082,8 @@ public final class B2 {
     }
 
     public static b2Polygon b2MakeBox(float halfWidth, float halfHeight) {
+        b2Assert(b2IsValidFloat(halfWidth) && halfWidth > 0.0f, "halfWidth is valid and positive");
+        b2Assert(b2IsValidFloat(halfHeight) && halfHeight > 0.0f, "halfHeight is valid and positive");
         b2Polygon shape = new b2Polygon();
         shape.count = 4;
         shape.vertices[0].set(-halfWidth, -halfHeight);
@@ -2892,6 +3100,7 @@ public final class B2 {
     }
 
     public static b2Polygon b2MakeRoundedBox(float halfWidth, float halfHeight, float radius) {
+        b2Assert(b2IsValidFloat(radius) && radius >= 0.0f, "radius is valid and non-negative");
         b2Polygon shape = b2MakeBox(halfWidth, halfHeight);
         shape.radius = radius;
         return shape;
@@ -2902,6 +3111,7 @@ public final class B2 {
     }
 
     public static b2Polygon b2MakeOffsetRoundedBox(float halfWidth, float halfHeight, b2Vec2 center, b2Rot rotation, float radius) {
+        b2Assert(b2IsValidFloat(radius) && radius >= 0.0f, "radius is valid and non-negative");
         b2Transform xf = new b2Transform(center, rotation);
         b2Polygon shape = new b2Polygon();
         shape.count = 4;
@@ -2962,6 +3172,7 @@ public final class B2 {
     }
 
     public static b2MassData b2ComputePolygonMass(b2Polygon shape, float density) {
+        b2Assert(shape.count > 0, "shape.count > 0");
         if (shape.count == 1) {
             return b2ComputeCircleMass(new b2Circle(shape.vertices[0], shape.radius), density);
         }
@@ -3003,6 +3214,7 @@ public final class B2 {
 
         b2MassData massData = new b2MassData();
         massData.mass = density * area;
+        b2Assert(area > Math.ulp(1.0f), "area > FLT_EPSILON");
         float invArea = 1.0f / area;
         center.x *= invArea;
         center.y *= invArea;
@@ -3026,6 +3238,7 @@ public final class B2 {
     }
 
     public static b2AABB b2ComputePolygonAABB(b2Polygon shape, b2Transform xf) {
+        b2Assert(shape.count > 0, "shape.count > 0");
         b2Vec2 lower = b2TransformPoint(xf, shape.vertices[0]);
         b2Vec2 upper = lower.copy();
         for (int i = 1; i < shape.count; ++i) {
@@ -3292,6 +3505,7 @@ public final class B2 {
         float dd1 = b2Dot(d1, d1);
         float dd2 = b2Dot(d2, d2);
         final float epsSqr = Math.ulp(1.0f) * Math.ulp(1.0f);
+        b2Assert(dd1 > epsSqr && dd2 > epsSqr, "both capsule axes are non-degenerate");
 
         b2Vec2 r = b2Sub(p1, p2);
         float rd1 = b2Dot(r, d1);
@@ -4142,6 +4356,7 @@ public final class B2 {
     }
 
     public static b2CastOutput b2RayCastCircle(b2RayCastInput input, b2Circle shape) {
+        b2Assert(b2IsValidRay(input), "ray input is valid");
         b2CastOutput output = new b2CastOutput();
         b2Vec2 s = b2Sub(input.origin, shape.center);
         float rr = shape.radius * shape.radius;
@@ -4219,6 +4434,7 @@ public final class B2 {
     }
 
     public static b2CastOutput b2RayCastPolygon(b2RayCastInput input, b2Polygon shape) {
+        b2Assert(b2IsValidRay(input), "ray input is valid");
         if (shape.radius != 0.0f) {
             b2ShapeCastPairInput castInput = new b2ShapeCastPairInput();
             castInput.proxyA = b2MakeProxy(shape.vertices, shape.count, shape.radius);
@@ -4256,6 +4472,8 @@ public final class B2 {
                 return output;
             }
         }
+        b2Assert(0.0f <= lower && lower <= input.maxFraction,
+            "0 <= lower <= input.maxFraction");
         if (index >= 0) {
             output.fraction = lower;
             output.normal = shape.normals[index].copy();
@@ -4269,6 +4487,7 @@ public final class B2 {
     }
 
     public static b2CastOutput b2RayCastCapsule(b2RayCastInput input, b2Capsule shape) {
+        b2Assert(b2IsValidRay(input), "ray input is valid");
         b2CastOutput output = new b2CastOutput();
 
         b2Vec2 v1 = shape.center1;
@@ -4527,6 +4746,21 @@ public final class B2 {
                 }
             }
         }
+
+        float linearSlop = B2_LINEAR_SLOP();
+        for (int i = 0; i < hull.count; ++i) {
+            int i1 = i;
+            int i2 = (i + 1) % hull.count;
+            int i3 = (i + 2) % hull.count;
+            b2Vec2 p1 = hull.points[i1];
+            b2Vec2 p2 = hull.points[i2];
+            b2Vec2 p3 = hull.points[i3];
+            b2Vec2 e = b2Normalize(b2Sub(p3, p1));
+            float distance = b2Cross(b2Sub(p2, p1), e);
+            if (distance <= linearSlop) {
+                return false;
+            }
+        }
         return true;
     }
 
@@ -4582,6 +4816,7 @@ public final class B2 {
     }
 
     public static b2ShapeProxy b2MakeProxy(b2Vec2[] points, int count, float radius) {
+        count = b2MinInt(count, b2MinInt(B2_MAX_POLYGON_VERTICES, points.length));
         b2ShapeProxy proxy = new b2ShapeProxy();
         proxy.count = count;
         proxy.radius = radius;
@@ -4592,6 +4827,7 @@ public final class B2 {
     }
 
     public static b2ShapeProxy b2MakeOffsetProxy(b2Vec2[] points, int count, float radius, b2Vec2 position, b2Rot rotation) {
+        count = b2MinInt(count, b2MinInt(B2_MAX_POLYGON_VERTICES, points.length));
         b2ShapeProxy proxy = new b2ShapeProxy();
         proxy.count = count;
         proxy.radius = radius;
@@ -4672,6 +4908,7 @@ public final class B2 {
     }
 
     private static b2Simplex b2MakeSimplexFromCache(b2SimplexCache cache, b2ShapeProxy proxyA, b2ShapeProxy proxyB) {
+        b2Assert(cache.count <= 3, "cache.count <= 3");
         b2Simplex s = new b2Simplex();
         s.count = cache.count;
         b2SimplexVertex[] vertices = s.vertices();
@@ -4841,6 +5078,9 @@ public final class B2 {
     }
 
     public static b2DistanceOutput b2ShapeDistance(b2DistanceInput input, b2SimplexCache cache, Object simplexes, int simplexCapacity) {
+        b2Assert(input.proxyA.count > 0 && input.proxyB.count > 0, "both proxy counts are positive");
+        b2Assert(input.proxyA.radius >= 0.0f, "proxyA.radius >= 0");
+        b2Assert(input.proxyB.radius >= 0.0f, "proxyB.radius >= 0");
         b2DistanceOutput output = new b2DistanceOutput();
         b2ShapeProxy proxyA = input.proxyA;
 
@@ -4977,6 +5217,7 @@ public final class B2 {
         float totalRadius = input.proxyA.radius + input.proxyB.radius;
         float target = b2MaxFloat(linearSlop, totalRadius - linearSlop);
         float tolerance = 0.25f * linearSlop;
+        b2Assert(target > tolerance, "target > tolerance");
 
         b2SimplexCache cache = new b2SimplexCache();
         float fraction = 0.0f;
@@ -5183,6 +5424,10 @@ public final class B2 {
 
         b2Sweep sweepA = copySweep(input.sweepA);
         b2Sweep sweepB = copySweep(input.sweepB);
+        b2Assert(b2IsNormalizedRot(sweepA.q1) && b2IsNormalizedRot(sweepA.q2),
+            "sweepA rotations are normalized");
+        b2Assert(b2IsNormalizedRot(sweepB.q1) && b2IsNormalizedRot(sweepB.q2),
+            "sweepB rotations are normalized");
         b2ShapeProxy proxyA = input.proxyA;
         b2ShapeProxy proxyB = input.proxyB;
 
@@ -5190,6 +5435,7 @@ public final class B2 {
         float totalRadius = proxyA.radius + proxyB.radius;
         float target = b2MaxFloat(B2_LINEAR_SLOP(), totalRadius - B2_LINEAR_SLOP());
         float tolerance = 0.25f * B2_LINEAR_SLOP();
+        b2Assert(target > tolerance, "target > tolerance");
 
         float t1 = 0.0f;
         final int maxIterations = 20;
@@ -5415,6 +5661,7 @@ public final class B2 {
     }
 
     public static b2WorldId b2CreateWorld(b2WorldDef def) {
+        b2CheckDef(def.internalValue);
         B2DebugHooks.beforeWorldCreated(def);
         for (int i = 0; i < WORLDS.length; ++i) {
             if (WORLDS[i] == null) {
@@ -5425,7 +5672,7 @@ public final class B2 {
                 return worldId;
             }
         }
-        throw new IllegalStateException("Maximum Box2D world count reached");
+        return new b2WorldId();
     }
 
     private static void b2ParallelFor(WorldSlot world, int itemCount, int minRange,
@@ -5433,6 +5680,7 @@ public final class B2 {
         if (itemCount <= 0) {
             return;
         }
+        world.taskCount += 1;
         int range = b2MaxInt(1, minRange);
         if (world.workerCount == 1 || itemCount < 2 * range) {
             task.invoke(0, itemCount, 0, taskContext);
@@ -5445,6 +5693,10 @@ public final class B2 {
         }
     }
 
+    private static float b2ElapsedMilliseconds(long startNanos) {
+        return b2MaxFloat(Float.MIN_VALUE, (System.nanoTime() - startNanos) * 1.0e-6f);
+    }
+
     private static <T> void b2ParallelList(WorldSlot world, java.util.List<T> items, int minRange,
                                            java.util.function.Consumer<java.util.List<T>> rangeTask) {
         b2ParallelFor(world, items.size(), minRange,
@@ -5454,6 +5706,7 @@ public final class B2 {
 
     public static void b2DestroyWorld(b2WorldId worldId) {
         WorldSlot world = getWorld(worldId);
+        b2Assert(world != null, "world id is valid");
         if (world == null) {
             return;
         }
@@ -5498,7 +5751,22 @@ public final class B2 {
     }
 
     public static b2BodyId b2CreateBody(b2WorldId worldId, b2BodyDef def) {
+        b2CheckDef(def.internalValue);
+        b2Assert(b2IsValidVec2(def.position), "body position is valid");
+        b2Assert(b2IsValidRotation(def.rotation), "body rotation is valid");
+        b2Assert(b2IsValidVec2(def.linearVelocity), "body linear velocity is valid");
+        b2Assert(b2IsValidFloat(def.angularVelocity), "body angular velocity is valid");
+        b2Assert(b2IsValidFloat(def.linearDamping) && def.linearDamping >= 0.0f,
+            "body linear damping is valid and non-negative");
+        b2Assert(b2IsValidFloat(def.angularDamping) && def.angularDamping >= 0.0f,
+            "body angular damping is valid and non-negative");
+        b2Assert(b2IsValidFloat(def.sleepThreshold) && def.sleepThreshold >= 0.0f,
+            "body sleep threshold is valid and non-negative");
+        b2Assert(b2IsValidFloat(def.gravityScale), "body gravity scale is valid");
         WorldSlot world = requireWorld(worldId);
+        if (b2RejectLockedWorld(world)) {
+            return new b2BodyId();
+        }
         BodySlot body = new BodySlot();
         body.index = b2AllocSlot(world.freeBodyIndices, world.bodies.size());
         if (body.index < world.bodies.size()) {
@@ -5508,13 +5776,13 @@ public final class B2 {
         body.type = def.type;
         body.position = def.position.copy();
         body.rotation = def.rotation.copy();
-        body.linearVelocity = def.linearVelocity.copy();
-        body.angularVelocity = def.angularVelocity;
         body.linearDamping = def.linearDamping;
         body.angularDamping = def.angularDamping;
         body.gravityScale = def.gravityScale;
         body.enabled = def.isEnabled;
         body.awake = body.type != b2_staticBody && (def.isAwake || !def.enableSleep) && def.isEnabled;
+        body.linearVelocity = body.awake ? def.linearVelocity.copy() : b2Vec2_zero.copy();
+        body.angularVelocity = body.awake ? def.angularVelocity : 0.0f;
         body.fixedRotation = def.fixedRotation;
         body.bullet = def.isBullet;
         body.allowFastRotation = def.allowFastRotation;
@@ -5524,41 +5792,48 @@ public final class B2 {
         body.userData = def.userData;
         body.center = def.position.copy();
         b2StoreSlot(world.bodies, body.index, body);
-        if (body.enabled && body.type == b2_dynamicBody) {
+        if (body.awake) {
             world.solverBodyOrder.add(body);
         }
         if (body.enabled && body.type != b2_staticBody) {
             body.sleepIslandId = b2CreateSleepIsland(world);
+            world.sleepIslandBodies.get(body.sleepIslandId).add(body);
         }
         return bodyId(world, body);
     }
 
     public static void b2DestroyBody(b2BodyId bodyId) {
         BodySlot body = getBody(bodyId);
+        b2Assert(body != null, "body id is valid");
         if (body == null) {
             return;
         }
-        body.alive = false;
-        body.generation += 1;
         WorldSlot world = WORLDS[body.worldIndex];
+        if (b2RejectLockedWorld(world)) {
+            return;
+        }
         b2RemoveSwap(world.solverBodyOrder, body);
+        for (JointSlot joint : new java.util.ArrayList<>(body.joints)) {
+            b2DestroyJointInternal(world, joint, true);
+        }
+        b2DestroyContactsForBody(world, body, true);
+        for (int i = body.shapes.size() - 1; i >= 0; --i) {
+            b2DestroyShapeInternal(world, body.shapes.get(i), false, false);
+        }
         for (int i = body.chains.size() - 1; i >= 0; --i) {
             ChainSlot chain = body.chains.get(i);
             chain.alive = false;
             chain.generation += 1;
             world.freeChainIndices.add(chain.index);
         }
-        for (int i = body.shapes.size() - 1; i >= 0; --i) {
-            ShapeSlot shape = body.shapes.get(i);
-            b2DestroyShapeProxy(shape, world.broadPhase);
-            shape.alive = false;
-            shape.generation += 1;
-            world.freeShapeIndices.add(shape.index);
+        int sleepRoot = b2FindSleepIsland(world, body.sleepIslandId);
+        java.util.ArrayList<BodySlot> islandBodies = world.sleepIslandBodies.get(sleepRoot);
+        if (islandBodies != null) {
+            islandBodies.remove(body);
         }
-        for (JointSlot joint : new java.util.ArrayList<>(body.joints)) {
-            b2DestroyJointInternal(world, joint);
-        }
-        b2DestroyContactsForBody(world, body, true);
+        body.sleepIslandId = B2_NULL_INDEX;
+        body.alive = false;
+        body.generation += 1;
         body.chains.clear();
         body.contacts.clear();
         body.joints.clear();
@@ -5580,30 +5855,60 @@ public final class B2 {
             return;
         }
         WorldSlot world = WORLDS[body.worldIndex];
-        if (body.enabled && body.type == b2_dynamicBody) {
+        if (b2RejectLockedWorld(world)) {
+            return;
+        }
+        if (!body.enabled) {
+            body.type = type;
+            b2UpdateBodyMassData(body);
+            return;
+        }
+
+        b2DestroyContactsForBody(world, body);
+        b2WakeBody(body);
+
+        boolean rebuildJointGraph = body.type == b2_staticBody || type == b2_staticBody;
+        for (JointSlot joint : body.joints) {
+            b2UnlinkSleepJoint(world, joint);
+            b2WakeBody(joint.bodyA);
+            b2WakeBody(joint.bodyB);
+        }
+        int originalType = body.type;
+        if (body.enabled && originalType != b2_staticBody && type == b2_staticBody) {
             b2RemoveSwap(world.solverBodyOrder, body);
         }
         body.type = type;
-        if (body.enabled && body.type == b2_dynamicBody) {
-            world.solverBodyOrder.add(body);
+        if (body.enabled && originalType == b2_staticBody && type != b2_staticBody) {
+            b2WakeBody(body);
         }
         if (type == b2_staticBody) {
+            body.awake = false;
             body.linearVelocity = b2Vec2_zero.copy();
             body.angularVelocity = 0.0f;
             body.force = b2Vec2_zero.copy();
             body.torque = 0.0f;
         }
-        b2DestroyContactsForBody(world, body);
-        b2WakeBody(body);
-        for (JointSlot joint : body.joints) {
-            b2WakeBody(joint.bodyA);
-            b2WakeBody(joint.bodyB);
+        if (rebuildJointGraph) {
+            for (JointSlot joint : body.joints) {
+                if (joint.colorIndex != B2_NULL_INDEX) {
+                    b2RemoveJointFromGraph(world, joint);
+                }
+                if (joint.bodyA.enabled && joint.bodyB.enabled
+                    && (joint.bodyA.type != b2_staticBody || joint.bodyB.type != b2_staticBody)) {
+                    b2AddJointToGraph(world, joint);
+                }
+            }
         }
         if (body.enabled) {
             for (ShapeSlot shape : body.shapes) {
                 b2DestroyShapeProxy(shape, world.broadPhase);
-                boolean forcePairCreation = shape.def.invokeContactCreation || shape.def.isSensor;
-                b2CreateShapeProxy(shape, world.broadPhase, body.type, forcePairCreation);
+                b2CreateShapeProxy(shape, world.broadPhase, body.type, true);
+            }
+        }
+        for (JointSlot joint : body.joints) {
+            if (joint.bodyA.enabled && joint.bodyB.enabled
+                && (joint.bodyA.type != b2_staticBody || joint.bodyB.type != b2_staticBody)) {
+                b2LinkSleepJoint(world, joint);
             }
         }
         b2UpdateBodyMassData(body);
@@ -5627,7 +5932,12 @@ public final class B2 {
     }
 
     public static void b2Body_SetTransform(b2BodyId bodyId, b2Vec2 position, b2Rot rotation) {
+        b2Assert(b2IsValidVec2(position), "body position is valid");
+        b2Assert(b2IsValidRotation(rotation), "body rotation is valid");
         BodySlot body = requireBody(bodyId);
+        if (b2RejectLockedWorld(WORLDS[body.worldIndex])) {
+            return;
+        }
         body.position = position.copy();
         body.rotation = rotation.copy();
         body.center = b2TransformPoint(new b2Transform(body.position, body.rotation), body.localCenter);
@@ -5635,7 +5945,12 @@ public final class B2 {
     }
 
     public static b2ShapeId b2CreatePolygonShape(b2BodyId bodyId, b2ShapeDef def, b2Polygon polygon) {
+        b2Assert(b2IsValidFloat(polygon.radius) && polygon.radius >= 0.0f,
+            "polygon radius is valid and non-negative");
         ShapeSlot shape = createShape(bodyId, def, 1);
+        if (shape == null) {
+            return new b2ShapeId();
+        }
         shape.polygon = b2TransformPolygon(b2Transform_identity, polygon);
         finishShapeCreate(shape);
         return shapeId(requireWorld(new b2WorldId(shape.body.worldIndex + 1, WORLD_GENERATIONS[shape.body.worldIndex])), shape);
@@ -5643,20 +5958,36 @@ public final class B2 {
 
     public static b2ShapeId b2CreateCircleShape(b2BodyId bodyId, b2ShapeDef def, b2Circle circle) {
         ShapeSlot shape = createShape(bodyId, def, 2);
+        if (shape == null) {
+            return new b2ShapeId();
+        }
         shape.circle = new b2Circle(circle.center, circle.radius);
         finishShapeCreate(shape);
         return shapeId(requireWorld(new b2WorldId(shape.body.worldIndex + 1, WORLD_GENERATIONS[shape.body.worldIndex])), shape);
     }
 
     public static b2ShapeId b2CreateCapsuleShape(b2BodyId bodyId, b2ShapeDef def, b2Capsule capsule) {
+        float lengthSquared = b2DistanceSquared(capsule.center1, capsule.center2);
+        if (lengthSquared <= B2_LINEAR_SLOP() * B2_LINEAR_SLOP()) {
+            b2Circle circle = new b2Circle(b2Lerp(capsule.center1, capsule.center2, 0.5f), capsule.radius);
+            return b2CreateCircleShape(bodyId, def, circle);
+        }
         ShapeSlot shape = createShape(bodyId, def, 4);
+        if (shape == null) {
+            return new b2ShapeId();
+        }
         shape.capsule = new b2Capsule(capsule.center1, capsule.center2, capsule.radius);
         finishShapeCreate(shape);
         return shapeId(requireWorld(new b2WorldId(shape.body.worldIndex + 1, WORLD_GENERATIONS[shape.body.worldIndex])), shape);
     }
 
     public static b2ShapeId b2CreateSegmentShape(b2BodyId bodyId, b2ShapeDef def, b2Segment segment) {
+        b2Assert(b2DistanceSquared(segment.point1, segment.point2) > B2_LINEAR_SLOP() * B2_LINEAR_SLOP(),
+            "segment length is greater than the linear slop");
         ShapeSlot shape = createShape(bodyId, def, 3);
+        if (shape == null) {
+            return new b2ShapeId();
+        }
         shape.segment = new b2Segment(segment.point1, segment.point2);
         finishShapeCreate(shape);
         return shapeId(requireWorld(new b2WorldId(shape.body.worldIndex + 1, WORLD_GENERATIONS[shape.body.worldIndex])), shape);
@@ -5664,17 +5995,36 @@ public final class B2 {
 
     public static void b2DestroyShape(b2ShapeId shapeId, boolean updateBodyMass) {
         ShapeSlot shape = getShape(shapeId);
+        b2Assert(shape != null, "shape id is valid");
         if (shape == null) {
             return;
         }
-        b2DestroyShapeInternal(WORLDS[shape.body.worldIndex], shape, updateBodyMass);
+        WorldSlot world = WORLDS[shape.body.worldIndex];
+        if (b2RejectLockedWorld(world)) {
+            return;
+        }
+        b2DestroyShapeInternal(world, shape, true, updateBodyMass);
     }
 
     public static b2ChainId b2CreateChain(b2BodyId bodyId, b2ChainDef def) {
+        b2CheckDef(def.internalValue);
         BodySlot body = requireBody(bodyId);
         WorldSlot world = WORLDS[body.worldIndex];
+        if (b2RejectLockedWorld(world)) {
+            return new b2ChainId();
+        }
         b2Assert(def.count >= 4, "chain point count is at least 4");
         b2Assert(def.materialCount == 1 || def.materialCount == def.count, "chain material count is 1 or point count");
+        for (int i = 0; i < def.materialCount; ++i) {
+            b2SurfaceMaterial material = def.materials[i];
+            b2Assert(b2IsValidFloat(material.friction) && material.friction >= 0.0f,
+                "chain friction is valid and non-negative");
+            b2Assert(b2IsValidFloat(material.restitution) && material.restitution >= 0.0f,
+                "chain restitution is valid and non-negative");
+            b2Assert(b2IsValidFloat(material.rollingResistance) && material.rollingResistance >= 0.0f,
+                "chain rolling resistance is valid and non-negative");
+            b2Assert(b2IsValidFloat(material.tangentSpeed), "chain tangent speed is valid");
+        }
 
         ChainSlot chain = new ChainSlot();
         chain.index = b2AllocSlot(world.freeChainIndices, world.chains.size());
@@ -5742,22 +6092,21 @@ public final class B2 {
 
     public static void b2DestroyChain(b2ChainId chainId) {
         ChainSlot chain = getChain(chainId);
+        b2Assert(chain != null, "chain id is valid");
         if (chain == null) {
             return;
         }
         WorldSlot world = WORLDS[chain.body.worldIndex];
+        if (b2RejectLockedWorld(world)) {
+            return;
+        }
         chain.alive = false;
         chain.generation += 1;
         world.freeChainIndices.add(chain.index);
         chain.body.chains.remove(chain);
         for (int shapeIndex : chain.shapeIndices) {
             ShapeSlot shape = world.shapes.get(shapeIndex);
-            b2DestroyShapeProxy(shape, world.broadPhase);
-            b2DestroyContactsForShape(world, shape);
-            shape.alive = false;
-            shape.generation += 1;
-            world.freeShapeIndices.add(shape.index);
-            chain.body.shapes.remove(shape);
+            b2DestroyShapeInternal(world, shape, true, false);
         }
         b2RebuildContactPairSet(world);
     }
@@ -5769,13 +6118,20 @@ public final class B2 {
     }
 
     public static int b2Chain_GetSegmentCount(b2ChainId chainId) {
-        return requireChain(chainId).count;
+        ChainSlot chain = requireChain(chainId);
+        if (b2RejectLockedWorld(WORLDS[chain.body.worldIndex])) {
+            return 0;
+        }
+        return chain.count;
     }
 
     public static int b2Chain_GetSegments(b2ChainId chainId, b2ShapeId[] segmentArray, int capacity) {
         ChainSlot chain = requireChain(chainId);
         WorldSlot world = WORLDS[chain.body.worldIndex];
-        int count = b2MinInt(chain.count, b2MinInt(capacity, segmentArray.length));
+        if (b2RejectLockedWorld(world)) {
+            return 0;
+        }
+        int count = b2MaxInt(0, b2MinInt(chain.count, b2MinInt(capacity, segmentArray.length)));
         for (int i = 0; i < count; ++i) {
             ShapeSlot shape = world.shapes.get(chain.shapeIndices[i]);
             segmentArray[i] = shapeId(world, shape);
@@ -5784,7 +6140,12 @@ public final class B2 {
     }
 
     public static void b2Chain_SetFriction(b2ChainId chainId, float friction) {
+        b2Assert(b2IsValidFloat(friction) && friction >= 0.0f,
+            "chain friction is valid and non-negative");
         ChainSlot chain = requireChain(chainId);
+        if (b2RejectLockedWorld(WORLDS[chain.body.worldIndex])) {
+            return;
+        }
         for (b2SurfaceMaterial material : chain.materials) {
             material.friction = friction;
         }
@@ -5796,7 +6157,11 @@ public final class B2 {
     }
 
     public static void b2Chain_SetRestitution(b2ChainId chainId, float restitution) {
+        b2Assert(b2IsValidFloat(restitution), "chain restitution is valid");
         ChainSlot chain = requireChain(chainId);
+        if (b2RejectLockedWorld(WORLDS[chain.body.worldIndex])) {
+            return;
+        }
         for (b2SurfaceMaterial material : chain.materials) {
             material.restitution = restitution;
         }
@@ -5809,6 +6174,9 @@ public final class B2 {
 
     public static void b2Chain_SetMaterial(b2ChainId chainId, int material) {
         ChainSlot chain = requireChain(chainId);
+        if (b2RejectLockedWorld(WORLDS[chain.body.worldIndex])) {
+            return;
+        }
         for (b2SurfaceMaterial surfaceMaterial : chain.materials) {
             surfaceMaterial.userMaterialId = material;
         }
@@ -5824,7 +6192,13 @@ public final class B2 {
     }
 
     public static b2JointId b2CreateDistanceJoint(b2WorldId worldId, b2DistanceJointDef def) {
+        b2CheckDef(def.internalValue);
+        b2Assert(b2IsValidFloat(def.length) && def.length > 0.0f,
+            "distance joint length is valid and positive");
         WorldSlot world = requireWorld(worldId);
+        if (b2RejectLockedWorld(world)) {
+            return new b2JointId();
+        }
         BodySlot bodyA = requireBody(def.bodyIdA);
         BodySlot bodyB = requireBody(def.bodyIdB);
         JointSlot joint = b2CreateJointBase(world, bodyA, bodyB, def.userData, b2_distanceJoint, def.collideConnected);
@@ -5950,7 +6324,11 @@ public final class B2 {
     }
 
     public static b2JointId b2CreateMotorJoint(b2WorldId worldId, b2MotorJointDef def) {
+        b2CheckDef(def.internalValue);
         WorldSlot world = requireWorld(worldId);
+        if (b2RejectLockedWorld(world)) {
+            return new b2JointId();
+        }
         BodySlot bodyA = requireBody(def.bodyIdA);
         BodySlot bodyB = requireBody(def.bodyIdB);
         JointSlot joint = b2CreateJointBase(world, bodyA, bodyB, def.userData, b2_motorJoint, def.collideConnected);
@@ -6006,7 +6384,11 @@ public final class B2 {
     }
 
     public static b2JointId b2CreateMouseJoint(b2WorldId worldId, b2MouseJointDef def) {
+        b2CheckDef(def.internalValue);
         WorldSlot world = requireWorld(worldId);
+        if (b2RejectLockedWorld(world)) {
+            return new b2JointId();
+        }
         BodySlot bodyA = requireBody(def.bodyIdA);
         BodySlot bodyB = requireBody(def.bodyIdB);
         JointSlot joint = b2CreateJointBase(world, bodyA, bodyB, def.userData, b2_mouseJoint, def.collideConnected);
@@ -6020,6 +6402,7 @@ public final class B2 {
     }
 
     public static void b2MouseJoint_SetTarget(b2JointId jointId, b2Vec2 target) {
+        b2Assert(b2IsValidVec2(target), "mouse joint target is valid");
         requireMouseJoint(jointId).mouseTarget = target.copy();
     }
 
@@ -6028,6 +6411,8 @@ public final class B2 {
     }
 
     public static void b2MouseJoint_SetSpringHertz(b2JointId jointId, float hertz) {
+        b2Assert(b2IsValidFloat(hertz) && hertz >= 0.0f,
+            "mouse joint hertz is valid and non-negative");
         requireMouseJoint(jointId).mouseHertz = hertz;
     }
 
@@ -6036,6 +6421,8 @@ public final class B2 {
     }
 
     public static void b2MouseJoint_SetSpringDampingRatio(b2JointId jointId, float dampingRatio) {
+        b2Assert(b2IsValidFloat(dampingRatio) && dampingRatio >= 0.0f,
+            "mouse joint damping ratio is valid and non-negative");
         requireMouseJoint(jointId).mouseDampingRatio = dampingRatio;
     }
 
@@ -6044,6 +6431,8 @@ public final class B2 {
     }
 
     public static void b2MouseJoint_SetMaxForce(b2JointId jointId, float maxForce) {
+        b2Assert(b2IsValidFloat(maxForce) && maxForce >= 0.0f,
+            "mouse joint max force is valid and non-negative");
         requireMouseJoint(jointId).mouseMaxForce = maxForce;
     }
 
@@ -6052,7 +6441,11 @@ public final class B2 {
     }
 
     public static b2JointId b2CreateFilterJoint(b2WorldId worldId, b2FilterJointDef def) {
+        b2CheckDef(def.internalValue);
         WorldSlot world = requireWorld(worldId);
+        if (b2RejectLockedWorld(world)) {
+            return new b2JointId();
+        }
         BodySlot bodyA = requireBody(def.bodyIdA);
         BodySlot bodyB = requireBody(def.bodyIdB);
         JointSlot joint = b2CreateJointBase(world, bodyA, bodyB, def.userData, b2_filterJoint, false);
@@ -6060,7 +6453,13 @@ public final class B2 {
     }
 
     public static b2JointId b2CreatePrismaticJoint(b2WorldId worldId, b2PrismaticJointDef def) {
+        b2CheckDef(def.internalValue);
+        b2Assert(def.lowerTranslation <= def.upperTranslation,
+            "prismatic lower translation does not exceed upper translation");
         WorldSlot world = requireWorld(worldId);
+        if (b2RejectLockedWorld(world)) {
+            return new b2JointId();
+        }
         BodySlot bodyA = requireBody(def.bodyIdA);
         BodySlot bodyB = requireBody(def.bodyIdB);
         JointSlot joint = b2CreateJointBase(world, bodyA, bodyB, def.userData, b2_prismaticJoint, def.collideConnected);
@@ -6142,6 +6541,7 @@ public final class B2 {
     }
 
     public static void b2PrismaticJoint_SetLimits(b2JointId jointId, float lower, float upper) {
+        b2Assert(lower <= upper, "prismatic lower limit does not exceed upper limit");
         JointSlot joint = requirePrismaticJoint(jointId);
         if (lower != joint.prismaticLowerTranslation || upper != joint.prismaticUpperTranslation) {
             joint.prismaticLowerTranslation = b2MinFloat(lower, upper);
@@ -6208,13 +6608,21 @@ public final class B2 {
     }
 
     public static b2JointId b2CreateRevoluteJoint(b2WorldId worldId, b2RevoluteJointDef def) {
+        b2CheckDef(def.internalValue);
+        b2Assert(def.lowerAngle <= def.upperAngle, "revolute lower angle does not exceed upper angle");
+        b2Assert(def.lowerAngle >= -0.99f * B2_PI, "revolute lower angle is within the supported range");
+        b2Assert(def.upperAngle <= 0.99f * B2_PI, "revolute upper angle is within the supported range");
         WorldSlot world = requireWorld(worldId);
+        if (b2RejectLockedWorld(world)) {
+            return new b2JointId();
+        }
         BodySlot bodyA = requireBody(def.bodyIdA);
         BodySlot bodyB = requireBody(def.bodyIdB);
         JointSlot joint = b2CreateJointBase(world, bodyA, bodyB, def.userData, b2_revoluteJoint, def.collideConnected);
         joint.localAnchorA = def.localAnchorA.copy();
         joint.localAnchorB = def.localAnchorB.copy();
         joint.referenceAngle = b2ClampFloat(def.referenceAngle, -B2_PI, B2_PI);
+        joint.drawSize = def.drawSize;
         joint.revoluteTargetAngle = b2ClampFloat(def.targetAngle, -B2_PI, B2_PI);
         joint.revoluteHertz = def.hertz;
         joint.revoluteDampingRatio = def.dampingRatio;
@@ -6294,6 +6702,9 @@ public final class B2 {
     }
 
     public static void b2RevoluteJoint_SetLimits(b2JointId jointId, float lower, float upper) {
+        b2Assert(lower <= upper, "revolute lower limit does not exceed upper limit");
+        b2Assert(lower >= -0.99f * B2_PI, "revolute lower limit is within the supported range");
+        b2Assert(upper <= 0.99f * B2_PI, "revolute upper limit is within the supported range");
         JointSlot joint = requireRevoluteJoint(jointId);
         if (lower != joint.revoluteLowerAngle || upper != joint.revoluteUpperAngle) {
             joint.revoluteLowerAngle = b2MinFloat(lower, upper);
@@ -6337,7 +6748,11 @@ public final class B2 {
     }
 
     public static b2JointId b2CreateWeldJoint(b2WorldId worldId, b2WeldJointDef def) {
+        b2CheckDef(def.internalValue);
         WorldSlot world = requireWorld(worldId);
+        if (b2RejectLockedWorld(world)) {
+            return new b2JointId();
+        }
         BodySlot bodyA = requireBody(def.bodyIdA);
         BodySlot bodyB = requireBody(def.bodyIdB);
         JointSlot joint = b2CreateJointBase(world, bodyA, bodyB, def.userData, b2_weldJoint, def.collideConnected);
@@ -6355,6 +6770,8 @@ public final class B2 {
     }
 
     public static void b2WeldJoint_SetLinearHertz(b2JointId jointId, float hertz) {
+        b2Assert(b2IsValidFloat(hertz) && hertz >= 0.0f,
+            "weld linear hertz is valid and non-negative");
         requireWeldJoint(jointId).weldLinearHertz = hertz;
     }
 
@@ -6363,6 +6780,8 @@ public final class B2 {
     }
 
     public static void b2WeldJoint_SetLinearDampingRatio(b2JointId jointId, float dampingRatio) {
+        b2Assert(b2IsValidFloat(dampingRatio) && dampingRatio >= 0.0f,
+            "weld linear damping ratio is valid and non-negative");
         requireWeldJoint(jointId).weldLinearDampingRatio = dampingRatio;
     }
 
@@ -6371,6 +6790,8 @@ public final class B2 {
     }
 
     public static void b2WeldJoint_SetAngularHertz(b2JointId jointId, float hertz) {
+        b2Assert(b2IsValidFloat(hertz) && hertz >= 0.0f,
+            "weld angular hertz is valid and non-negative");
         requireWeldJoint(jointId).weldAngularHertz = hertz;
     }
 
@@ -6379,6 +6800,8 @@ public final class B2 {
     }
 
     public static void b2WeldJoint_SetAngularDampingRatio(b2JointId jointId, float dampingRatio) {
+        b2Assert(b2IsValidFloat(dampingRatio) && dampingRatio >= 0.0f,
+            "weld angular damping ratio is valid and non-negative");
         requireWeldJoint(jointId).weldAngularDampingRatio = dampingRatio;
     }
 
@@ -6387,7 +6810,13 @@ public final class B2 {
     }
 
     public static b2JointId b2CreateWheelJoint(b2WorldId worldId, b2WheelJointDef def) {
+        b2CheckDef(def.internalValue);
+        b2Assert(def.lowerTranslation <= def.upperTranslation,
+            "wheel lower translation does not exceed upper translation");
         WorldSlot world = requireWorld(worldId);
+        if (b2RejectLockedWorld(world)) {
+            return new b2JointId();
+        }
         BodySlot bodyA = requireBody(def.bodyIdA);
         BodySlot bodyB = requireBody(def.bodyIdB);
         JointSlot joint = b2CreateJointBase(world, bodyA, bodyB, def.userData, b2_wheelJoint, def.collideConnected);
@@ -6459,6 +6888,7 @@ public final class B2 {
     }
 
     public static void b2WheelJoint_SetLimits(b2JointId jointId, float lower, float upper) {
+        b2Assert(lower <= upper, "wheel lower limit does not exceed upper limit");
         JointSlot joint = requireWheelJoint(jointId);
         if (lower != joint.wheelLowerTranslation || upper != joint.wheelUpperTranslation) {
             joint.wheelLowerTranslation = b2MinFloat(lower, upper);
@@ -6503,10 +6933,15 @@ public final class B2 {
 
     public static void b2DestroyJoint(b2JointId jointId) {
         JointSlot joint = getJoint(jointId);
+        b2Assert(joint != null, "joint id is valid");
         if (joint == null) {
             return;
         }
-        b2DestroyJointInternal(WORLDS[joint.bodyA.worldIndex], joint);
+        WorldSlot world = WORLDS[joint.bodyA.worldIndex];
+        if (b2RejectLockedWorld(world)) {
+            return;
+        }
+        b2DestroyJointInternal(world, joint, true);
     }
 
     public static boolean b2Joint_IsValid(b2JointId jointId) {
@@ -6534,6 +6969,7 @@ public final class B2 {
     }
 
     public static void b2Joint_SetLocalAnchorA(b2JointId jointId, b2Vec2 localAnchor) {
+        b2Assert(b2IsValidVec2(localAnchor), "joint local anchor A is valid");
         requireJoint(jointId).localAnchorA = localAnchor.copy();
     }
 
@@ -6542,6 +6978,7 @@ public final class B2 {
     }
 
     public static void b2Joint_SetLocalAnchorB(b2JointId jointId, b2Vec2 localAnchor) {
+        b2Assert(b2IsValidVec2(localAnchor), "joint local anchor B is valid");
         requireJoint(jointId).localAnchorB = localAnchor.copy();
     }
 
@@ -6550,6 +6987,7 @@ public final class B2 {
     }
 
     public static void b2Joint_SetReferenceAngle(b2JointId jointId, float angleInRadians) {
+        b2Assert(b2IsValidFloat(angleInRadians), "joint reference angle is valid");
         JointSlot joint = requireJoint(jointId);
         if (joint.type == b2_prismaticJoint || joint.type == b2_revoluteJoint || joint.type == b2_weldJoint) {
             joint.referenceAngle = angleInRadians;
@@ -6565,6 +7003,8 @@ public final class B2 {
     }
 
     public static void b2Joint_SetLocalAxisA(b2JointId jointId, b2Vec2 localAxis) {
+        b2Assert(b2IsValidVec2(localAxis), "joint local axis is valid");
+        b2Assert(b2IsNormalized(localAxis), "joint local axis is normalized");
         JointSlot joint = requireJoint(jointId);
         if (joint.type == b2_prismaticJoint || joint.type == b2_wheelJoint) {
             joint.localAxisA = localAxis.copy();
@@ -6581,11 +7021,14 @@ public final class B2 {
 
     public static void b2Joint_SetCollideConnected(b2JointId jointId, boolean shouldCollide) {
         JointSlot joint = requireJoint(jointId);
+        WorldSlot world = WORLDS[joint.bodyA.worldIndex];
+        if (b2RejectLockedWorld(world)) {
+            return;
+        }
         if (joint.collideConnected == shouldCollide) {
             return;
         }
         joint.collideConnected = shouldCollide;
-        WorldSlot world = WORLDS[joint.bodyA.worldIndex];
         if (shouldCollide) {
             for (ShapeSlot shape : joint.bodyA.shapes.size() < joint.bodyB.shapes.size() ? joint.bodyA.shapes : joint.bodyB.shapes) {
                 if (shape.proxyKey != B2_NULL_INDEX) {
@@ -6611,6 +7054,9 @@ public final class B2 {
 
     public static void b2Joint_WakeBodies(b2JointId jointId) {
         JointSlot joint = requireJoint(jointId);
+        if (b2RejectLockedWorld(WORLDS[joint.bodyA.worldIndex])) {
+            return;
+        }
         b2WakeBody(joint.bodyA);
         b2WakeBody(joint.bodyB);
     }
@@ -6649,7 +7095,7 @@ public final class B2 {
             return b2Add(b2MulSV(perpForce, perpA), b2MulSV(axialForce, axisA));
         }
         if (joint.type == b2_wheelJoint) {
-            b2Vec2 axisA = b2RotateVector(joint.bodyA.rotation, joint.localAxisA);
+            b2Vec2 axisA = joint.wheelAxisA;
             b2Vec2 perpA = b2LeftPerp(axisA);
             float invH = WORLDS[joint.bodyA.worldIndex].invH;
             float perpForce = invH * joint.wheelPerpImpulse;
@@ -6793,16 +7239,21 @@ public final class B2 {
     }
 
     public static b2Vec2 b2Body_GetLinearVelocity(b2BodyId bodyId) {
-        return requireBody(bodyId).linearVelocity.copy();
+        BodySlot body = requireBody(bodyId);
+        return body.awake ? body.linearVelocity.copy() : b2Vec2_zero.copy();
     }
 
     public static float b2Body_GetAngularVelocity(b2BodyId bodyId) {
-        return requireBody(bodyId).angularVelocity;
+        BodySlot body = requireBody(bodyId);
+        return body.awake ? body.angularVelocity : 0.0f;
     }
 
     public static void b2Body_SetLinearVelocity(b2BodyId bodyId, b2Vec2 linearVelocity) {
         BodySlot body = requireBody(bodyId);
         if (body.type == b2_staticBody) {
+            return;
+        }
+        if (!body.enabled) {
             return;
         }
         if (b2LengthSquared(linearVelocity) > 0.0f) {
@@ -6814,6 +7265,9 @@ public final class B2 {
     public static void b2Body_SetAngularVelocity(b2BodyId bodyId, float angularVelocity) {
         BodySlot body = requireBody(bodyId);
         if (body.type == b2_staticBody || body.fixedRotation) {
+            return;
+        }
+        if (!body.enabled) {
             return;
         }
         if (angularVelocity != 0.0f) {
@@ -6839,13 +7293,16 @@ public final class B2 {
             return;
         }
         b2WakeBody(body);
+        if (!body.enabled) {
+            return;
+        }
         body.linearVelocity = linearVelocity;
         body.angularVelocity = angularVelocity;
     }
 
     public static b2Vec2 b2Body_GetLocalPointVelocity(b2BodyId bodyId, b2Vec2 localPoint) {
         BodySlot body = requireBody(bodyId);
-        if (body.type == b2_staticBody) {
+        if (!body.awake) {
             return b2Vec2_zero.copy();
         }
         b2Vec2 r = b2RotateVector(body.rotation, b2Sub(localPoint, body.localCenter));
@@ -6854,7 +7311,7 @@ public final class B2 {
 
     public static b2Vec2 b2Body_GetWorldPointVelocity(b2BodyId bodyId, b2Vec2 worldPoint) {
         BodySlot body = requireBody(bodyId);
-        if (body.type == b2_staticBody) {
+        if (!body.awake) {
             return b2Vec2_zero.copy();
         }
         b2Vec2 r = b2Sub(worldPoint, body.center);
@@ -6868,6 +7325,9 @@ public final class B2 {
     public static void b2Body_SetAwake(b2BodyId bodyId, boolean awake) {
         BodySlot body = requireBody(bodyId);
         WorldSlot world = WORLDS[body.worldIndex];
+        if (b2RejectLockedWorld(world)) {
+            return;
+        }
         if (awake) {
             b2WakeBody(body);
         } else if (body.awake && body.type != b2_staticBody) {
@@ -6877,6 +7337,9 @@ public final class B2 {
 
     public static void b2Body_EnableSleep(b2BodyId bodyId, boolean enableSleep) {
         BodySlot body = requireBody(bodyId);
+        if (b2RejectLockedWorld(WORLDS[body.worldIndex])) {
+            return;
+        }
         body.enableSleep = enableSleep;
         if (!enableSleep) {
             b2WakeBody(body);
@@ -6901,42 +7364,76 @@ public final class B2 {
 
     public static void b2Body_Disable(b2BodyId bodyId) {
         BodySlot body = requireBody(bodyId);
+        WorldSlot world = WORLDS[body.worldIndex];
+        if (b2RejectLockedWorld(world)) {
+            return;
+        }
         if (!body.enabled) {
             return;
         }
-        WorldSlot world = WORLDS[body.worldIndex];
+        for (JointSlot joint : body.joints) {
+            b2RemoveJointFromGraph(world, joint);
+            b2UnlinkSleepJoint(world, joint);
+        }
+        for (int shapeIndex = body.shapes.size() - 1; shapeIndex >= 0; --shapeIndex) {
+            ShapeSlot shape = body.shapes.get(shapeIndex);
+            b2DestroyShapeProxy(shape, world.broadPhase);
+            b2DestroyContactsForShape(world, shape, true);
+        }
         body.enabled = false;
-        if (body.type == b2_dynamicBody) {
+        body.awake = false;
+        body.linearVelocity = b2Vec2_zero.copy();
+        body.angularVelocity = 0.0f;
+        if (body.type != b2_staticBody) {
             b2RemoveSwap(world.solverBodyOrder, body);
         }
-        for (ShapeSlot shape : body.shapes) {
-            b2DestroyShapeProxy(shape, world.broadPhase);
-            b2DestroyContactsForShape(world, shape);
+        int sleepRoot = b2FindSleepIsland(world, body.sleepIslandId);
+        java.util.ArrayList<BodySlot> islandBodies = world.sleepIslandBodies.get(sleepRoot);
+        if (islandBodies != null) {
+            islandBodies.remove(body);
         }
+        b2MarkSleepIslandConstraintRemoved(world, sleepRoot);
+        body.sleepIslandId = B2_NULL_INDEX;
         b2RebuildContactPairSet(world);
     }
 
     public static void b2Body_Enable(b2BodyId bodyId) {
         BodySlot body = requireBody(bodyId);
+        WorldSlot world = WORLDS[body.worldIndex];
+        if (b2RejectLockedWorld(world)) {
+            return;
+        }
         if (body.enabled) {
             return;
         }
-        WorldSlot world = WORLDS[body.worldIndex];
         body.enabled = true;
         body.awake = body.type != b2_staticBody;
-        if (body.type == b2_dynamicBody) {
+        if (body.type != b2_staticBody) {
             world.solverBodyOrder.add(body);
+            b2EnsureBodySleepIsland(world, body);
         }
-        for (ShapeSlot shape : body.shapes) {
+        for (int shapeIndex = body.shapes.size() - 1; shapeIndex >= 0; --shapeIndex) {
+            ShapeSlot shape = body.shapes.get(shapeIndex);
             if (shape.proxyKey == B2_NULL_INDEX) {
-                boolean forcePairCreation = shape.def.invokeContactCreation || shape.def.isSensor;
-                b2CreateShapeProxy(shape, world.broadPhase, body.type, forcePairCreation);
+                b2CreateShapeProxy(shape, world.broadPhase, body.type, true);
+            }
+        }
+        for (JointSlot joint : body.joints) {
+            if (joint.colorIndex == B2_NULL_INDEX && joint.bodyA.enabled && joint.bodyB.enabled
+                && (joint.bodyA.type != b2_staticBody || joint.bodyB.type != b2_staticBody)) {
+                b2LinkSleepJoint(world, joint);
+                if (joint.bodyA.awake || joint.bodyB.awake) {
+                    b2AddJointToGraph(world, joint);
+                }
             }
         }
     }
 
     public static void b2Body_SetFixedRotation(b2BodyId bodyId, boolean flag) {
         BodySlot body = requireBody(bodyId);
+        if (b2RejectLockedWorld(WORLDS[body.worldIndex])) {
+            return;
+        }
         if (body.fixedRotation != flag) {
             body.fixedRotation = flag;
             body.angularVelocity = 0.0f;
@@ -6949,7 +7446,11 @@ public final class B2 {
     }
 
     public static void b2Body_SetBullet(b2BodyId bodyId, boolean flag) {
-        requireBody(bodyId).bullet = flag;
+        BodySlot body = requireBody(bodyId);
+        if (b2RejectLockedWorld(WORLDS[body.worldIndex])) {
+            return;
+        }
+        body.bullet = flag;
     }
 
     public static boolean b2Body_IsBullet(b2BodyId bodyId) {
@@ -6973,7 +7474,15 @@ public final class B2 {
     }
 
     public static void b2Body_SetMassData(b2BodyId bodyId, b2MassData massData) {
+        b2Assert(b2IsValidFloat(massData.mass) && massData.mass >= 0.0f,
+            "mass is valid and non-negative");
+        b2Assert(b2IsValidFloat(massData.rotationalInertia) && massData.rotationalInertia >= 0.0f,
+            "rotational inertia is valid and non-negative");
+        b2Assert(b2IsValidVec2(massData.center), "mass center is valid");
         BodySlot body = requireBody(bodyId);
+        if (b2RejectLockedWorld(WORLDS[body.worldIndex])) {
+            return;
+        }
         body.mass = massData.mass;
         body.inertia = massData.rotationalInertia;
         body.localCenter = massData.center.copy();
@@ -6992,7 +7501,11 @@ public final class B2 {
     }
 
     public static void b2Body_ApplyMassFromShapes(b2BodyId bodyId) {
-        b2UpdateBodyMassData(requireBody(bodyId));
+        BodySlot body = requireBody(bodyId);
+        if (b2RejectLockedWorld(WORLDS[body.worldIndex])) {
+            return;
+        }
+        b2UpdateBodyMassData(body);
     }
 
     public static void b2Body_ApplyForce(b2BodyId bodyId, b2Vec2 force, b2Vec2 point, boolean wake) {
@@ -7060,7 +7573,13 @@ public final class B2 {
     }
 
     public static void b2Body_SetLinearDamping(b2BodyId bodyId, float linearDamping) {
-        requireBody(bodyId).linearDamping = linearDamping;
+        b2Assert(b2IsValidFloat(linearDamping) && linearDamping >= 0.0f,
+            "linear damping is valid and non-negative");
+        BodySlot body = requireBody(bodyId);
+        if (b2RejectLockedWorld(WORLDS[body.worldIndex])) {
+            return;
+        }
+        body.linearDamping = linearDamping;
     }
 
     public static float b2Body_GetLinearDamping(b2BodyId bodyId) {
@@ -7068,7 +7587,13 @@ public final class B2 {
     }
 
     public static void b2Body_SetAngularDamping(b2BodyId bodyId, float angularDamping) {
-        requireBody(bodyId).angularDamping = angularDamping;
+        b2Assert(b2IsValidFloat(angularDamping) && angularDamping >= 0.0f,
+            "angular damping is valid and non-negative");
+        BodySlot body = requireBody(bodyId);
+        if (b2RejectLockedWorld(WORLDS[body.worldIndex])) {
+            return;
+        }
+        body.angularDamping = angularDamping;
     }
 
     public static float b2Body_GetAngularDamping(b2BodyId bodyId) {
@@ -7076,7 +7601,12 @@ public final class B2 {
     }
 
     public static void b2Body_SetGravityScale(b2BodyId bodyId, float gravityScale) {
-        requireBody(bodyId).gravityScale = gravityScale;
+        b2Assert(b2IsValidFloat(gravityScale), "gravity scale is valid");
+        BodySlot body = requireBody(bodyId);
+        if (b2RejectLockedWorld(WORLDS[body.worldIndex])) {
+            return;
+        }
+        body.gravityScale = gravityScale;
     }
 
     public static float b2Body_GetGravityScale(b2BodyId bodyId) {
@@ -7085,7 +7615,8 @@ public final class B2 {
 
     public static void b2Body_EnableContactEvents(b2BodyId bodyId, boolean flag) {
         BodySlot body = requireBody(bodyId);
-        for (ShapeSlot shape : body.shapes) {
+        for (int shapeIndex = body.shapes.size() - 1; shapeIndex >= 0; --shapeIndex) {
+            ShapeSlot shape = body.shapes.get(shapeIndex);
             shape.def.enableContactEvents = flag;
         }
     }
@@ -7111,7 +7642,7 @@ public final class B2 {
         BodySlot body = requireBody(bodyId);
         WorldSlot world = WORLDS[body.worldIndex];
         int count = 0;
-        int limit = b2MinInt(capacity, shapeArray.length);
+        int limit = b2MaxInt(0, b2MinInt(capacity, shapeArray.length));
         for (int i = body.shapes.size() - 1; i >= 0 && count < limit; --i) {
             shapeArray[count++] = shapeId(world, body.shapes.get(i));
         }
@@ -7126,7 +7657,7 @@ public final class B2 {
         BodySlot body = requireBody(bodyId);
         WorldSlot world = WORLDS[body.worldIndex];
         int count = 0;
-        int limit = b2MinInt(capacity, jointArray.length);
+        int limit = b2MaxInt(0, b2MinInt(capacity, jointArray.length));
         for (JointSlot joint : body.joints) {
             if (count >= limit) {
                 break;
@@ -7138,6 +7669,9 @@ public final class B2 {
 
     public static b2AABB b2Body_ComputeAABB(b2BodyId bodyId) {
         BodySlot body = requireBody(bodyId);
+        if (b2RejectLockedWorld(WORLDS[body.worldIndex])) {
+            return new b2AABB();
+        }
         if (body.shapes.isEmpty()) {
             return new b2AABB(body.position, body.position);
         }
@@ -7172,7 +7706,12 @@ public final class B2 {
         }
         counters.contactCount = world.contactCount;
         counters.islandCount = islandRoots.size();
+        counters.staticTreeHeight = b2DynamicTree_GetHeight(world.broadPhase.trees[b2_staticBody]);
+        counters.treeHeight = b2MaxInt(
+            b2DynamicTree_GetHeight(world.broadPhase.trees[b2_dynamicBody]),
+            b2DynamicTree_GetHeight(world.broadPhase.trees[b2_kinematicBody]));
         counters.byteCount = b2GetByteCount();
+        counters.taskCount = world.taskCount;
         for (int i = 0; i < B2_GRAPH_COLOR_COUNT; ++i) {
             counters.colorCounts[i] = world.contactGraphColors[i].size() + world.jointGraphColors[i].size();
         }
@@ -7180,137 +7719,156 @@ public final class B2 {
     }
 
     public static void b2World_Step(b2WorldId worldId, float timeStep, int subStepCount) {
+        b2Assert(b2IsValidFloat(timeStep), "timeStep is valid");
+        b2Assert(subStepCount > 0, "subStepCount is greater than zero");
         WorldSlot world = requireWorld(worldId);
+        b2Assert(!world.locked, "world is not locked");
+        if (world.locked) {
+            return;
+        }
+
         B2DebugHooks.beforeWorldStep(worldId, timeStep, subStepCount);
-        world.stepCount += 1;
-        world.contactEvents = new b2ContactEvents();
-        b2UpdateBroadPhasePairs(world);
-        Object treeTask = world.enqueueTask.invoke(
-            (startIndex, endIndex, workerIndex, taskContext) -> b2BroadPhase_RebuildTrees(world.broadPhase),
-            1, 1, null, world.userTaskContext);
-        try {
-            b2UpdateContacts(world);
-        } finally {
-            if (treeTask != null) {
-                world.finishTask.invoke(treeTask, world.userTaskContext);
-            }
-        }
-        b2SplitSleepIsland(world);
-        int actualSubStepCount = b2MaxInt(1, subStepCount);
-        if (timeStep == 0.0f) {
-            world.invH = 0.0f;
-            updateSensorEvents(world);
-            B2DebugHooks.stepComplete(worldId);
-            return;
-        }
-        world.invH = actualSubStepCount / timeStep;
-        if (b2SolveWorldContacts(world, timeStep, actualSubStepCount)) {
-            b2IntegrateKinematicBodies(world, timeStep, actualSubStepCount);
-            updateSensorEvents(world);
-            B2DebugHooks.stepComplete(worldId);
-            return;
-        }
-        float h = timeStep / actualSubStepCount;
-        float maxLinearSpeed = world.def.maximumLinearSpeed;
-        float maxLinearSpeedSquared = maxLinearSpeed * maxLinearSpeed;
-        float maxAngularSpeed = B2_MAX_ROTATION() / timeStep;
-        float maxAngularSpeedSquared = maxAngularSpeed * maxAngularSpeed;
-        java.util.ArrayList<b2BodyMoveEvent> moves = new java.util.ArrayList<>();
-        for (BodySlot body : world.bodies) {
-            if (body == null || !body.alive || !body.enabled || body.type == b2_staticBody
-                || (body.type == b2_dynamicBody && !body.awake)) {
-                continue;
-            }
-            b2Vec2 deltaPosition = b2Vec2_zero.copy();
-            b2Rot deltaRotation = b2Rot_identity.copy();
-            for (int i = 0; i < actualSubStepCount; ++i) {
-                float linearDamping = 1.0f / (1.0f + h * body.linearDamping);
-                float angularDamping = 1.0f / (1.0f + h * body.angularDamping);
-
-                float gravityScale = body.invMass > 0.0f ? body.gravityScale : 0.0f;
-                b2Vec2 linearVelocityDelta = b2Add(b2MulSV(h * body.invMass, body.force),
-                    b2MulSV(h * gravityScale, world.def.gravity));
-                float angularVelocityDelta = h * body.invInertia * body.torque;
-                body.linearVelocity = b2MulAdd(linearVelocityDelta, linearDamping, body.linearVelocity);
-                body.angularVelocity = angularVelocityDelta + angularDamping * body.angularVelocity;
-
-                if (b2Dot(body.linearVelocity, body.linearVelocity) > maxLinearSpeedSquared) {
-                    float ratio = maxLinearSpeed / b2Length(body.linearVelocity);
-                    body.linearVelocity = b2MulSV(ratio, body.linearVelocity);
-                }
-
-                if (body.angularVelocity * body.angularVelocity > maxAngularSpeedSquared && !body.allowFastRotation) {
-                    float ratio = maxAngularSpeed / b2AbsFloat(body.angularVelocity);
-                    body.angularVelocity *= ratio;
-                }
-
-                deltaRotation = b2IntegrateRotation(deltaRotation, h * body.angularVelocity);
-                deltaPosition = b2MulAdd(deltaPosition, h, body.linearVelocity);
-            }
-            body.center = b2Add(body.center, deltaPosition);
-            body.rotation = b2NormalizeRot(b2MulRot(deltaRotation, body.rotation));
-            body.position = b2Sub(body.center, b2RotateVector(body.rotation, body.localCenter));
-            b2SynchronizeBodyProxies(world, body);
-            b2BodyMoveEvent event = new b2BodyMoveEvent();
-            event.bodyId = bodyId(world, body);
-            event.transform = new b2Transform(body.position, body.rotation);
-            event.userData = body.userData;
-            moves.add(event);
-            body.force = b2Vec2_zero.copy();
-            body.torque = 0.0f;
-        }
         world.bodyEvents = new b2BodyEvents();
-        world.bodyEvents.moveEvents = moves.toArray(new b2BodyMoveEvent[0]);
-        world.bodyEvents.moveCount = world.bodyEvents.moveEvents.length;
-        updateSensorEvents(world);
-        B2DebugHooks.stepComplete(worldId);
-    }
+        world.sensorEvents = new b2SensorEvents();
+        world.contactEvents = new b2ContactEvents();
+        world.profile = new b2Profile();
+        if (timeStep == 0.0f) {
+            world.sensorEvents.endEvents = world.pendingSensorEndEvents.toArray(new b2SensorEndTouchEvent[0]);
+            world.sensorEvents.endCount = world.sensorEvents.endEvents.length;
+            world.pendingSensorEndEvents.clear();
+            world.contactEvents.endEvents = world.pendingContactEndEvents.toArray(new b2ContactEndTouchEvent[0]);
+            world.contactEvents.endCount = world.contactEvents.endEvents.length;
+            world.pendingContactEndEvents.clear();
+            world.invH = 0.0f;
+            B2DebugHooks.stepComplete(worldId);
+            return;
+        }
 
-    private static void b2IntegrateKinematicBodies(WorldSlot world, float timeStep, int subStepCount) {
-        float h = timeStep / b2MaxInt(1, subStepCount);
-        java.util.ArrayList<b2BodyMoveEvent> moves = new java.util.ArrayList<>();
-        if (world.bodyEvents.moveEvents != null) {
-            java.util.Collections.addAll(moves, world.bodyEvents.moveEvents);
-        }
-        for (BodySlot body : world.bodies) {
-            if (body == null || !body.alive || !body.enabled || body.type != b2_kinematicBody) {
-                continue;
+        world.locked = true;
+        boolean completed = false;
+        try {
+            long stepStart = System.nanoTime();
+            world.stepCount += 1;
+            world.taskCount = 0;
+            long phaseStart = System.nanoTime();
+            b2UpdateBroadPhasePairs(world);
+            world.profile.pairs = b2ElapsedMilliseconds(phaseStart);
+            phaseStart = System.nanoTime();
+            world.taskCount += 1;
+            Object treeTask = world.enqueueTask.invoke(
+                (startIndex, endIndex, workerIndex, taskContext) -> b2BroadPhase_RebuildTrees(world.broadPhase),
+                1, 1, null, world.userTaskContext);
+            try {
+                b2UpdateContacts(world);
+            } finally {
+                if (treeTask != null) {
+                    world.finishTask.invoke(treeTask, world.userTaskContext);
+                }
             }
-            b2Vec2 deltaPosition = b2Vec2_zero.copy();
-            b2Rot deltaRotation = b2Rot_identity.copy();
-            for (int i = 0; i < subStepCount; ++i) {
-                deltaRotation = b2IntegrateRotation(deltaRotation, h * body.angularVelocity);
-                deltaPosition = b2MulAdd(deltaPosition, h, body.linearVelocity);
+            world.profile.collide = b2ElapsedMilliseconds(phaseStart);
+            phaseStart = System.nanoTime();
+            if (b2SplitSleepIsland(world)) {
+                world.profile.splitIslands = b2ElapsedMilliseconds(phaseStart);
             }
-            body.center = b2Add(body.center, deltaPosition);
-            body.rotation = b2NormalizeRot(b2MulRot(deltaRotation, body.rotation));
-            body.position = b2Sub(body.center, b2RotateVector(body.rotation, body.localCenter));
-            b2SynchronizeBodyProxies(world, body);
-            b2BodyMoveEvent event = new b2BodyMoveEvent();
-            event.bodyId = bodyId(world, body);
-            event.transform = new b2Transform(body.position, body.rotation);
-            event.userData = body.userData;
-            moves.add(event);
+            int actualSubStepCount = b2MaxInt(1, subStepCount);
+            world.invH = actualSubStepCount / timeStep;
+            phaseStart = System.nanoTime();
+            if (b2SolveWorldContacts(world, timeStep, actualSubStepCount)) {
+                world.profile.solve = b2ElapsedMilliseconds(phaseStart);
+                phaseStart = System.nanoTime();
+                updateSensorEvents(world);
+                world.profile.sensors = b2ElapsedMilliseconds(phaseStart);
+                world.profile.step = b2ElapsedMilliseconds(stepStart);
+                completed = true;
+                return;
+            }
+            float h = timeStep / actualSubStepCount;
+            float maxLinearSpeed = world.def.maximumLinearSpeed;
+            float maxLinearSpeedSquared = maxLinearSpeed * maxLinearSpeed;
+            float maxAngularSpeed = B2_MAX_ROTATION() / timeStep;
+            float maxAngularSpeedSquared = maxAngularSpeed * maxAngularSpeed;
+            java.util.ArrayList<b2BodyMoveEvent> moves = new java.util.ArrayList<>();
+            for (BodySlot body : world.bodies) {
+                if (body == null || !body.alive || !body.enabled || body.type == b2_staticBody
+                    || (body.type == b2_dynamicBody && !body.awake)) {
+                    continue;
+                }
+                b2Vec2 deltaPosition = b2Vec2_zero.copy();
+                b2Rot deltaRotation = b2Rot_identity.copy();
+                for (int i = 0; i < actualSubStepCount; ++i) {
+                    float linearDamping = 1.0f / (1.0f + h * body.linearDamping);
+                    float angularDamping = 1.0f / (1.0f + h * body.angularDamping);
+
+                    float gravityScale = body.invMass > 0.0f ? body.gravityScale : 0.0f;
+                    b2Vec2 linearVelocityDelta = b2Add(b2MulSV(h * body.invMass, body.force),
+                        b2MulSV(h * gravityScale, world.def.gravity));
+                    float angularVelocityDelta = h * body.invInertia * body.torque;
+                    body.linearVelocity = b2MulAdd(linearVelocityDelta, linearDamping, body.linearVelocity);
+                    body.angularVelocity = angularVelocityDelta + angularDamping * body.angularVelocity;
+
+                    if (b2Dot(body.linearVelocity, body.linearVelocity) > maxLinearSpeedSquared) {
+                        float ratio = maxLinearSpeed / b2Length(body.linearVelocity);
+                        body.linearVelocity = b2MulSV(ratio, body.linearVelocity);
+                    }
+
+                    if (body.angularVelocity * body.angularVelocity > maxAngularSpeedSquared && !body.allowFastRotation) {
+                        float ratio = maxAngularSpeed / b2AbsFloat(body.angularVelocity);
+                        body.angularVelocity *= ratio;
+                    }
+
+                    deltaRotation = b2IntegrateRotation(deltaRotation, h * body.angularVelocity);
+                    deltaPosition = b2MulAdd(deltaPosition, h, body.linearVelocity);
+                }
+                body.center = b2Add(body.center, deltaPosition);
+                body.rotation = b2NormalizeRot(b2MulRot(deltaRotation, body.rotation));
+                body.position = b2Sub(body.center, b2RotateVector(body.rotation, body.localCenter));
+                b2SynchronizeBodyProxies(world, body);
+                b2BodyMoveEvent event = new b2BodyMoveEvent();
+                event.bodyId = bodyId(world, body);
+                event.transform = new b2Transform(body.position, body.rotation);
+                event.userData = body.userData;
+                moves.add(event);
+                body.force = b2Vec2_zero.copy();
+                body.torque = 0.0f;
+            }
+            world.bodyEvents.moveEvents = moves.toArray(new b2BodyMoveEvent[0]);
+            world.bodyEvents.moveCount = world.bodyEvents.moveEvents.length;
+            world.profile.solve = b2ElapsedMilliseconds(phaseStart);
+            phaseStart = System.nanoTime();
+            updateSensorEvents(world);
+            world.profile.sensors = b2ElapsedMilliseconds(phaseStart);
+            world.profile.step = b2ElapsedMilliseconds(stepStart);
+            completed = true;
+        } finally {
+            world.locked = false;
+            if (completed) {
+                B2DebugHooks.stepComplete(worldId);
+            }
         }
-        world.bodyEvents.moveEvents = moves.toArray(new b2BodyMoveEvent[0]);
-        world.bodyEvents.moveCount = world.bodyEvents.moveEvents.length;
     }
 
     public static b2BodyEvents b2World_GetBodyEvents(b2WorldId worldId) {
-        return requireWorld(worldId).bodyEvents;
+        WorldSlot world = requireWorld(worldId);
+        return b2RejectLockedWorld(world) ? new b2BodyEvents() : world.bodyEvents;
     }
 
     public static b2SensorEvents b2World_GetSensorEvents(b2WorldId worldId) {
-        return requireWorld(worldId).sensorEvents;
+        WorldSlot world = requireWorld(worldId);
+        return b2RejectLockedWorld(world) ? new b2SensorEvents() : world.sensorEvents;
     }
 
     public static b2ContactEvents b2World_GetContactEvents(b2WorldId worldId) {
-        return requireWorld(worldId).contactEvents;
+        WorldSlot world = requireWorld(worldId);
+        return b2RejectLockedWorld(world) ? new b2ContactEvents() : world.contactEvents;
     }
 
     public static void b2World_Draw(b2WorldId worldId, b2DebugDraw draw) {
         WorldSlot world = requireWorld(worldId);
+        if (b2RejectLockedWorld(world)) {
+            return;
+        }
         if (draw.useDrawingBounds) {
+            b2Assert(b2IsValidAABB(draw.drawingBounds), "debug drawing bounds are valid");
             for (ShapeSlot shape : world.shapes) {
                 if (shape == null || !shape.alive || shape.proxyKey == B2_NULL_INDEX || !b2AABB_Overlaps(shape.fatAABB, draw.drawingBounds)) {
                     continue;
@@ -7388,11 +7946,19 @@ public final class B2 {
         if (draw.drawContacts) {
             b2DrawContacts(draw, world);
         }
+
+        if (draw.drawIslands) {
+            b2DrawIslands(draw, world);
+        }
     }
 
     public static b2TreeStats b2World_OverlapAABB(b2WorldId worldId, b2AABB aabb, b2QueryFilter filter, b2OverlapResultFcn callback) {
         WorldSlot world = requireWorld(worldId);
         b2TreeStats stats = new b2TreeStats();
+        if (b2RejectLockedWorld(world)) {
+            return stats;
+        }
+        b2Assert(b2IsValidAABB(aabb), "overlap AABB is valid");
         for (int i = 0; i < b2_bodyTypeCount(); ++i) {
             b2TreeStats treeStats = b2DynamicTree_Query(world.broadPhase.trees[i], aabb, filter.maskBits, (proxyId, userData) -> {
                 ShapeSlot shape = getWorldQueryShape(world, userData);
@@ -7410,6 +7976,9 @@ public final class B2 {
     public static b2TreeStats b2World_OverlapShape(b2WorldId worldId, b2ShapeProxy proxy, b2QueryFilter filter, b2OverlapResultFcn callback) {
         WorldSlot world = requireWorld(worldId);
         b2TreeStats stats = new b2TreeStats();
+        if (b2RejectLockedWorld(world)) {
+            return stats;
+        }
         b2AABB aabb = b2MakeAABB(proxy.points, proxy.count, proxy.radius);
         for (int i = 0; i < b2_bodyTypeCount(); ++i) {
             b2TreeStats treeStats = b2DynamicTree_Query(world.broadPhase.trees[i], aabb, filter.maskBits, (proxyId, userData) -> {
@@ -7442,6 +8011,11 @@ public final class B2 {
                                               b2CastResultFcn callback) {
         WorldSlot world = requireWorld(worldId);
         b2TreeStats stats = new b2TreeStats();
+        if (b2RejectLockedWorld(world)) {
+            return stats;
+        }
+        b2Assert(b2IsValidVec2(origin), "ray origin is valid");
+        b2Assert(b2IsValidVec2(translation), "ray translation is valid");
         b2RayCastInput input = new b2RayCastInput(origin, translation, 1.0f);
         float[] fraction = {1.0f};
         for (int i = 0; i < b2_bodyTypeCount(); ++i) {
@@ -7492,6 +8066,10 @@ public final class B2 {
                                                 b2CastResultFcn callback) {
         WorldSlot world = requireWorld(worldId);
         b2TreeStats stats = new b2TreeStats();
+        if (b2RejectLockedWorld(world)) {
+            return stats;
+        }
+        b2Assert(b2IsValidVec2(translation), "shape cast translation is valid");
         b2ShapeCastInput input = new b2ShapeCastInput();
         input.proxy = proxy;
         input.translation = translation.copy();
@@ -7524,9 +8102,12 @@ public final class B2 {
     }
 
     public static float b2World_CastMover(b2WorldId worldId, b2Capsule mover, b2Vec2 translation, b2QueryFilter filter) {
-        WorldSlot world = requireWorld(worldId);
         b2Assert(b2IsValidVec2(translation), "translation is valid");
         b2Assert(mover.radius > 2.0f * B2_LINEAR_SLOP(), "mover radius is greater than twice the linear slop");
+        WorldSlot world = requireWorld(worldId);
+        if (b2RejectLockedWorld(world)) {
+            return 1.0f;
+        }
 
         b2ShapeCastInput input = new b2ShapeCastInput();
         input.proxy = b2MakeProxy(new b2Vec2[] {mover.center1, mover.center2}, 2, mover.radius);
@@ -7557,6 +8138,9 @@ public final class B2 {
 
     public static void b2World_CollideMover(b2WorldId worldId, b2Capsule mover, b2QueryFilter filter, b2PlaneResultFcn callback) {
         WorldSlot world = requireWorld(worldId);
+        if (b2RejectLockedWorld(world)) {
+            return;
+        }
         b2Vec2 r = new b2Vec2(mover.radius, mover.radius);
         b2AABB aabb = new b2AABB(b2Sub(b2Min(mover.center1, mover.center2), r), b2Add(b2Max(mover.center1, mover.center2), r));
         for (int i = 0; i < b2_bodyTypeCount(); ++i) {
@@ -7583,7 +8167,26 @@ public final class B2 {
     }
 
     public static void b2World_EnableSleeping(b2WorldId worldId, boolean flag) {
-        requireWorld(worldId).sleepEnabled = flag;
+        WorldSlot world = requireWorld(worldId);
+        if (b2RejectLockedWorld(world) || world.sleepEnabled == flag) {
+            return;
+        }
+        world.sleepEnabled = flag;
+        if (!flag) {
+            for (int root : new java.util.ArrayList<>(world.sleepingIslandRoots)) {
+                java.util.ArrayList<BodySlot> bodies = world.sleepIslandBodies.get(root);
+                if (bodies == null) {
+                    continue;
+                }
+                for (BodySlot body : bodies) {
+                    if (body != null && body.alive && body.enabled && body.type != b2_staticBody && !body.awake
+                        && b2FindSleepIsland(world, body.sleepIslandId) == root) {
+                        b2WakeBodySleepIsland(world, body);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     public static boolean b2World_IsSleepingEnabled(b2WorldId worldId) {
@@ -7591,7 +8194,10 @@ public final class B2 {
     }
 
     public static void b2World_EnableContinuous(b2WorldId worldId, boolean flag) {
-        requireWorld(worldId).continuousEnabled = flag;
+        WorldSlot world = requireWorld(worldId);
+        if (!b2RejectLockedWorld(world)) {
+            world.continuousEnabled = flag;
+        }
     }
 
     public static boolean b2World_IsContinuousEnabled(b2WorldId worldId) {
@@ -7603,7 +8209,10 @@ public final class B2 {
     }
 
     public static void b2World_SetRestitutionThreshold(b2WorldId worldId, float value) {
-        requireWorld(worldId).def.restitutionThreshold = b2ClampFloat(value, 0.0f, Float.MAX_VALUE);
+        WorldSlot world = requireWorld(worldId);
+        if (!b2RejectLockedWorld(world)) {
+            world.def.restitutionThreshold = b2ClampFloat(value, 0.0f, Float.MAX_VALUE);
+        }
     }
 
     public static float b2World_GetRestitutionThreshold(b2WorldId worldId) {
@@ -7611,7 +8220,10 @@ public final class B2 {
     }
 
     public static void b2World_SetHitEventThreshold(b2WorldId worldId, float value) {
-        requireWorld(worldId).def.hitEventThreshold = b2ClampFloat(value, 0.0f, Float.MAX_VALUE);
+        WorldSlot world = requireWorld(worldId);
+        if (!b2RejectLockedWorld(world)) {
+            world.def.hitEventThreshold = b2ClampFloat(value, 0.0f, Float.MAX_VALUE);
+        }
     }
 
     public static float b2World_GetHitEventThreshold(b2WorldId worldId) {
@@ -7627,7 +8239,6 @@ public final class B2 {
     }
 
     public static void b2World_Explode(b2WorldId worldId, b2ExplosionDef explosionDef) {
-        WorldSlot world = requireWorld(worldId);
         b2Vec2 position = explosionDef.position.copy();
         float radius = explosionDef.radius;
         float falloff = explosionDef.falloff;
@@ -7636,6 +8247,10 @@ public final class B2 {
         b2Assert(b2IsValidFloat(radius) && radius >= 0.0f, "explosion radius is non-negative");
         b2Assert(b2IsValidFloat(falloff) && falloff >= 0.0f, "explosion falloff is non-negative");
         b2Assert(b2IsValidFloat(impulsePerLength), "explosion impulse is valid");
+        WorldSlot world = requireWorld(worldId);
+        if (b2RejectLockedWorld(world)) {
+            return;
+        }
 
         float range = radius + falloff;
         b2AABB aabb = new b2AABB(new b2Vec2(position.x - range, position.y - range),
@@ -7695,13 +8310,21 @@ public final class B2 {
 
     public static void b2World_SetContactTuning(b2WorldId worldId, float hertz, float dampingRatio, float pushSpeed) {
         WorldSlot world = requireWorld(worldId);
+        if (b2RejectLockedWorld(world)) {
+            return;
+        }
         world.def.contactHertz = b2ClampFloat(hertz, 0.0f, Float.MAX_VALUE);
         world.def.contactDampingRatio = b2ClampFloat(dampingRatio, 0.0f, Float.MAX_VALUE);
         world.def.maxContactPushSpeed = b2ClampFloat(pushSpeed, 0.0f, Float.MAX_VALUE);
     }
 
     public static void b2World_SetMaximumLinearSpeed(b2WorldId worldId, float value) {
-        requireWorld(worldId).def.maximumLinearSpeed = value;
+        b2Assert(b2IsValidFloat(value) && value > 0.0f,
+            "maximum linear speed is valid and positive");
+        WorldSlot world = requireWorld(worldId);
+        if (!b2RejectLockedWorld(world)) {
+            world.def.maximumLinearSpeed = value;
+        }
     }
 
     public static float b2World_GetMaximumLinearSpeed(b2WorldId worldId) {
@@ -7709,7 +8332,10 @@ public final class B2 {
     }
 
     public static void b2World_EnableWarmStarting(b2WorldId worldId, boolean flag) {
-        requireWorld(worldId).warmStartingEnabled = flag;
+        WorldSlot world = requireWorld(worldId);
+        if (!b2RejectLockedWorld(world)) {
+            world.warmStartingEnabled = flag;
+        }
     }
 
     public static boolean b2World_IsWarmStartingEnabled(b2WorldId worldId) {
@@ -7739,27 +8365,107 @@ public final class B2 {
     }
 
     public static void b2World_SetFrictionCallback(b2WorldId worldId, b2FrictionCallback callback) {
-        requireWorld(worldId).def.frictionCallback = callback;
+        WorldSlot world = requireWorld(worldId);
+        if (!world.locked) {
+            world.def.frictionCallback = callback;
+        }
     }
 
     public static void b2World_SetRestitutionCallback(b2WorldId worldId, b2RestitutionCallback callback) {
-        requireWorld(worldId).def.restitutionCallback = callback;
+        WorldSlot world = requireWorld(worldId);
+        if (!world.locked) {
+            world.def.restitutionCallback = callback;
+        }
     }
 
     public static void b2World_DumpMemoryStats(b2WorldId worldId) {
+        WorldSlot world = requireWorld(worldId);
         b2Counters counters = b2World_GetCounters(worldId);
         try (java.io.PrintWriter writer = new java.io.PrintWriter("box2d_memory.txt")) {
-            writer.println("bodyCount = " + counters.bodyCount);
-            writer.println("shapeCount = " + counters.shapeCount);
-            writer.println("contactCount = " + counters.contactCount);
-            writer.println("jointCount = " + counters.jointCount);
-            writer.println("byteCount = " + counters.byteCount);
+            writer.println("id pools");
+            b2WriteManagedMemoryStat(writer, "body ids", counters.bodyCount);
+            b2WriteManagedMemoryStat(writer, "solver set ids", 0);
+            b2WriteManagedMemoryStat(writer, "joint ids", counters.jointCount);
+            b2WriteManagedMemoryStat(writer, "contact ids", counters.contactCount);
+            b2WriteManagedMemoryStat(writer, "island ids", counters.islandCount);
+            b2WriteManagedMemoryStat(writer, "shape ids", counters.shapeCount);
+            b2WriteManagedMemoryStat(writer, "chain ids", b2LiveChainCount(world));
+            writer.println();
+
+            writer.println("world arrays");
+            b2WriteManagedMemoryStat(writer, "bodies", counters.bodyCount);
+            b2WriteManagedMemoryStat(writer, "solver sets", 0);
+            b2WriteManagedMemoryStat(writer, "joints", counters.jointCount);
+            b2WriteManagedMemoryStat(writer, "contacts", counters.contactCount);
+            b2WriteManagedMemoryStat(writer, "islands", counters.islandCount);
+            b2WriteManagedMemoryStat(writer, "shapes", counters.shapeCount);
+            b2WriteManagedMemoryStat(writer, "chains", b2LiveChainCount(world));
+            writer.println();
+
+            writer.println("broad-phase");
+            writer.println("static tree: " + b2DynamicTree_GetByteCount(world.broadPhase.trees[b2_staticBody]));
+            writer.println("kinematic tree: " + b2DynamicTree_GetByteCount(world.broadPhase.trees[b2_kinematicBody]));
+            writer.println("dynamic tree: " + b2DynamicTree_GetByteCount(world.broadPhase.trees[b2_dynamicBody]));
+            writer.printf(java.util.Locale.ROOT, "moveSet: %d (%d, %d)%n",
+                b2GetHashSetBytes(world.broadPhase.moveSet), world.broadPhase.moveSet.count,
+                world.broadPhase.moveSet.capacity);
+            writer.println("moveArray: " + 4 * world.broadPhase.moveArray.size());
+            writer.printf(java.util.Locale.ROOT, "pairSet: %d (%d, %d)%n",
+                b2GetHashSetBytes(world.broadPhase.pairSet), world.broadPhase.pairSet.count,
+                world.broadPhase.pairSet.capacity);
+            writer.println();
+
+            writer.println("solver sets");
+            b2WriteManagedMemoryStat(writer, "body sim", counters.bodyCount);
+            b2WriteManagedMemoryStat(writer, "body state", b2World_GetAwakeBodyCount(worldId));
+            b2WriteManagedMemoryStat(writer, "joint sim", counters.jointCount);
+            b2WriteManagedMemoryStat(writer, "contact sim", counters.contactCount);
+            b2WriteManagedMemoryStat(writer, "island sim", counters.islandCount);
+            writer.println();
+
+            int graphContacts = 0;
+            int graphJoints = 0;
+            int graphBodies = 0;
+            for (int i = 0; i < B2_GRAPH_COLOR_COUNT; ++i) {
+                graphContacts += world.contactGraphColors[i].size();
+                graphJoints += world.jointGraphColors[i].size();
+                if (i < world.graphBodySets.length) {
+                    graphBodies += world.graphBodySets[i].size();
+                }
+            }
+            writer.println("constraint graph");
+            b2WriteManagedMemoryStat(writer, "body bit sets", graphBodies);
+            b2WriteManagedMemoryStat(writer, "joint sim", graphJoints);
+            b2WriteManagedMemoryStat(writer, "contact sim", graphContacts);
+            writer.println();
+
+            writer.println("stack allocator: n/a (Java heap; stackUsed=0)");
+            writer.println();
+            writer.println("native allocation hook");
+            writer.println("tracked bytes: " + counters.byteCount);
         } catch (java.io.FileNotFoundException ignored) {
         }
     }
 
+    private static void b2WriteManagedMemoryStat(java.io.PrintWriter writer, String label, int liveCount) {
+        writer.printf(java.util.Locale.ROOT, "%s: n/a (Java managed; live=%d)%n", label, liveCount);
+    }
+
+    private static int b2LiveChainCount(WorldSlot world) {
+        int count = 0;
+        for (ChainSlot chain : world.chains) {
+            if (chain != null && chain.alive) {
+                count += 1;
+            }
+        }
+        return count;
+    }
+
     public static void b2World_RebuildStaticTree(b2WorldId worldId) {
-        b2DynamicTree_Rebuild(requireWorld(worldId).broadPhase.trees[b2_staticBody], true);
+        WorldSlot world = requireWorld(worldId);
+        if (!b2RejectLockedWorld(world)) {
+            b2DynamicTree_Rebuild(world.broadPhase.trees[b2_staticBody], true);
+        }
     }
 
     public static void b2World_SetCustomFilterCallback(b2WorldId worldId, b2CustomFilterFcn callback, Object context) {
@@ -7783,15 +8489,20 @@ public final class B2 {
     }
 
     public static int b2Body_GetContactCapacity(b2BodyId bodyId) {
-        return requireBody(bodyId).contacts.size();
+        BodySlot body = requireBody(bodyId);
+        return b2RejectLockedWorld(WORLDS[body.worldIndex]) ? 0 : body.contacts.size();
     }
 
     public static int b2Body_GetContactData(b2BodyId bodyId, b2ContactData[] contactData, int capacity) {
         BodySlot body = requireBody(bodyId);
         WorldSlot world = WORLDS[body.worldIndex];
+        if (b2RejectLockedWorld(world)) {
+            return 0;
+        }
         int count = 0;
+        int limit = b2MaxInt(0, b2MinInt(capacity, contactData.length));
         for (ContactSlot contact : body.contacts) {
-            if (count == capacity) {
+            if (count >= limit) {
                 break;
             }
             if (contact.alive && contact.touching) {
@@ -7803,6 +8514,9 @@ public final class B2 {
 
     public static int b2Shape_GetContactCapacity(b2ShapeId shapeId) {
         ShapeSlot shape = requireShape(shapeId);
+        if (b2RejectLockedWorld(WORLDS[shape.body.worldIndex])) {
+            return 0;
+        }
         if (shape.def.isSensor) {
             return 0;
         }
@@ -7812,9 +8526,13 @@ public final class B2 {
     public static int b2Shape_GetContactData(b2ShapeId shapeId, b2ContactData[] contactData, int capacity) {
         ShapeSlot shape = requireShape(shapeId);
         WorldSlot world = WORLDS[shape.body.worldIndex];
+        if (b2RejectLockedWorld(world)) {
+            return 0;
+        }
         int count = 0;
+        int limit = b2MaxInt(0, b2MinInt(capacity, contactData.length));
         for (ContactSlot contact : shape.body.contacts) {
-            if (count == capacity) {
+            if (count >= limit) {
                 break;
             }
             if (contact.alive && contact.touching && (contact.shapeA == shape || contact.shapeB == shape)) {
@@ -7826,6 +8544,9 @@ public final class B2 {
 
     public static int b2Shape_GetSensorCapacity(b2ShapeId shapeId) {
         ShapeSlot shape = requireShape(shapeId);
+        if (b2RejectLockedWorld(WORLDS[shape.body.worldIndex])) {
+            return 0;
+        }
         if (!shape.def.isSensor) {
             return 0;
         }
@@ -7835,15 +8556,18 @@ public final class B2 {
 
     public static int b2Shape_GetSensorOverlaps(b2ShapeId shapeId, b2ShapeId[] overlaps, int capacity) {
         ShapeSlot shape = requireShape(shapeId);
+        WorldSlot world = WORLDS[shape.body.worldIndex];
+        if (b2RejectLockedWorld(world)) {
+            return 0;
+        }
         if (!shape.def.isSensor) {
             return 0;
         }
-        WorldSlot world = WORLDS[shape.body.worldIndex];
         SensorOverlapState state = world.sensorOverlaps.get(shape.index);
         if (state == null) {
             return 0;
         }
-        int count = b2MinInt(state.refs.size(), capacity);
+        int count = b2MaxInt(0, b2MinInt(state.refs.size(), b2MinInt(capacity, overlaps.length)));
         for (int i = 0; i < count; ++i) {
             ShapeRef ref = state.refs.get(i);
             overlaps[i] = new b2ShapeId(ref.shapeIndex + 1, world.index, ref.generation);
@@ -7888,7 +8612,12 @@ public final class B2 {
     }
 
     public static void b2Shape_SetDensity(b2ShapeId shapeId, float density, boolean updateBodyMass) {
+        b2Assert(b2IsValidFloat(density) && density >= 0.0f,
+            "shape density is valid and non-negative");
         ShapeSlot shape = requireShape(shapeId);
+        if (b2RejectLockedWorld(WORLDS[shape.body.worldIndex])) {
+            return;
+        }
         if (density == shape.def.density) {
             return;
         }
@@ -7941,7 +8670,12 @@ public final class B2 {
     }
 
     public static void b2Shape_SetFriction(b2ShapeId shapeId, float friction) {
-        requireShape(shapeId).def.material.friction = friction;
+        b2Assert(b2IsValidFloat(friction) && friction >= 0.0f,
+            "shape friction is valid and non-negative");
+        ShapeSlot shape = requireShape(shapeId);
+        if (!b2RejectLockedWorld(WORLDS[shape.body.worldIndex])) {
+            shape.def.material.friction = friction;
+        }
     }
 
     public static float b2Shape_GetFriction(b2ShapeId shapeId) {
@@ -7949,7 +8683,12 @@ public final class B2 {
     }
 
     public static void b2Shape_SetRestitution(b2ShapeId shapeId, float restitution) {
-        requireShape(shapeId).def.material.restitution = restitution;
+        b2Assert(b2IsValidFloat(restitution) && restitution >= 0.0f,
+            "shape restitution is valid and non-negative");
+        ShapeSlot shape = requireShape(shapeId);
+        if (!b2RejectLockedWorld(WORLDS[shape.body.worldIndex])) {
+            shape.def.material.restitution = restitution;
+        }
     }
 
     public static float b2Shape_GetRestitution(b2ShapeId shapeId) {
@@ -7957,7 +8696,10 @@ public final class B2 {
     }
 
     public static void b2Shape_SetMaterial(b2ShapeId shapeId, int material) {
-        requireShape(shapeId).def.material.userMaterialId = material;
+        ShapeSlot shape = requireShape(shapeId);
+        if (!b2RejectLockedWorld(WORLDS[shape.body.worldIndex])) {
+            shape.def.material.userMaterialId = material;
+        }
     }
 
     public static int b2Shape_GetMaterial(b2ShapeId shapeId) {
@@ -7978,6 +8720,9 @@ public final class B2 {
 
     public static void b2Shape_SetFilter(b2ShapeId shapeId, b2Filter filter) {
         ShapeSlot shape = requireShape(shapeId);
+        if (b2RejectLockedWorld(WORLDS[shape.body.worldIndex])) {
+            return;
+        }
         b2Filter oldFilter = shape.def.filter;
         if (oldFilter.categoryBits == filter.categoryBits && oldFilter.maskBits == filter.maskBits
             && oldFilter.groupIndex == filter.groupIndex) {
@@ -8000,7 +8745,10 @@ public final class B2 {
     }
 
     public static void b2Shape_EnableSensorEvents(b2ShapeId shapeId, boolean flag) {
-        requireShape(shapeId).def.enableSensorEvents = flag;
+        ShapeSlot shape = requireShape(shapeId);
+        if (!b2RejectLockedWorld(WORLDS[shape.body.worldIndex])) {
+            shape.def.enableSensorEvents = flag;
+        }
     }
 
     public static boolean b2Shape_AreSensorEventsEnabled(b2ShapeId shapeId) {
@@ -8008,7 +8756,10 @@ public final class B2 {
     }
 
     public static void b2Shape_EnableContactEvents(b2ShapeId shapeId, boolean flag) {
-        requireShape(shapeId).def.enableContactEvents = flag;
+        ShapeSlot shape = requireShape(shapeId);
+        if (!b2RejectLockedWorld(WORLDS[shape.body.worldIndex])) {
+            shape.def.enableContactEvents = flag;
+        }
     }
 
     public static boolean b2Shape_AreContactEventsEnabled(b2ShapeId shapeId) {
@@ -8016,7 +8767,10 @@ public final class B2 {
     }
 
     public static void b2Shape_EnablePreSolveEvents(b2ShapeId shapeId, boolean flag) {
-        requireShape(shapeId).def.enablePreSolveEvents = flag;
+        ShapeSlot shape = requireShape(shapeId);
+        if (!b2RejectLockedWorld(WORLDS[shape.body.worldIndex])) {
+            shape.def.enablePreSolveEvents = flag;
+        }
     }
 
     public static boolean b2Shape_ArePreSolveEventsEnabled(b2ShapeId shapeId) {
@@ -8024,7 +8778,10 @@ public final class B2 {
     }
 
     public static void b2Shape_EnableHitEvents(b2ShapeId shapeId, boolean flag) {
-        requireShape(shapeId).def.enableHitEvents = flag;
+        ShapeSlot shape = requireShape(shapeId);
+        if (!b2RejectLockedWorld(WORLDS[shape.body.worldIndex])) {
+            shape.def.enableHitEvents = flag;
+        }
     }
 
     public static boolean b2Shape_AreHitEventsEnabled(b2ShapeId shapeId) {
@@ -8063,6 +8820,9 @@ public final class B2 {
 
     public static void b2Shape_SetCircle(b2ShapeId shapeId, b2Circle circle) {
         ShapeSlot shape = requireShape(shapeId);
+        if (b2RejectLockedWorld(WORLDS[shape.body.worldIndex])) {
+            return;
+        }
         shape.circle = new b2Circle(circle.center, circle.radius);
         shape.polygon = null;
         shape.segment = null;
@@ -8073,6 +8833,9 @@ public final class B2 {
 
     public static void b2Shape_SetCapsule(b2ShapeId shapeId, b2Capsule capsule) {
         ShapeSlot shape = requireShape(shapeId);
+        if (b2RejectLockedWorld(WORLDS[shape.body.worldIndex])) {
+            return;
+        }
         shape.capsule = new b2Capsule(capsule.center1, capsule.center2, capsule.radius);
         shape.polygon = null;
         shape.circle = null;
@@ -8083,6 +8846,9 @@ public final class B2 {
 
     public static void b2Shape_SetSegment(b2ShapeId shapeId, b2Segment segment) {
         ShapeSlot shape = requireShape(shapeId);
+        if (b2RejectLockedWorld(WORLDS[shape.body.worldIndex])) {
+            return;
+        }
         shape.segment = new b2Segment(segment.point1, segment.point2);
         shape.polygon = null;
         shape.circle = null;
@@ -8093,6 +8859,9 @@ public final class B2 {
 
     public static void b2Shape_SetPolygon(b2ShapeId shapeId, b2Polygon polygon) {
         ShapeSlot shape = requireShape(shapeId);
+        if (b2RejectLockedWorld(WORLDS[shape.body.worldIndex])) {
+            return;
+        }
         shape.polygon = b2TransformPolygon(b2Transform_identity, polygon);
         shape.circle = null;
         shape.segment = null;
@@ -8104,7 +8873,7 @@ public final class B2 {
     public static b2ChainId b2Shape_GetParentChain(b2ShapeId shapeId) {
         ShapeSlot shape = requireShape(shapeId);
         if (shape.kind != 5 || shape.chainSegment.chainId == B2_NULL_INDEX) {
-            return b2_nullChainId;
+            return new b2ChainId();
         }
         WorldSlot world = WORLDS[shape.body.worldIndex];
         ChainSlot chain = world.chains.get(shape.chainSegment.chainId);
@@ -8112,8 +8881,21 @@ public final class B2 {
     }
 
     private static ShapeSlot createShape(b2BodyId bodyId, b2ShapeDef def, int kind) {
+        b2CheckDef(def.internalValue);
+        b2Assert(b2IsValidFloat(def.density) && def.density >= 0.0f,
+            "shape density is valid and non-negative");
+        b2Assert(b2IsValidFloat(def.material.friction) && def.material.friction >= 0.0f,
+            "shape friction is valid and non-negative");
+        b2Assert(b2IsValidFloat(def.material.restitution) && def.material.restitution >= 0.0f,
+            "shape restitution is valid and non-negative");
+        b2Assert(b2IsValidFloat(def.material.rollingResistance) && def.material.rollingResistance >= 0.0f,
+            "shape rolling resistance is valid and non-negative");
+        b2Assert(b2IsValidFloat(def.material.tangentSpeed), "shape tangent speed is valid");
         BodySlot body = requireBody(bodyId);
         WorldSlot world = WORLDS[body.worldIndex];
+        if (b2RejectLockedWorld(world)) {
+            return null;
+        }
         ShapeSlot shape = new ShapeSlot();
         shape.index = b2AllocSlot(world.freeShapeIndices, world.shapes.size());
         if (shape.index < world.shapes.size()) {
@@ -8166,14 +8948,16 @@ public final class B2 {
         if (bodyB != bodyA) {
             bodyB.joints.add(0, joint);
         }
-        if (bodyA.type != b2_staticBody || bodyB.type != b2_staticBody) {
-            b2AddJointToGraph(world, joint);
+        if (bodyA.enabled && bodyB.enabled && (bodyA.type != b2_staticBody || bodyB.type != b2_staticBody)) {
             b2LinkSleepJoint(world, joint);
+            if (bodyA.awake || bodyB.awake) {
+                b2AddJointToGraph(world, joint);
+            }
         }
         return joint;
     }
 
-    private static void b2DestroyJointInternal(WorldSlot world, JointSlot joint) {
+    private static void b2DestroyJointInternal(WorldSlot world, JointSlot joint, boolean wakeBodies) {
         if (joint == null || !joint.alive) {
             return;
         }
@@ -8184,12 +8968,9 @@ public final class B2 {
         world.freeJointIndices.add(joint.index);
         joint.bodyA.joints.remove(joint);
         joint.bodyB.joints.remove(joint);
-        if (joint.collideConnected) {
-            for (ShapeSlot shape : joint.bodyA.shapes.size() < joint.bodyB.shapes.size() ? joint.bodyA.shapes : joint.bodyB.shapes) {
-                if (shape.proxyKey != B2_NULL_INDEX) {
-                    b2BufferMove(world.broadPhase, shape.proxyKey);
-                }
-            }
+        if (wakeBodies) {
+            b2WakeBody(joint.bodyA);
+            b2WakeBody(joint.bodyB);
         }
         b2RebuildContactPairSet(world);
     }
@@ -8534,19 +9315,148 @@ public final class B2 {
     }
 
     private static void b2DrawJoint(b2DebugDraw draw, JointSlot joint) {
+        if (!joint.bodyA.enabled || !joint.bodyB.enabled) {
+            return;
+        }
         b2Transform transformA = new b2Transform(joint.bodyA.position, joint.bodyA.rotation);
         b2Transform transformB = new b2Transform(joint.bodyB.position, joint.bodyB.rotation);
         b2Vec2 pA = b2TransformPoint(transformA, joint.localAnchorA);
         b2Vec2 pB = b2TransformPoint(transformB, joint.localAnchorB);
-        if (joint.type == b2_mouseJoint) {
+
+        if (joint.type == b2_distanceJoint) {
+            b2DrawDistanceJoint(draw, joint, pA, pB);
+        } else if (joint.type == b2_mouseJoint) {
             draw.DrawPointFcn.invoke(joint.mouseTarget.copy(), 4.0f, b2_colorGreen);
             draw.DrawPointFcn.invoke(pB, 4.0f, b2_colorGreen);
-            draw.DrawSegmentFcn.invoke(joint.mouseTarget.copy(), pB, b2_colorGray);
-            return;
+            draw.DrawSegmentFcn.invoke(joint.mouseTarget.copy(), pB, b2_colorLightGray);
+        } else if (joint.type == b2_filterJoint) {
+            draw.DrawSegmentFcn.invoke(pA, pB, b2_colorGold);
+        } else if (joint.type == b2_prismaticJoint) {
+            b2DrawLinearJoint(draw, joint, transformA, pA, pB,
+                joint.prismaticEnableLimit, joint.prismaticLowerTranslation, joint.prismaticUpperTranslation,
+                b2_colorDimGray, b2_colorBlue);
+        } else if (joint.type == b2_revoluteJoint) {
+            b2DrawRevoluteJoint(draw, joint, transformA, transformB, pA, pB);
+        } else if (joint.type == b2_wheelJoint) {
+            b2DrawLinearJoint(draw, joint, transformA, pA, pB,
+                joint.wheelEnableLimit, joint.wheelLowerTranslation, joint.wheelUpperTranslation,
+                b2_colorBlue, b2_colorDimGray);
+        } else {
+            draw.DrawSegmentFcn.invoke(transformA.p.copy(), pA, b2_colorDarkSeaGreen);
+            draw.DrawSegmentFcn.invoke(pA, pB, b2_colorDarkSeaGreen);
+            draw.DrawSegmentFcn.invoke(transformB.p.copy(), pB, b2_colorDarkSeaGreen);
         }
-        draw.DrawSegmentFcn.invoke(transformA.p.copy(), pA, b2_colorWhite);
+
+        if (draw.drawGraphColors && joint.colorIndex != B2_NULL_INDEX) {
+            int[] colors = {
+                b2_colorRed, b2_colorOrange, b2_colorYellow, b2_colorGreen,
+                b2_colorCyan, b2_colorBlue, b2_colorViolet, b2_colorPink,
+                b2_colorChocolate, b2_colorGoldenRod, b2_colorCoral, b2_colorBlack
+            };
+            draw.DrawPointFcn.invoke(b2Lerp(pA, pB, 0.5f), 5.0f, colors[joint.colorIndex]);
+        }
+    }
+
+    private static void b2DrawDistanceJoint(b2DebugDraw draw, JointSlot joint, b2Vec2 pA, b2Vec2 pB) {
+        b2Vec2 axis = b2Normalize(b2Sub(pB, pA));
+        if (joint.distanceMinLength < joint.distanceMaxLength && joint.distanceEnableLimit) {
+            b2Vec2 pMin = b2MulAdd(pA, joint.distanceMinLength, axis);
+            b2Vec2 pMax = b2MulAdd(pA, joint.distanceMaxLength, axis);
+            b2Vec2 offset = b2MulSV(0.05f * lengthUnitsPerMeter, b2RightPerp(axis));
+            if (joint.distanceMinLength > B2_LINEAR_SLOP()) {
+                draw.DrawSegmentFcn.invoke(b2Sub(pMin, offset), b2Add(pMin, offset), b2_colorLightGreen);
+            }
+            if (joint.distanceMaxLength < B2_HUGE()) {
+                draw.DrawSegmentFcn.invoke(b2Sub(pMax, offset), b2Add(pMax, offset), b2_colorRed);
+            }
+            if (joint.distanceMinLength > B2_LINEAR_SLOP() && joint.distanceMaxLength < B2_HUGE()) {
+                draw.DrawSegmentFcn.invoke(pMin, pMax, b2_colorGray);
+            }
+        }
         draw.DrawSegmentFcn.invoke(pA, pB, b2_colorWhite);
-        draw.DrawSegmentFcn.invoke(transformB.p.copy(), pB, b2_colorWhite);
+        draw.DrawPointFcn.invoke(pA, 4.0f, b2_colorWhite);
+        draw.DrawPointFcn.invoke(pB, 4.0f, b2_colorWhite);
+        if (joint.distanceHertz > 0.0f && joint.distanceEnableSpring) {
+            draw.DrawPointFcn.invoke(b2MulAdd(pA, joint.distanceLength, axis), 4.0f, b2_colorBlue);
+        }
+    }
+
+    private static void b2DrawLinearJoint(b2DebugDraw draw, JointSlot joint, b2Transform transformA,
+                                          b2Vec2 pA, b2Vec2 pB, boolean enableLimit,
+                                          float lowerTranslation, float upperTranslation,
+                                          int mainColor, int anchorBColor) {
+        b2Vec2 axis = b2RotateVector(transformA.q, joint.localAxisA);
+        draw.DrawSegmentFcn.invoke(pA, pB, mainColor);
+        if (enableLimit) {
+            b2Vec2 lower = b2MulAdd(pA, lowerTranslation, axis);
+            b2Vec2 upper = b2MulAdd(pA, upperTranslation, axis);
+            b2Vec2 perp = b2LeftPerp(axis);
+            draw.DrawSegmentFcn.invoke(lower, upper, b2_colorGray);
+            draw.DrawSegmentFcn.invoke(b2MulSub(lower, 0.1f, perp), b2MulAdd(lower, 0.1f, perp), b2_colorGreen);
+            draw.DrawSegmentFcn.invoke(b2MulSub(upper, 0.1f, perp), b2MulAdd(upper, 0.1f, perp), b2_colorRed);
+        } else {
+            draw.DrawSegmentFcn.invoke(b2MulSub(pA, 1.0f, axis), b2MulAdd(pA, 1.0f, axis), b2_colorGray);
+        }
+        draw.DrawPointFcn.invoke(pA, 5.0f, b2_colorGray);
+        draw.DrawPointFcn.invoke(pB, 5.0f, anchorBColor);
+    }
+
+    private static void b2DrawRevoluteJoint(b2DebugDraw draw, JointSlot joint, b2Transform transformA,
+                                            b2Transform transformB, b2Vec2 pA, b2Vec2 pB) {
+        float length = joint.drawSize;
+        draw.DrawCircleFcn.invoke(pB, length, b2_colorGray);
+        float angle = b2RelativeAngle(transformB.q, transformA.q);
+        b2Rot rotation = b2MakeRot(angle);
+        b2Vec2 pC = b2Add(pB, new b2Vec2(length * rotation.c, length * rotation.s));
+        draw.DrawSegmentFcn.invoke(pB, pC, b2_colorGray);
+        if (draw.drawJointExtras) {
+            float jointAngle = b2UnwindAngle(angle - joint.referenceAngle);
+            String text = String.format(java.util.Locale.ROOT, " %.1f deg", 180.0f * jointAngle / B2_PI);
+            draw.DrawStringFcn.invoke(pC, text, b2_colorWhite);
+        }
+        if (joint.revoluteEnableLimit) {
+            b2Rot lower = b2MakeRot(joint.revoluteLowerAngle + joint.referenceAngle);
+            b2Rot upper = b2MakeRot(joint.revoluteUpperAngle + joint.referenceAngle);
+            b2Rot reference = b2MakeRot(joint.referenceAngle);
+            draw.DrawSegmentFcn.invoke(pB,
+                b2Add(pB, new b2Vec2(length * lower.c, length * lower.s)), b2_colorGreen);
+            draw.DrawSegmentFcn.invoke(pB,
+                b2Add(pB, new b2Vec2(length * upper.c, length * upper.s)), b2_colorRed);
+            draw.DrawSegmentFcn.invoke(pB,
+                b2Add(pB, new b2Vec2(length * reference.c, length * reference.s)), b2_colorBlue);
+        }
+        draw.DrawSegmentFcn.invoke(transformA.p.copy(), pA, b2_colorGold);
+        draw.DrawSegmentFcn.invoke(pA, pB, b2_colorGold);
+        draw.DrawSegmentFcn.invoke(transformB.p.copy(), pB, b2_colorGold);
+    }
+
+    private static void b2DrawIslands(b2DebugDraw draw, WorldSlot world) {
+        java.util.TreeMap<Integer, b2AABB> islandBounds = new java.util.TreeMap<>();
+        for (BodySlot body : world.bodies) {
+            if (body == null || !body.alive || !body.enabled || body.type == b2_staticBody || body.shapes.isEmpty()) {
+                continue;
+            }
+            int root = b2GetBodySleepIsland(world, body);
+            b2AABB bounds = islandBounds.get(root);
+            for (ShapeSlot shape : body.shapes) {
+                if (!shape.alive) {
+                    continue;
+                }
+                bounds = bounds == null ? shape.fatAABB.copy() : b2AABB_Union(bounds, shape.fatAABB);
+            }
+            if (bounds != null) {
+                islandBounds.put(root, bounds);
+            }
+        }
+        for (b2AABB bounds : islandBounds.values()) {
+            b2Vec2[] vertices = {
+                new b2Vec2(bounds.lowerBound.x, bounds.lowerBound.y),
+                new b2Vec2(bounds.upperBound.x, bounds.lowerBound.y),
+                new b2Vec2(bounds.upperBound.x, bounds.upperBound.y),
+                new b2Vec2(bounds.lowerBound.x, bounds.upperBound.y)
+            };
+            draw.DrawPolygonFcn.invoke(vertices, 4, b2_colorOrangeRed);
+        }
     }
 
     private static b2PlaneResult b2CollideMover(ShapeSlot shape, b2Transform transform, b2Capsule mover) {
@@ -8655,7 +9565,8 @@ public final class B2 {
 
     private static void b2SynchronizeBodyProxies(WorldSlot world, BodySlot body, boolean deferEnlarge) {
         b2Transform transform = new b2Transform(body.position, body.rotation);
-        for (ShapeSlot shape : body.shapes) {
+        for (int shapeIndex = body.shapes.size() - 1; shapeIndex >= 0; --shapeIndex) {
+            ShapeSlot shape = body.shapes.get(shapeIndex);
             if (shape.proxyKey == B2_NULL_INDEX) {
                 continue;
             }
@@ -8675,7 +9586,7 @@ public final class B2 {
                 if (deferEnlarge) {
                     shape.enlargedAABB = true;
                 } else {
-                    b2BroadPhase_EnlargeProxy(world.broadPhase, shape.proxyKey, shape.fatAABB);
+                    b2BroadPhase_MoveProxy(world.broadPhase, shape.proxyKey, shape.fatAABB);
                 }
             }
         }
@@ -8683,7 +9594,8 @@ public final class B2 {
 
     private static void b2SynchronizeFastBodyProxies(WorldSlot world, BodySlot body, boolean didHit, boolean deferEnlarge) {
         b2Transform transform = new b2Transform(body.position, body.rotation);
-        for (ShapeSlot shape : body.shapes) {
+        for (int shapeIndex = body.shapes.size() - 1; shapeIndex >= 0; --shapeIndex) {
+            ShapeSlot shape = body.shapes.get(shapeIndex);
             if (shape.proxyKey == B2_NULL_INDEX) {
                 continue;
             }
@@ -8713,7 +9625,8 @@ public final class B2 {
     }
 
     private static void b2ApplyDeferredProxyEnlargements(WorldSlot world, BodySlot body) {
-        for (ShapeSlot shape : body.shapes) {
+        for (int shapeIndex = body.shapes.size() - 1; shapeIndex >= 0; --shapeIndex) {
+            ShapeSlot shape = body.shapes.get(shapeIndex);
             if (shape.proxyKey != B2_NULL_INDEX && shape.enlargedAABB) {
                 b2BroadPhase_EnlargeProxy(world.broadPhase, shape.proxyKey, shape.fatAABB);
                 shape.enlargedAABB = false;
@@ -8795,16 +9708,21 @@ public final class B2 {
                     if (b2ContainsKey(bp.pairSet, pairKey)) {
                         return true;
                     }
-                    if (other.body == shape.body) {
+                    ShapeSlot shapeA = world.shapes.get(shapeIndexA);
+                    ShapeSlot shapeB = world.shapes.get(shapeIndexB);
+                    if (shapeA.body == shapeB.body) {
                         return true;
                     }
-                    if (shape.body.type == b2_staticBody && other.body.type == b2_staticBody) {
+                    if (shapeA.def.isSensor || shapeB.def.isSensor) {
                         return true;
                     }
-                    if (!b2ShouldShapesCollide(shape, other)) {
+                    if (shapeA.body.type == b2_staticBody && shapeB.body.type == b2_staticBody) {
                         return true;
                     }
-                    if (!b2ShouldCustomFilterCollide(world, shape, other)) {
+                    if (!b2ShouldShapesCollide(shapeA, shapeB)) {
+                        return true;
+                    }
+                    if (!b2ShouldCustomFilterCollide(world, shapeA, shapeB)) {
                         return true;
                     }
                     MovePair pair = new MovePair();
@@ -8902,12 +9820,22 @@ public final class B2 {
         }
     }
 
-    private static void b2DestroyShapeInternal(WorldSlot world, ShapeSlot shape, boolean updateBodyMass) {
+    private static void b2DestroyShapeInternal(WorldSlot world, ShapeSlot shape, boolean wakeBodies,
+                                               boolean updateBodyMass) {
         if (shape == null || !shape.alive) {
             return;
         }
+        if (shape.def.isSensor) {
+            SensorOverlapState overlaps = world.sensorOverlaps.remove(shape.index);
+            if (overlaps != null) {
+                b2ShapeId sensorId = shapeId(world, shape);
+                for (ShapeRef visitorRef : overlaps.refs) {
+                    world.pendingSensorEndEvents.add(b2MakeSensorEndTouchEvent(world, sensorId, visitorRef));
+                }
+            }
+        }
         b2DestroyShapeProxy(shape, world.broadPhase);
-        b2DestroyContactsForShape(world, shape);
+        b2DestroyContactsForShape(world, shape, wakeBodies);
         shape.alive = false;
         shape.generation += 1;
         world.freeShapeIndices.add(shape.index);
@@ -8936,6 +9864,12 @@ public final class B2 {
         ContactSlot contact = b2AllocContact(world);
         contact.shapeA = shapeA;
         contact.shapeB = shapeB;
+        contact.enableContactEvents = shapeA.def.enableContactEvents || shapeB.def.enableContactEvents;
+        contact.enablePreSolveEvents = shapeA.def.enablePreSolveEvents || shapeB.def.enablePreSolveEvents;
+        contact.friction = b2MixFriction(world, shapeA, shapeB);
+        contact.restitution = b2MixRestitution(world, shapeA, shapeB);
+        contact.rollingResistance = 0.0f;
+        contact.tangentSpeed = 0.0f;
         shapeA.body.contacts.add(0, contact);
         shapeB.body.contacts.add(0, contact);
     }
@@ -9000,11 +9934,14 @@ public final class B2 {
             }
         }
         contact.alive = true;
+        contact.enableContactEvents = false;
+        contact.enablePreSolveEvents = false;
         contact.manifold = new b2Manifold();
         contact.touching = false;
         contact.sleepIslandId = B2_NULL_INDEX;
         world.contactCount += 1;
         world.contactUpdateOrder.add(contact);
+        b2AddAwakeNonTouchingContact(world, contact);
         return contact;
     }
 
@@ -9013,15 +9950,24 @@ public final class B2 {
     }
 
     private static void b2DestroyContact(WorldSlot world, ContactSlot contact, boolean wakeBodies) {
+        b2DestroyContact(world, contact, wakeBodies, true);
+    }
+
+    private static void b2DestroyContact(WorldSlot world, ContactSlot contact, boolean wakeBodies,
+                                         boolean publishEndEvent) {
         if (contact == null || !contact.alive) {
             return;
         }
         boolean touching = contact.touching;
+        if (publishEndEvent && touching && contact.enableContactEvents) {
+            world.pendingContactEndEvents.add(b2MakeContactEndTouchEvent(world, contact));
+        }
         BodySlot bodyA = contact.shapeA.body;
         BodySlot bodyB = contact.shapeB.body;
         b2RemoveKey(world.broadPhase.pairSet, B2_SHAPE_PAIR_KEY(contact.shapeA.index + 1, contact.shapeB.index + 1));
         b2UnlinkSleepContact(world, contact);
         b2RemoveContactFromGraph(world, contact);
+        b2RemoveAwakeNonTouchingContact(world, contact);
         bodyA.contacts.remove(contact);
         bodyB.contacts.remove(contact);
         contact.alive = false;
@@ -9038,16 +9984,22 @@ public final class B2 {
 
     private static void b2UpdateContacts(WorldSlot world) {
         java.util.ArrayList<b2ContactBeginTouchEvent> beginEvents = new java.util.ArrayList<>();
-        java.util.ArrayList<b2ContactEndTouchEvent> endEvents = new java.util.ArrayList<>();
+        java.util.ArrayList<b2ContactEndTouchEvent> endEvents =
+            new java.util.ArrayList<>(world.pendingContactEndEvents);
+        world.pendingContactEndEvents.clear();
         byte[] contactState = new byte[world.contacts.size()];
-        java.util.ArrayList<ContactSlot> updateOrder = new java.util.ArrayList<>(world.contactUpdateOrder);
+        java.util.ArrayList<ContactSlot> updateOrder = new java.util.ArrayList<>(world.contactUpdateOrder.size());
+        for (int colorIndex = 0; colorIndex < B2_GRAPH_COLOR_COUNT; ++colorIndex) {
+            updateOrder.addAll(world.contactGraphColors[colorIndex]);
+        }
+        updateOrder.addAll(world.awakeNonTouchingContacts);
         b2ParallelFor(world, updateOrder.size(), 64, (startIndex, endIndex, workerIndex, taskContext) -> {
             for (int updateIndex = startIndex; updateIndex < endIndex; ++updateIndex) {
                 ContactSlot contact = updateOrder.get(updateIndex);
                 if (contact == null || !contact.alive) {
                     continue;
                 }
-                if (!b2ContactHasAwakeDynamicBody(contact)) {
+                if (!b2ContactHasAwakeBody(contact)) {
                     continue;
                 }
                 ShapeSlot shapeA = contact.shapeA;
@@ -9060,13 +10012,25 @@ public final class B2 {
                 boolean wasTouching = contact.touching;
                 b2Manifold oldManifold = contact.manifold;
                 contact.manifold = b2ComputeContactManifold(shapeA, shapeB, oldManifold);
+                contact.friction = b2MixFriction(world, shapeA, shapeB);
+                contact.restitution = b2MixRestitution(world, shapeA, shapeB);
+                contact.rollingResistance = b2ComputeRollingResistance(shapeA, shapeB);
+                contact.tangentSpeed = shapeA.def.material.tangentSpeed + shapeB.def.material.tangentSpeed;
                 contact.touching = contact.manifold.pointCount > 0;
-                if (contact.touching && world.preSolveFcn != null
-                    && (shapeA.def.enablePreSolveEvents || shapeB.def.enablePreSolveEvents)) {
+                if (contact.touching && world.preSolveFcn != null && contact.enablePreSolveEvents) {
                     contact.touching = world.preSolveFcn.invoke(shapeId(world, shapeA), shapeId(world, shapeB),
                         contact.manifold, world.preSolveContext);
                     if (!contact.touching) {
                         contact.manifold.pointCount = 0;
+                    }
+                }
+                if (!world.speculativeEnabled && contact.manifold.pointCount == 2) {
+                    float threshold = 1.5f * B2_LINEAR_SLOP();
+                    if (contact.manifold.points[0].separation > threshold) {
+                        contact.manifold.points[0] = b2CopyManifoldPoint(contact.manifold.points[1]);
+                        contact.manifold.pointCount = 1;
+                    } else if (contact.manifold.points[0].separation > threshold) {
+                        contact.manifold.pointCount = 1;
                     }
                 }
                 if (contact.touching && !wasTouching) {
@@ -9087,22 +10051,28 @@ public final class B2 {
                 continue;
             }
             if (state == 1) {
-                if (contact.touching) {
+                if (contact.touching && contact.enableContactEvents) {
                     endEvents.add(b2MakeContactEndTouchEvent(world, contact));
                 }
-                b2DestroyContact(world, contact);
+                b2DestroyContact(world, contact, false, false);
             } else if (state == 2) {
                 if (contact.touching) {
                     b2WakeTouchingContactBodies(world, contact);
+                    b2RemoveAwakeNonTouchingContact(world, contact);
                     b2AddContactToGraph(world, contact);
                     b2LinkSleepContact(world, contact);
-                    beginEvents.add(b2MakeContactBeginTouchEvent(world, contact));
+                    if (contact.enableContactEvents) {
+                        beginEvents.add(b2MakeContactBeginTouchEvent(world, contact));
+                    }
                 }
             } else if (state == 3) {
                 if (!contact.touching) {
                     b2UnlinkSleepContact(world, contact);
                     b2RemoveContactFromGraph(world, contact);
-                    endEvents.add(b2MakeContactEndTouchEvent(world, contact));
+                    b2AddAwakeNonTouchingContact(world, contact);
+                    if (contact.enableContactEvents) {
+                        endEvents.add(b2MakeContactEndTouchEvent(world, contact));
+                    }
                 }
             }
         }
@@ -9117,19 +10087,19 @@ public final class B2 {
         world.contactEvents = events;
     }
 
-    private static boolean b2ContactHasAwakeDynamicBody(ContactSlot contact) {
+    private static boolean b2ContactHasAwakeBody(ContactSlot contact) {
         BodySlot bodyA = contact.shapeA.body;
         BodySlot bodyB = contact.shapeB.body;
-        return (bodyA.type == b2_dynamicBody && bodyA.awake) || (bodyB.type == b2_dynamicBody && bodyB.awake);
+        return (bodyA.type != b2_staticBody && bodyA.awake) || (bodyB.type != b2_staticBody && bodyB.awake);
     }
 
     private static void b2WakeTouchingContactBodies(WorldSlot world, ContactSlot contact) {
         BodySlot bodyA = contact.shapeA.body;
         BodySlot bodyB = contact.shapeB.body;
-        if (bodyA.type == b2_dynamicBody && bodyA.awake && bodyA.enableSleep && !bodyB.awake) {
+        if (bodyA.awake && !bodyB.awake) {
             b2WakeBodySleepIsland(world, bodyB);
         }
-        if (bodyB.type == b2_dynamicBody && bodyB.awake && bodyB.enableSleep && !bodyA.awake) {
+        if (bodyB.awake && !bodyA.awake) {
             b2WakeBodySleepIsland(world, bodyA);
         }
     }
@@ -9193,12 +10163,8 @@ public final class B2 {
         if (colorIndex < 0 || colorIndex >= B2_OVERFLOW_INDEX) {
             return;
         }
-        if (bodyA.type != b2_staticBody) {
-            world.graphBodySets[colorIndex].remove(bodyA.index);
-        }
-        if (bodyB.type != b2_staticBody) {
-            world.graphBodySets[colorIndex].remove(bodyB.index);
-        }
+        world.graphBodySets[colorIndex].remove(bodyA.index);
+        world.graphBodySets[colorIndex].remove(bodyB.index);
     }
 
     private static void b2AddContactToGraph(WorldSlot world, ContactSlot contact) {
@@ -9207,6 +10173,28 @@ public final class B2 {
         contact.colorIndex = colorIndex;
         contact.localIndex = color.size();
         color.add(contact);
+    }
+
+    private static void b2AddAwakeNonTouchingContact(WorldSlot world, ContactSlot contact) {
+        if (contact.nonTouchingIndex != B2_NULL_INDEX) {
+            return;
+        }
+        contact.nonTouchingIndex = world.awakeNonTouchingContacts.size();
+        world.awakeNonTouchingContacts.add(contact);
+    }
+
+    private static void b2RemoveAwakeNonTouchingContact(WorldSlot world, ContactSlot contact) {
+        int localIndex = contact.nonTouchingIndex;
+        if (localIndex == B2_NULL_INDEX) {
+            return;
+        }
+        java.util.ArrayList<ContactSlot> contacts = world.awakeNonTouchingContacts;
+        ContactSlot moved = contacts.remove(contacts.size() - 1);
+        if (localIndex < contacts.size()) {
+            contacts.set(localIndex, moved);
+            moved.nonTouchingIndex = localIndex;
+        }
+        contact.nonTouchingIndex = B2_NULL_INDEX;
     }
 
     private static void b2RemoveContactFromGraph(WorldSlot world, ContactSlot contact) {
@@ -9285,6 +10273,21 @@ public final class B2 {
         return dst;
     }
 
+    private static b2ManifoldPoint b2CopyManifoldPoint(b2ManifoldPoint src) {
+        b2ManifoldPoint dst = new b2ManifoldPoint();
+        dst.anchorA = src.anchorA.copy();
+        dst.anchorB = src.anchorB.copy();
+        dst.point = src.point.copy();
+        dst.separation = src.separation;
+        dst.normalImpulse = src.normalImpulse;
+        dst.tangentImpulse = src.tangentImpulse;
+        dst.totalNormalImpulse = src.totalNormalImpulse;
+        dst.normalVelocity = src.normalVelocity;
+        dst.id = src.id;
+        dst.persisted = src.persisted;
+        return dst;
+    }
+
     private static b2Manifold b2ComputeContactManifold(ShapeSlot shapeA, ShapeSlot shapeB, b2Manifold oldManifold) {
         b2Manifold manifold = b2ComputeManifold(shapeA, shapeB);
         if (manifold.pointCount > 0) {
@@ -9319,6 +10322,11 @@ public final class B2 {
     private static b2Manifold b2ComputeManifold(ShapeSlot shapeA, ShapeSlot shapeB) {
         b2Transform xfA = new b2Transform(shapeA.body.position, shapeA.body.rotation);
         b2Transform xfB = new b2Transform(shapeB.body.position, shapeB.body.rotation);
+        return b2ComputeManifold(shapeA, xfA, shapeB, xfB);
+    }
+
+    private static b2Manifold b2ComputeManifold(ShapeSlot shapeA, b2Transform xfA,
+                                                ShapeSlot shapeB, b2Transform xfB) {
         if (shapeA.kind == 1 && shapeB.kind == 1) {
             return b2CollidePolygons(shapeA.polygon, xfA, shapeB.polygon, xfB);
         }
@@ -9410,6 +10418,7 @@ public final class B2 {
     private static int b2CreateSleepIsland(WorldSlot world) {
         int islandId = world.nextSleepIslandId++;
         world.sleepIslandParents.put(islandId, islandId);
+        world.sleepIslandBodies.put(islandId, new java.util.ArrayList<>());
         world.sleepIslandContacts.put(islandId, new java.util.ArrayList<>());
         world.sleepIslandJoints.put(islandId, new java.util.ArrayList<>());
         return islandId;
@@ -9451,6 +10460,7 @@ public final class B2 {
         }
         if (body.sleepIslandId == B2_NULL_INDEX || !world.sleepIslandParents.containsKey(body.sleepIslandId)) {
             body.sleepIslandId = b2CreateSleepIsland(world);
+            world.sleepIslandBodies.get(body.sleepIslandId).add(body);
         }
     }
 
@@ -9469,10 +10479,13 @@ public final class B2 {
             return rootA;
         }
         world.sleepIslandParents.put(rootB, rootA);
+        world.sleepIslandBodies.computeIfAbsent(rootA, ignored -> new java.util.ArrayList<>())
+            .addAll(world.sleepIslandBodies.getOrDefault(rootB, new java.util.ArrayList<>()));
         world.sleepIslandContacts.computeIfAbsent(rootA, ignored -> new java.util.ArrayList<>())
             .addAll(world.sleepIslandContacts.getOrDefault(rootB, new java.util.ArrayList<>()));
         world.sleepIslandJoints.computeIfAbsent(rootA, ignored -> new java.util.ArrayList<>())
             .addAll(world.sleepIslandJoints.getOrDefault(rootB, new java.util.ArrayList<>()));
+        world.sleepIslandBodies.remove(rootB);
         world.sleepIslandContacts.remove(rootB);
         world.sleepIslandJoints.remove(rootB);
         if (world.sleepingIslandRoots.remove(rootB)) {
@@ -9498,13 +10511,19 @@ public final class B2 {
             return;
         }
         int root = b2GetBodySleepIsland(world, body);
-        for (BodySlot candidate : world.bodies) {
+        java.util.ArrayList<BodySlot> islandBodies = world.sleepIslandBodies.get(root);
+        java.util.List<BodySlot> wakeOrder = islandBodies != null ? islandBodies : world.bodies;
+        java.util.Set<BodySlot> wokenBodies = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+        for (BodySlot candidate : wakeOrder) {
             if (candidate == null || !candidate.alive || !candidate.enabled || candidate.type == b2_staticBody) {
                 continue;
             }
-            if (b2FindSleepIsland(world, candidate.sleepIslandId) == root) {
+            if (b2FindSleepIsland(world, candidate.sleepIslandId) == root && wokenBodies.add(candidate)) {
                 candidate.awake = true;
                 candidate.sleepTime = 0.0f;
+                if (!world.solverBodyOrder.contains(candidate)) {
+                    world.solverBodyOrder.add(candidate);
+                }
             }
         }
         if (world.sleepingIslandRoots.remove(root)) {
@@ -9525,12 +10544,31 @@ public final class B2 {
                 }
             }
         }
+        for (BodySlot candidate : world.bodies) {
+            if (candidate == null || !candidate.alive || b2FindSleepIsland(world, candidate.sleepIslandId) != root) {
+                continue;
+            }
+            for (ContactSlot contact : candidate.contacts) {
+                if (contact.alive && !contact.touching && contact.colorIndex == B2_NULL_INDEX
+                    && contact.nonTouchingIndex == B2_NULL_INDEX) {
+                    b2AddAwakeNonTouchingContact(world, contact);
+                }
+            }
+        }
     }
 
     private static void b2SleepIslandGraph(WorldSlot world, int islandId) {
         int root = b2FindSleepIsland(world, islandId);
         if (root == B2_NULL_INDEX || !world.sleepingIslandRoots.add(root)) {
             return;
+        }
+        java.util.ArrayList<BodySlot> bodies = world.sleepIslandBodies.get(root);
+        if (bodies != null) {
+            for (BodySlot body : bodies) {
+                if (body.alive && !body.awake) {
+                    b2RemoveSwap(world.solverBodyOrder, body);
+                }
+            }
         }
         java.util.ArrayList<ContactSlot> contacts = world.sleepIslandContacts.get(root);
         if (contacts != null) {
@@ -9563,6 +10601,11 @@ public final class B2 {
                 candidate.angularVelocity = 0.0f;
             }
         }
+        for (ContactSlot contact : world.contactUpdateOrder) {
+            if (contact.alive && !contact.touching && !b2ContactHasAwakeBody(contact)) {
+                b2RemoveAwakeNonTouchingContact(world, contact);
+            }
+        }
         b2SleepIslandGraph(world, root);
     }
 
@@ -9578,7 +10621,15 @@ public final class B2 {
             || contact.shapeA.def.isSensor || contact.shapeB.def.isSensor) {
             return;
         }
-        int root = b2UnionBodySleepIslands(world, contact.shapeA.body, contact.shapeB.body);
+        BodySlot bodyA = contact.shapeA.body;
+        BodySlot bodyB = contact.shapeB.body;
+        if (bodyA.awake && !bodyB.awake) {
+            b2WakeBody(bodyB);
+        }
+        if (bodyB.awake && !bodyA.awake) {
+            b2WakeBody(bodyA);
+        }
+        int root = b2UnionBodySleepIslands(world, bodyA, bodyB);
         contact.sleepIslandId = root;
         world.sleepIslandContacts.computeIfAbsent(root, ignored -> new java.util.ArrayList<>()).add(0, contact);
     }
@@ -9600,6 +10651,11 @@ public final class B2 {
         if (joint == null || !joint.alive) {
             return;
         }
+        if (joint.bodyA.awake && !joint.bodyB.awake) {
+            b2WakeBody(joint.bodyB);
+        } else if (joint.bodyB.awake && !joint.bodyA.awake) {
+            b2WakeBody(joint.bodyA);
+        }
         int root = b2UnionBodySleepIslands(world, joint.bodyA, joint.bodyB);
         joint.sleepIslandId = root;
         world.sleepIslandJoints.computeIfAbsent(root, ignored -> new java.util.ArrayList<>()).add(0, joint);
@@ -9618,32 +10674,43 @@ public final class B2 {
         joint.sleepIslandId = B2_NULL_INDEX;
     }
 
-    private static void b2SplitSleepIsland(WorldSlot world) {
+    private static boolean b2SplitSleepIsland(WorldSlot world) {
         int splitIslandId = world.splitSleepIslandId;
         world.splitSleepIslandId = B2_NULL_INDEX;
         int splitRoot = b2FindSleepIsland(world, splitIslandId);
         if (splitRoot == B2_NULL_INDEX || !world.sleepIslandConstraintRemoved.remove(splitRoot)) {
-            return;
+            return false;
         }
 
-        java.util.HashSet<BodySlot> splitBodies = new java.util.HashSet<>();
+        java.util.ArrayList<BodySlot> splitBodies = new java.util.ArrayList<>();
+        java.util.HashSet<BodySlot> splitBodySet = new java.util.HashSet<>();
+        java.util.ArrayList<BodySlot> islandBodyOrder = world.sleepIslandBodies.get(splitRoot);
+        if (islandBodyOrder != null) {
+            for (BodySlot body : islandBodyOrder) {
+                if (body != null && body.alive && body.enabled && body.type != b2_staticBody
+                    && b2FindSleepIsland(world, body.sleepIslandId) == splitRoot && splitBodySet.add(body)) {
+                    splitBodies.add(body);
+                }
+            }
+        }
         for (BodySlot body : world.bodies) {
             if (body == null || !body.alive || !body.enabled || body.type == b2_staticBody) {
                 continue;
             }
-            if (b2FindSleepIsland(world, body.sleepIslandId) == splitRoot) {
+            if (b2FindSleepIsland(world, body.sleepIslandId) == splitRoot && splitBodySet.add(body)) {
                 splitBodies.add(body);
-                body.sleepIslandId = b2CreateSleepIsland(world);
             }
         }
         if (splitBodies.isEmpty()) {
             world.sleepIslandParents.remove(splitRoot);
+            world.sleepIslandBodies.remove(splitRoot);
             world.sleepIslandContacts.remove(splitRoot);
             world.sleepIslandJoints.remove(splitRoot);
             world.sleepingIslandRoots.remove(splitRoot);
-            return;
+            return true;
         }
 
+        world.sleepIslandBodies.remove(splitRoot);
         world.sleepIslandContacts.remove(splitRoot);
         world.sleepIslandJoints.remove(splitRoot);
         world.sleepingIslandRoots.remove(splitRoot);
@@ -9659,31 +10726,70 @@ public final class B2 {
             }
         }
 
-        for (ContactSlot contact : world.contacts) {
-            if (contact == null || !contact.alive || !contact.touching
-                || contact.shapeA.def.isSensor || contact.shapeB.def.isSensor) {
+        java.util.Set<BodySlot> visitedBodies = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+        java.util.Set<ContactSlot> visitedContacts = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+        java.util.Set<JointSlot> visitedJoints = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+        java.util.ArrayList<BodySlot> stack = new java.util.ArrayList<>();
+        for (BodySlot seed : splitBodies) {
+            if (!visitedBodies.add(seed)) {
                 continue;
             }
-            if (splitBodies.contains(contact.shapeA.body) || splitBodies.contains(contact.shapeB.body)) {
-                b2LinkSleepContact(world, contact);
-            }
-        }
-        for (JointSlot joint : world.joints) {
-            if (joint == null || !joint.alive) {
-                continue;
-            }
-            if (splitBodies.contains(joint.bodyA) || splitBodies.contains(joint.bodyB)) {
-                b2LinkSleepJoint(world, joint);
+            int islandId = b2CreateSleepIsland(world);
+            stack.add(seed);
+            while (!stack.isEmpty()) {
+                BodySlot body = stack.remove(stack.size() - 1);
+                body.sleepIslandId = islandId;
+                world.sleepIslandBodies.get(islandId).add(body);
+
+                for (ContactSlot contact : body.contacts) {
+                    if (contact == null || !contact.alive || !contact.touching
+                        || contact.shapeA.def.isSensor || contact.shapeB.def.isSensor
+                        || !visitedContacts.add(contact)) {
+                        continue;
+                    }
+                    contact.sleepIslandId = islandId;
+                    world.sleepIslandContacts.get(islandId).add(contact);
+                    BodySlot other = contact.shapeA.body == body ? contact.shapeB.body : contact.shapeA.body;
+                    if (other.enabled && other.type != b2_staticBody && splitBodySet.contains(other)
+                        && visitedBodies.add(other)) {
+                        stack.add(other);
+                    }
+                }
+
+                for (JointSlot joint : body.joints) {
+                    if (joint == null || !joint.alive || !visitedJoints.add(joint)) {
+                        continue;
+                    }
+                    BodySlot other = joint.bodyA == body ? joint.bodyB : joint.bodyA;
+                    if (!other.enabled) {
+                        continue;
+                    }
+                    joint.sleepIslandId = islandId;
+                    world.sleepIslandJoints.get(islandId).add(joint);
+                    if (other.type != b2_staticBody && splitBodySet.contains(other) && visitedBodies.add(other)) {
+                        stack.add(other);
+                    }
+                }
             }
         }
         world.sleepIslandParents.remove(splitRoot);
+        return true;
     }
 
     private static boolean b2SolveWorldContacts(WorldSlot world, float timeStep, int subStepCount) {
+        long mergeStart = System.nanoTime();
+        for (BodySlot body : world.bodies) {
+            if (body != null && body.alive && body.enabled && body.type != b2_staticBody) {
+                b2GetBodySleepIsland(world, body);
+            }
+        }
+        world.profile.mergeIslands = b2ElapsedMilliseconds(mergeStart);
+
+        long prepareStart = System.nanoTime();
         java.util.ArrayList<SolverBodyState> states = new java.util.ArrayList<>();
         java.util.IdentityHashMap<BodySlot, Integer> stateIndices = new java.util.IdentityHashMap<>();
         for (BodySlot body : world.solverBodyOrder) {
-            if (body == null || !body.alive || !body.enabled || !body.awake || body.type != b2_dynamicBody) {
+            if (body == null || !body.alive || !body.enabled || !body.awake || body.type == b2_staticBody) {
                 continue;
             }
             SolverBodyState state = new SolverBodyState();
@@ -9706,6 +10812,9 @@ public final class B2 {
         float contactSpeed = world.def.maxContactPushSpeed / staticSoftness.massScale;
         float h = timeStep / subStepCount;
         float invH = subStepCount / timeStep;
+        world.profile.prepareStages = b2ElapsedMilliseconds(prepareStart);
+
+        long prepareConstraintStart = System.nanoTime();
         for (int colorIndex = 0; colorIndex < B2_GRAPH_COLOR_COUNT; ++colorIndex) {
             java.util.ArrayList<JointSlot> colorJoints = world.jointGraphColors[colorIndex];
             Object[] preparedJoints = new Object[colorJoints.size()];
@@ -9742,38 +10851,64 @@ public final class B2 {
         float maxLinearSpeedSquared = maxLinearSpeed * maxLinearSpeed;
         float maxAngularSpeed = B2_MAX_ROTATION() / timeStep;
         float maxAngularSpeedSquared = maxAngularSpeed * maxAngularSpeed;
+        world.profile.prepareConstraints = b2ElapsedMilliseconds(prepareConstraintStart);
 
+        long constraintStart = System.nanoTime();
         for (int i = 0; i < subStepCount; ++i) {
+            long stageStart = System.nanoTime();
             b2IntegrateVelocities(world, states, h, maxLinearSpeed, maxLinearSpeedSquared,
                 maxAngularSpeed, maxAngularSpeedSquared);
+            world.profile.integrateVelocities += b2ElapsedMilliseconds(stageStart);
 
+            stageStart = System.nanoTime();
             b2WarmStartConstraintColor(colors[B2_OVERFLOW_INDEX], states);
             for (int colorIndex = 0; colorIndex < B2_OVERFLOW_INDEX; ++colorIndex) {
                 b2WarmStartConstraintColorParallel(world, colors[colorIndex], states);
             }
+            world.profile.warmStart += b2ElapsedMilliseconds(stageStart);
+
+            stageStart = System.nanoTime();
             b2SolveConstraintColor(colors[B2_OVERFLOW_INDEX], states, h, invH, world.def.maxContactPushSpeed, true, true);
             for (int colorIndex = 0; colorIndex < B2_OVERFLOW_INDEX; ++colorIndex) {
                 b2SolveConstraintColorParallel(world, colors[colorIndex], states, h, invH, contactSpeed, true);
             }
+            world.profile.solveImpulses += b2ElapsedMilliseconds(stageStart);
 
+            stageStart = System.nanoTime();
             b2IntegratePositions(world, states, h);
+            world.profile.integratePositions += b2ElapsedMilliseconds(stageStart);
 
+            stageStart = System.nanoTime();
             b2SolveConstraintColor(colors[B2_OVERFLOW_INDEX], states, h, invH, world.def.maxContactPushSpeed, false, true);
             for (int colorIndex = 0; colorIndex < B2_OVERFLOW_INDEX; ++colorIndex) {
                 b2SolveConstraintColorParallel(world, colors[colorIndex], states, h, invH, contactSpeed, false);
             }
+            world.profile.relaxImpulses += b2ElapsedMilliseconds(stageStart);
         }
 
+        long stageStart = System.nanoTime();
+        if (!colors[B2_OVERFLOW_INDEX].contacts.isEmpty()) {
+            b2ApplyRestitution(colors[B2_OVERFLOW_INDEX].contacts, states, world.def.restitutionThreshold, true);
+        }
         for (int colorIndex = 0; colorIndex < B2_OVERFLOW_INDEX; ++colorIndex) {
             b2ParallelList(world, colors[colorIndex].contacts, 4,
-                range -> b2ApplyRestitution(range, states, world.def.restitutionThreshold));
+                range -> b2ApplyRestitution(range, states, world.def.restitutionThreshold, false));
         }
-        if (!colors[B2_OVERFLOW_INDEX].contacts.isEmpty()) {
-            b2ApplyRestitution(colors[B2_OVERFLOW_INDEX].contacts, states, world.def.restitutionThreshold);
-        }
-        b2ParallelList(world, constraints, 4, B2::b2StoreContactImpulses);
-        b2UpdateContactHitEvents(world, constraints);
+        world.profile.applyRestitution = b2ElapsedMilliseconds(stageStart);
 
+        stageStart = System.nanoTime();
+        b2ParallelList(world, constraints, 4, B2::b2StoreContactImpulses);
+        world.profile.storeImpulses = b2ElapsedMilliseconds(stageStart);
+        world.profile.solveConstraints = b2ElapsedMilliseconds(constraintStart);
+        if (constraints.isEmpty()) {
+            b2UpdateContactHitEvents(world, constraints);
+        } else {
+            long hitEventStart = System.nanoTime();
+            b2UpdateContactHitEvents(world, constraints);
+            world.profile.hitEvents = b2ElapsedMilliseconds(hitEventStart);
+        }
+
+        long transformStart = System.nanoTime();
         boolean[] sleepReady = new boolean[states.size()];
         BulletSweep[] bulletSweepByState = new BulletSweep[states.size()];
         java.util.ArrayList<BulletSweep> bulletSweeps = new java.util.ArrayList<>();
@@ -9788,9 +10923,9 @@ public final class B2 {
                 b2Vec2 center2 = b2Add(body.center, state.deltaPosition);
                 b2Rot rotation2 = b2NormalizeRot(b2MulRot(state.deltaRotation, body.rotation));
                 float maxVelocity = b2Length(state.linearVelocity) + b2AbsFloat(state.angularVelocity) * body.maxExtent;
-                boolean fastNonBullet = world.continuousEnabled && !body.bullet
+                boolean fastNonBullet = body.type == b2_dynamicBody && world.continuousEnabled && !body.bullet
                     && maxVelocity * timeStep > 0.5f * body.minExtent;
-                boolean fastBullet = world.continuousEnabled && body.bullet
+                boolean fastBullet = body.type == b2_dynamicBody && world.continuousEnabled && body.bullet
                     && maxVelocity * timeStep > 0.5f * body.minExtent;
                 boolean didHit = false;
                 if (fastNonBullet) {
@@ -9828,7 +10963,9 @@ public final class B2 {
                 bulletSweeps.add(sweep);
             }
         }
+        world.profile.transforms = b2ElapsedMilliseconds(transformStart);
 
+        long bulletStart = System.nanoTime();
         float[] bulletFractions = new float[bulletSweeps.size()];
         java.util.Arrays.fill(bulletFractions, 1.0f);
         b2ParallelFor(world, bulletSweeps.size(), 8, (startIndex, endIndex, workerIndex, taskContext) -> {
@@ -9850,11 +10987,25 @@ public final class B2 {
             }
             b2SynchronizeFastBodyProxies(world, sweep.body, didHit, true);
         }
+        if (!bulletSweeps.isEmpty()) {
+            world.profile.bullets = b2ElapsedMilliseconds(bulletStart);
+        }
 
+        boolean hasDeferredRefit = false;
+        for (SolverBodyState state : states) {
+            for (ShapeSlot shape : state.body.shapes) {
+                hasDeferredRefit |= shape.enlargedAABB;
+            }
+        }
+        long refitStart = System.nanoTime();
         for (SolverBodyState state : states) {
             b2ApplyDeferredProxyEnlargements(world, state.body);
         }
+        if (hasDeferredRefit) {
+            world.profile.refit = b2ElapsedMilliseconds(refitStart);
+        }
 
+        long sleepStart = System.nanoTime();
         final int[] sleepParents = new int[states.size()];
         for (int i = 0; i < sleepParents.length; ++i) {
             sleepParents[i] = i;
@@ -9958,6 +11109,9 @@ public final class B2 {
         world.bodyEvents = new b2BodyEvents();
         world.bodyEvents.moveEvents = moves.toArray(new b2BodyMoveEvent[0]);
         world.bodyEvents.moveCount = world.bodyEvents.moveEvents.length;
+        if (!rootsFallingAsleep.isEmpty()) {
+            world.profile.sleepIslands = b2ElapsedMilliseconds(sleepStart);
+        }
         return true;
     }
 
@@ -10130,6 +11284,84 @@ public final class B2 {
         return colors;
     }
 
+    private static final class ContinuousContext {
+        WorldSlot world;
+        BodySlot fastBody;
+        ShapeSlot fastShape;
+        b2Vec2 centroid1;
+        b2Vec2 centroid2;
+        b2Sweep sweep;
+        float fraction;
+    }
+
+    private static boolean b2ContinuousQueryCallback(int proxyId, long userData, ContinuousContext context) {
+        int shapeIndex = (int) userData;
+        if (shapeIndex == context.fastShape.index) {
+            return true;
+        }
+
+        WorldSlot world = context.world;
+        ShapeSlot shape = shapeIndex >= 0 && shapeIndex < world.shapes.size()
+            ? world.shapes.get(shapeIndex)
+            : null;
+        if (shape == null || !shape.alive || shape.body == context.fastBody || shape.def.isSensor
+            || !b2ShouldShapesCollide(context.fastShape, shape)) {
+            return true;
+        }
+
+        BodySlot body = shape.body;
+        if (body.bullet || !b2ShouldBodiesCollide(context.fastBody, body)) {
+            return true;
+        }
+
+        if (world.customFilterFcn != null
+            && !world.customFilterFcn.invoke(shapeId(world, shape), shapeId(world, context.fastShape),
+                world.customFilterContext)) {
+            return true;
+        }
+
+        if (shape.kind == 5
+            && b2SkipContinuousChainJunction(shape, context.centroid1, context.centroid2,
+                context.fastBody.minExtent)) {
+            return true;
+        }
+
+        b2TOIInput input = new b2TOIInput();
+        input.proxyA = b2MakeShapeDistanceProxy(shape);
+        input.proxyB = b2MakeShapeDistanceProxy(context.fastShape);
+        input.sweepA = b2MakeContinuousTargetSweep(body);
+        input.sweepB = context.sweep;
+        input.maxFraction = context.fraction;
+        b2TOIOutput output = b2TimeOfImpact(input);
+        float hitFraction = context.fraction;
+        boolean didHit = false;
+        if (0.0f < output.fraction && output.fraction < context.fraction) {
+            hitFraction = output.fraction;
+            didHit = true;
+        } else if (output.fraction == 0.0f) {
+            b2Vec2 centroid = b2GetShapeCentroid(context.fastShape);
+            ShapeExtent extent = b2ComputeShapeExtent(context.fastShape, centroid);
+            input.proxyB = b2MakeProxy(new b2Vec2[] {centroid}, 1, 0.25f * extent.minExtent);
+            output = b2TimeOfImpact(input);
+            if (0.0f < output.fraction && output.fraction < context.fraction) {
+                hitFraction = output.fraction;
+                didHit = true;
+            }
+        }
+        if (didHit && (shape.def.enablePreSolveEvents || context.fastShape.def.enablePreSolveEvents)
+            && world.preSolveFcn != null) {
+            b2Transform transformA = b2GetSweepTransform(input.sweepA, hitFraction);
+            b2Transform transformB = b2GetSweepTransform(input.sweepB, hitFraction);
+            b2Manifold manifold = b2ComputeManifold(shape, transformA, context.fastShape, transformB);
+            didHit = world.preSolveFcn.invoke(shapeId(world, shape), shapeId(world, context.fastShape),
+                manifold, world.preSolveContext);
+        }
+        if (didHit) {
+            context.fraction = hitFraction;
+        }
+        return true;
+    }
+
     private static float b2SolveContinuous(WorldSlot world, BodySlot fastBody, b2Vec2 center1, b2Rot rotation1,
                                            b2Vec2 center2, b2Rot rotation2) {
         b2Sweep sweepB = new b2Sweep();
@@ -10140,52 +11372,48 @@ public final class B2 {
         sweepB.q2 = rotation2.copy();
         b2Transform xf1 = b2GetSweepTransform(sweepB, 0.0f);
         b2Transform xf2 = b2GetSweepTransform(sweepB, 1.0f);
-        float fraction = 1.0f;
+        ContinuousContext context = new ContinuousContext();
+        context.world = world;
+        context.fastBody = fastBody;
+        context.sweep = sweepB;
+        context.fraction = 1.0f;
 
-        for (ShapeSlot fastShape : fastBody.shapes) {
-            if (fastShape.def.isSensor) {
-                continue;
-            }
+        for (int shapeIndex = fastBody.shapes.size() - 1; shapeIndex >= 0; --shapeIndex) {
+            ShapeSlot fastShape = fastBody.shapes.get(shapeIndex);
+            context.fastShape = fastShape;
             b2Vec2 centroid1 = b2TransformPoint(xf1, fastShape.localCentroid);
             b2Vec2 centroid2 = b2TransformPoint(xf2, fastShape.localCentroid);
+            context.centroid1 = centroid1;
+            context.centroid2 = centroid2;
             b2AABB box2 = b2ComputeShapeAABB(fastShape, xf2);
             b2AABB box = b2AABB_Union(fastShape.aabb, box2);
             fastShape.aabb = box2;
-            for (ShapeSlot shape : world.shapes) {
-                BodySlot body = shape == null ? null : shape.body;
-                if (shape == null || !shape.alive || body == fastBody
-                    || (!fastBody.bullet && body.type != b2_staticBody)
-                    || (fastBody.bullet && body.bullet)
-                    || shape.def.isSensor || !b2AABB_Overlaps(box, shape.fatAABB)
-                    || !b2ShouldShapesCollide(shape, fastShape)
-                    || !b2ShouldBodiesCollide(body, fastBody)) {
-                    continue;
-                }
-                if (shape.kind == 5 && b2SkipContinuousChainJunction(shape, centroid1, centroid2, fastBody.minExtent)) {
-                    continue;
-                }
 
-                b2TOIInput input = new b2TOIInput();
-                input.proxyA = b2MakeShapeDistanceProxy(shape);
-                input.proxyB = b2MakeShapeDistanceProxy(fastShape);
-                input.sweepA = b2MakeBodySweep(body, body.center, body.rotation, body.center, body.rotation);
-                input.sweepB = sweepB;
-                input.maxFraction = fraction;
-                b2TOIOutput output = b2TimeOfImpact(input);
-                if (0.0f < output.fraction && output.fraction < fraction) {
-                    fraction = output.fraction;
-                } else if (output.fraction == 0.0f) {
-                    b2Vec2 centroid = b2GetShapeCentroid(fastShape);
-                    ShapeExtent extent = b2ComputeShapeExtent(fastShape, centroid);
-                    input.proxyB = b2MakeProxy(new b2Vec2[] {centroid}, 1, 0.25f * extent.minExtent);
-                    output = b2TimeOfImpact(input);
-                    if (0.0f < output.fraction && output.fraction < fraction) {
-                        fraction = output.fraction;
-                    }
-                }
+            if (fastShape.def.isSensor) {
+                continue;
+            }
+
+            b2DynamicTree_Query(world.broadPhase.trees[b2_staticBody], box, B2_DEFAULT_MASK_BITS,
+                (proxyId, userData) -> b2ContinuousQueryCallback(proxyId, userData, context));
+            if (fastBody.bullet) {
+                b2DynamicTree_Query(world.broadPhase.trees[b2_kinematicBody], box, B2_DEFAULT_MASK_BITS,
+                    (proxyId, userData) -> b2ContinuousQueryCallback(proxyId, userData, context));
+                b2DynamicTree_Query(world.broadPhase.trees[b2_dynamicBody], box, B2_DEFAULT_MASK_BITS,
+                    (proxyId, userData) -> b2ContinuousQueryCallback(proxyId, userData, context));
             }
         }
-        return fraction;
+        return context.fraction;
+    }
+
+    private static b2Sweep b2MakeContinuousTargetSweep(BodySlot body) {
+        if (body.type == b2_staticBody) {
+            return b2MakeBodySweep(body, body.center, body.rotation, body.center, body.rotation);
+        }
+        if (body.type == b2_kinematicBody) {
+            return b2MakeBodySweep(body, body.center, body.rotation, body.center, body.rotation);
+        }
+        // Non-bullet dynamic targets have already completed finalization when deferred bullets run.
+        return b2MakeBodySweep(body, body.center, body.rotation, body.center, body.rotation);
     }
 
     private static boolean b2SkipContinuousChainJunction(ShapeSlot shape, b2Vec2 centroid1, b2Vec2 centroid2,
@@ -11293,6 +12521,7 @@ public final class B2 {
         constraint.anchorA = b2RotateVector(joint.bodyA.rotation, b2Sub(joint.localAnchorA, joint.bodyA.localCenter));
         constraint.anchorB = b2RotateVector(joint.bodyB.rotation, b2Sub(joint.localAnchorB, joint.bodyB.localCenter));
         constraint.axisA = b2RotateVector(joint.bodyA.rotation, joint.localAxisA);
+        joint.wheelAxisA = constraint.axisA.copy();
         constraint.deltaCenter = b2Sub(joint.bodyB.center, joint.bodyA.center);
 
         b2Vec2 d = b2Add(constraint.deltaCenter, b2Sub(constraint.anchorB, constraint.anchorA));
@@ -11540,19 +12769,12 @@ public final class B2 {
             return null;
         }
         constraint.normal = contact.manifold.normal.copy();
-        WorldSlot world = WORLDS[contact.shapeA.body.worldIndex];
-        b2SurfaceMaterial materialA = contact.shapeA.def.material;
-        b2SurfaceMaterial materialB = contact.shapeB.def.material;
-        constraint.friction = world.def.frictionCallback != null
-            ? world.def.frictionCallback.invoke(materialA.friction, materialA.userMaterialId, materialB.friction, materialB.userMaterialId)
-            : (float) Math.sqrt(materialA.friction * materialB.friction);
-        constraint.restitution = world.def.restitutionCallback != null
-            ? world.def.restitutionCallback.invoke(materialA.restitution, materialA.userMaterialId, materialB.restitution, materialB.userMaterialId)
-            : b2MaxFloat(materialA.restitution, materialB.restitution);
-        constraint.rollingResistance = b2ComputeRollingResistance(contact.shapeA, contact.shapeB);
+        constraint.friction = contact.friction;
+        constraint.restitution = contact.restitution;
+        constraint.rollingResistance = contact.rollingResistance;
         float warmStartScale = worldWarmStarting(contact.shapeA.body) ? 1.0f : 0.0f;
         constraint.rollingImpulse = warmStartScale * contact.manifold.rollingImpulse;
-        constraint.tangentSpeed = contact.shapeA.def.material.tangentSpeed + contact.shapeB.def.material.tangentSpeed;
+        constraint.tangentSpeed = contact.tangentSpeed;
         constraint.pointCount = pointCount;
         constraint.invMassA = contact.shapeA.body.type == b2_dynamicBody ? contact.shapeA.body.invMass : 0.0f;
         constraint.invIA = contact.shapeA.body.type == b2_dynamicBody ? contact.shapeA.body.invInertia : 0.0f;
@@ -11602,6 +12824,24 @@ public final class B2 {
             return 0.0f;
         }
         return b2MaxFloat(rollingA, rollingB) * b2MaxFloat(b2GetShapeRadius(shapeA), b2GetShapeRadius(shapeB));
+    }
+
+    private static float b2MixFriction(WorldSlot world, ShapeSlot shapeA, ShapeSlot shapeB) {
+        b2SurfaceMaterial materialA = shapeA.def.material;
+        b2SurfaceMaterial materialB = shapeB.def.material;
+        return world.def.frictionCallback != null
+            ? world.def.frictionCallback.invoke(materialA.friction, materialA.userMaterialId,
+                materialB.friction, materialB.userMaterialId)
+            : (float) Math.sqrt(materialA.friction * materialB.friction);
+    }
+
+    private static float b2MixRestitution(WorldSlot world, ShapeSlot shapeA, ShapeSlot shapeB) {
+        b2SurfaceMaterial materialA = shapeA.def.material;
+        b2SurfaceMaterial materialB = shapeB.def.material;
+        return world.def.restitutionCallback != null
+            ? world.def.restitutionCallback.invoke(materialA.restitution, materialA.userMaterialId,
+                materialB.restitution, materialB.userMaterialId)
+            : b2MaxFloat(materialA.restitution, materialB.restitution);
     }
 
     private static float b2GetShapeRadius(ShapeSlot shape) {
@@ -11776,7 +13016,8 @@ public final class B2 {
 
     private static void b2ApplyRestitution(java.util.List<ContactConstraint> constraints,
                                            java.util.ArrayList<SolverBodyState> states,
-                                           float threshold) {
+                                           float threshold,
+                                           boolean scalarOverflow) {
         for (ContactConstraint constraint : constraints) {
             if (constraint.restitution == 0.0f) {
                 continue;
@@ -11790,17 +13031,29 @@ public final class B2 {
             b2Vec2 normal = constraint.normal;
             for (int i = 0; i < constraint.pointCount; ++i) {
                 ContactConstraintPoint cp = constraint.points[i];
-                if (cp.relativeVelocity > -threshold || cp.totalNormalImpulse == 0.0f) {
+                boolean aboveThreshold = scalarOverflow
+                    ? cp.relativeVelocity > -threshold
+                    : cp.relativeVelocity + threshold > 0.0f;
+                if (aboveThreshold || cp.totalNormalImpulse == 0.0f) {
                     continue;
                 }
                 b2Vec2 vrB = b2Add(vB, b2CrossSV(wB, cp.anchorB));
                 b2Vec2 vrA = b2Add(vA, b2CrossSV(wA, cp.anchorA));
                 float vn = b2Dot(b2Sub(vrB, vrA), normal);
-                float impulse = -cp.normalMass * (vn + constraint.restitution * cp.relativeVelocity);
-                float newImpulse = b2MaxFloat(cp.normalImpulse + impulse, 0.0f);
+                float impulse;
+                float newImpulse;
+                if (scalarOverflow) {
+                    impulse = -cp.normalMass * (vn + constraint.restitution * cp.relativeVelocity);
+                    newImpulse = b2MaxFloat(cp.normalImpulse + impulse, 0.0f);
+                } else {
+                    float negImpulse = cp.normalMass * (vn + constraint.restitution * cp.relativeVelocity);
+                    newImpulse = b2MaxFloat(cp.normalImpulse - negImpulse, 0.0f);
+                }
                 impulse = newImpulse - cp.normalImpulse;
                 cp.normalImpulse = newImpulse;
-                cp.totalNormalImpulse += impulse;
+                if (scalarOverflow) {
+                    cp.totalNormalImpulse += impulse;
+                }
                 b2Vec2 p = b2MulSV(impulse, normal);
                 vA = b2MulSub(vA, constraint.invMassA, p);
                 wA -= constraint.invIA * b2Cross(cp.anchorA, p);
@@ -11878,6 +13131,13 @@ public final class B2 {
         b2Transform transform = new b2Transform(body.position, body.rotation);
         if (body.type != b2_dynamicBody) {
             body.center = transform.p.copy();
+            if (body.type == b2_kinematicBody) {
+                for (ShapeSlot shape : body.shapes) {
+                    ShapeExtent extent = b2ComputeShapeExtent(shape, b2Vec2_zero);
+                    body.minExtent = b2MinFloat(body.minExtent, extent.minExtent);
+                    body.maxExtent = b2MaxFloat(body.maxExtent, extent.maxExtent);
+                }
+            }
             return;
         }
 
@@ -12019,7 +13279,8 @@ public final class B2 {
     private static void updateSensorEvents(WorldSlot world) {
         java.util.HashMap<Integer, SensorOverlapState> current = new java.util.HashMap<>();
         java.util.ArrayList<b2SensorBeginTouchEvent> begins = new java.util.ArrayList<>();
-        java.util.ArrayList<b2SensorEndTouchEvent> ends = new java.util.ArrayList<>();
+        java.util.ArrayList<b2SensorEndTouchEvent> ends = new java.util.ArrayList<>(world.pendingSensorEndEvents);
+        world.pendingSensorEndEvents.clear();
 
         java.util.TreeSet<Integer> sensorIndices = new java.util.TreeSet<>(world.sensorOverlaps.keySet());
         for (ShapeSlot shape : world.shapes) {
@@ -12131,22 +13392,26 @@ public final class B2 {
 
     private static java.util.ArrayList<ShapeRef> b2CollectSensorOverlapRefs(WorldSlot world, ShapeSlot sensorShape) {
         java.util.ArrayList<ShapeRef> overlaps = new java.util.ArrayList<>();
-        for (ShapeSlot other : world.shapes) {
-            if (other == null || !other.alive || other == sensorShape) {
-                continue;
+        b2TreeQueryCallback callback = (proxyId, userData) -> {
+            int shapeIndex = (int) userData;
+            if (shapeIndex == sensorShape.index) {
+                return true;
             }
-            if (!other.def.enableSensorEvents || other.body == sensorShape.body || !other.body.enabled) {
-                continue;
-            }
-            if (!b2ShouldShapesCollide(sensorShape, other)) {
-                continue;
-            }
-            if (!b2AABB_Overlaps(sensorShape.aabb, other.aabb)) {
-                continue;
+            ShapeSlot other = shapeIndex >= 0 && shapeIndex < world.shapes.size()
+                ? world.shapes.get(shapeIndex)
+                : null;
+            if (other == null || !other.alive || !other.def.enableSensorEvents
+                || other.body == sensorShape.body || !b2ShouldShapesCollide(sensorShape, other)) {
+                return true;
             }
             if (b2SensorShapesOverlap(sensorShape, other)) {
                 overlaps.add(new ShapeRef(other.index, other.generation));
             }
+            return true;
+        };
+        for (int bodyType = b2_staticBody; bodyType <= b2_dynamicBody; ++bodyType) {
+            b2DynamicTree_Query(world.broadPhase.trees[bodyType], sensorShape.aabb,
+                sensorShape.def.filter.maskBits, callback);
         }
         overlaps.sort((a, b) -> a.shapeIndex != b.shapeIndex ? Integer.compare(a.shapeIndex, b.shapeIndex)
             : Integer.compare(a.generation, b.generation));
@@ -12323,6 +13588,14 @@ public final class B2 {
         return world;
     }
 
+    private static boolean b2RejectLockedWorld(WorldSlot world) {
+        if (!world.locked) {
+            return false;
+        }
+        b2Assert(false, "world is not locked");
+        return true;
+    }
+
     private static BodySlot getBody(b2BodyId id) {
         if (id == null || id.index1 <= 0 || id.world0 < 0 || id.world0 >= WORLDS.length) {
             return null;
@@ -12420,59 +13693,55 @@ public final class B2 {
     }
 
     private static JointSlot requireDistanceJoint(b2JointId id) {
-        JointSlot joint = requireJoint(id);
-        if (joint.type != b2_distanceJoint) {
-            throw new IllegalArgumentException("Expected b2_distanceJoint");
-        }
-        return joint;
+        return requireUnlockedJointType(id, b2_distanceJoint, "Expected b2_distanceJoint");
     }
 
     private static JointSlot requireMotorJoint(b2JointId id) {
-        JointSlot joint = requireJoint(id);
-        if (joint.type != b2_motorJoint) {
-            throw new IllegalArgumentException("Expected b2_motorJoint");
-        }
-        return joint;
+        return requireUnlockedJointType(id, b2_motorJoint, "Expected b2_motorJoint");
     }
 
     private static JointSlot requireMouseJoint(b2JointId id) {
-        JointSlot joint = requireJoint(id);
-        if (joint.type != b2_mouseJoint) {
-            throw new IllegalArgumentException("Expected b2_mouseJoint");
-        }
-        return joint;
+        return requireUnlockedJointType(id, b2_mouseJoint, "Expected b2_mouseJoint");
     }
 
     private static JointSlot requireWeldJoint(b2JointId id) {
-        JointSlot joint = requireJoint(id);
-        if (joint.type != b2_weldJoint) {
-            throw new IllegalArgumentException("Expected b2_weldJoint");
-        }
-        return joint;
+        return requireUnlockedJointType(id, b2_weldJoint, "Expected b2_weldJoint");
     }
 
     private static JointSlot requireRevoluteJoint(b2JointId id) {
-        JointSlot joint = requireJoint(id);
-        if (joint.type != b2_revoluteJoint) {
-            throw new IllegalArgumentException("Expected b2_revoluteJoint");
-        }
-        return joint;
+        return requireUnlockedJointType(id, b2_revoluteJoint, "Expected b2_revoluteJoint");
     }
 
     private static JointSlot requirePrismaticJoint(b2JointId id) {
-        JointSlot joint = requireJoint(id);
-        if (joint.type != b2_prismaticJoint) {
-            throw new IllegalArgumentException("Expected b2_prismaticJoint");
-        }
-        return joint;
+        return requireUnlockedJointType(id, b2_prismaticJoint, "Expected b2_prismaticJoint");
     }
 
     private static JointSlot requireWheelJoint(b2JointId id) {
+        return requireUnlockedJointType(id, b2_wheelJoint, "Expected b2_wheelJoint");
+    }
+
+    private static JointSlot requireUnlockedJointType(b2JointId id, int type, String typeError) {
         JointSlot joint = requireJoint(id);
-        if (joint.type != b2_wheelJoint) {
-            throw new IllegalArgumentException("Expected b2_wheelJoint");
+        if (joint.type != type) {
+            throw new IllegalArgumentException(typeError);
         }
-        return joint;
+        WorldSlot world = WORLDS[joint.bodyA.worldIndex];
+        if (!b2RejectLockedWorld(world)) {
+            return joint;
+        }
+
+        // Upstream returns a null internal joint after asserting. A detached
+        // sentinel preserves the Java API's return types without mutating the world.
+        JointSlot sentinel = new JointSlot();
+        sentinel.type = type;
+        BodySlot body = new BodySlot();
+        body.worldIndex = world.index;
+        body.position = b2Vec2_zero.copy();
+        body.rotation = b2Rot_identity.copy();
+        body.linearVelocity = b2Vec2_zero.copy();
+        sentinel.bodyA = body;
+        sentinel.bodyB = body;
+        return sentinel;
     }
 
     private static b2BodyId bodyId(WorldSlot world, BodySlot body) {

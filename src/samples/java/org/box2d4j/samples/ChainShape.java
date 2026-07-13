@@ -29,13 +29,17 @@ public final class ChainShape {
     }
 
     public static Result run() {
+        return run(STEP_COUNT);
+    }
+
+    public static Result run(int stepCount) {
         if (SampleRuntime.isActive()) {
-            return new Result(new VariantResult[] {runVariant(CIRCLE_SHAPE, STEP_COUNT)});
+            return new Result(new VariantResult[] {runVariant(CIRCLE_SHAPE, stepCount)});
         }
         VariantResult[] variants = {
-            runVariant(CIRCLE_SHAPE, STEP_COUNT),
-            runVariant(CAPSULE_SHAPE, STEP_COUNT),
-            runVariant(BOX_SHAPE, STEP_COUNT)
+            runVariant(CIRCLE_SHAPE, stepCount),
+            runVariant(CAPSULE_SHAPE, stepCount),
+            runVariant(BOX_SHAPE, stepCount)
         };
         return new Result(variants);
     }
@@ -146,7 +150,8 @@ public final class ChainShape {
     }
 
     public static void main(String[] args) {
-        System.out.println(run().toLine());
+        int stepCount = args.length == 0 ? STEP_COUNT : Integer.parseInt(args[0]);
+        System.out.println(run(stepCount).toLine());
     }
 
     public static final class Result {

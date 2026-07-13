@@ -13,10 +13,16 @@ import java.util.Locale;
 import static org.box2d4j.B2.*;
 
 public final class KinematicBody {
+    private static final int DEFAULT_STEP_COUNT = 120;
+
     private KinematicBody() {
     }
 
     public static Result run() {
+        return run(DEFAULT_STEP_COUNT);
+    }
+
+    public static Result run(int stepCount) {
         b2WorldId worldId = b2CreateWorld(b2DefaultWorldDef());
 
         float amplitude = 2.0f;
@@ -32,7 +38,7 @@ public final class KinematicBody {
         b2ShapeDef shapeDef = b2DefaultShapeDef();
         b2CreatePolygonShape(bodyId, shapeDef, box);
 
-        for (int i = 0; i < 120; ++i) {
+        for (int i = 0; i < stepCount; ++i) {
             b2Vec2 point = new b2Vec2(
                 2.0f * amplitude * (float) Math.cos(time),
                 amplitude * (float) Math.sin(2.0f * time));
@@ -53,7 +59,8 @@ public final class KinematicBody {
     }
 
     public static void main(String[] args) {
-        System.out.println(run().toLine());
+        int stepCount = args.length == 0 ? DEFAULT_STEP_COUNT : Integer.parseInt(args[0]);
+        System.out.println(run(stepCount).toLine());
     }
 
     public static final class Result {
@@ -88,7 +95,22 @@ public final class KinematicBody {
             if (value == 0.0f) {
                 return "0";
             }
-            return String.format(Locale.ROOT, "%.9g", value);
+            return trimTrailingZeros(String.format(Locale.ROOT, "%.9g", value));
+        }
+
+        private static String trimTrailingZeros(String text) {
+            int exponent = Math.max(text.indexOf('e'), text.indexOf('E'));
+            String suffix = exponent >= 0 ? text.substring(exponent) : "";
+            String mantissa = exponent >= 0 ? text.substring(0, exponent) : text;
+            if (mantissa.indexOf('.') >= 0) {
+                while (mantissa.endsWith("0")) {
+                    mantissa = mantissa.substring(0, mantissa.length() - 1);
+                }
+                if (mantissa.endsWith(".")) {
+                    mantissa = mantissa.substring(0, mantissa.length() - 1);
+                }
+            }
+            return mantissa + suffix;
         }
     }
 }

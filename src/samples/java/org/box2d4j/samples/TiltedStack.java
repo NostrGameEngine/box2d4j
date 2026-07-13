@@ -59,7 +59,7 @@ public final class TiltedStack {
             }
         }
 
-        for (int step = 0; step < 180; ++step) {
+        for (int step = 0; step < 2400; ++step) {
             b2World_Step(worldId, 1.0f / 60.0f, 4);
         }
 

@@ -77,9 +77,9 @@ final class ContactSolverParityTest {
         b2Rot q = b2Body_GetRotation(bodyId);
         b2Vec2 v = b2Body_GetLinearVelocity(bodyId);
 
-        assertEquals(Float.parseFloat(body[1]), p.x, 2.0e-7f);
-        assertEquals(Float.parseFloat(body[2]), p.y, 2.0e-7f);
-        assertEquals(Float.parseFloat(body[3]), b2Rot_GetAngle(q), 2.0e-7f);
+        assertEquals(Float.parseFloat(body[1]), p.x, 0.0f);
+        assertEquals(Float.parseFloat(body[2]), p.y, 0.0f);
+        assertEquals(Float.parseFloat(body[3]), b2Rot_GetAngle(q), 0.0f);
         assertEquals(Float.parseFloat(body[4]), v.x, 0.0f);
         assertEquals(Float.parseFloat(body[5]), v.y, 0.0f);
         assertEquals(Float.parseFloat(body[6]), b2Body_GetAngularVelocity(bodyId), 0.0f);

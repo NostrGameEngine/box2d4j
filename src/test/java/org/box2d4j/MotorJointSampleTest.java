@@ -15,11 +15,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 final class MotorJointSampleTest {
     @Test
     void sampleMatchesUpstreamCMotorJoint() throws Exception {
-        String upstream = runProbe();
+        Path probe = compileProbe();
+        assertRunMatches(probe, 110, false);
+    }
+
+    @Test
+    void motorSolverMatchesWithDeterministicTargetsAtLongHorizons() throws Exception {
+        Path probe = compileProbe();
+        for (int stepCount : new int[] {111, 240, 600, 2400}) {
+            assertRunMatches(probe, stepCount, true);
+        }
+    }
+
+    private static void assertRunMatches(Path probe, int stepCount, boolean deterministicTarget) throws Exception {
+        String upstream = runProbe(probe, stepCount, deterministicTarget);
         String[] parts = upstream.split("\\s+");
         assertEquals("motorJoint", parts[0]);
 
-        MotorJoint.Result result = MotorJoint.run();
+        MotorJoint.Result result = deterministicTarget ? MotorJoint.runDeterministic(stepCount) : MotorJoint.run(stepCount);
         assertEquals(Integer.parseInt(parts[1]), result.bodyCount);
         assertEquals(Integer.parseInt(parts[2]), result.shapeCount);
         assertEquals(Integer.parseInt(parts[3]), result.contactCount);
@@ -47,7 +60,7 @@ final class MotorJointSampleTest {
         assertEquals(Integer.parseInt(parts[index + 7]), body.contactCapacity);
     }
 
-    private static String runProbe() throws Exception {
+    private static Path compileProbe() throws Exception {
         Path root = new File(".").getCanonicalFile().toPath();
         Path outputDir = root.resolve("build/parity");
         Files.createDirectories(outputDir);
@@ -77,8 +90,14 @@ final class MotorJointSampleTest {
         Process compile = new ProcessBuilder(command).directory(root.toFile()).redirectErrorStream(true).start();
         String compileOutput = new String(compile.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
         assertEquals(0, compile.waitFor(), compileOutput);
+        return probe;
+    }
 
-        Process run = new ProcessBuilder(probe.toString()).directory(root.toFile()).redirectErrorStream(true).start();
+    private static String runProbe(Path probe, int stepCount, boolean deterministicTarget) throws Exception {
+        Path root = new File(".").getCanonicalFile().toPath();
+        Process run = new ProcessBuilder(probe.toString(), Integer.toString(stepCount), deterministicTarget ? "1" : "0")
+            .directory(root.toFile())
+            .redirectErrorStream(true).start();
         String output = new String(run.getInputStream().readAllBytes(), StandardCharsets.UTF_8).trim();
         assertEquals(0, run.waitFor(), output);
         return output;

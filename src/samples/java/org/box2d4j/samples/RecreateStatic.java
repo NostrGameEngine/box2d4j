@@ -15,10 +15,16 @@ import java.util.Locale;
 import static org.box2d4j.B2.*;
 
 public final class RecreateStatic {
+    private static final int DEFAULT_STEP_COUNT = 120;
+
     private RecreateStatic() {
     }
 
     public static Result run() {
+        return run(DEFAULT_STEP_COUNT);
+    }
+
+    public static Result run(int stepCount) {
         b2WorldId worldId = b2CreateWorld(b2DefaultWorldDef());
 
         b2BodyDef bodyDef = b2DefaultBodyDef();
@@ -31,7 +37,7 @@ public final class RecreateStatic {
         b2CreatePolygonShape(bodyId, shapeDef, box);
 
         b2BodyId groundId = new b2BodyId();
-        for (int step = 0; step < 120; ++step) {
+        for (int step = 0; step < stepCount; ++step) {
             if (b2Body_IsValid(groundId)) {
                 b2DestroyBody(groundId);
                 groundId = new b2BodyId();
@@ -61,7 +67,8 @@ public final class RecreateStatic {
     }
 
     public static void main(String[] args) {
-        System.out.println(run().toLine());
+        int stepCount = args.length == 0 ? DEFAULT_STEP_COUNT : Integer.parseInt(args[0]);
+        System.out.println(run(stepCount).toLine());
     }
 
     public static final class Result {
@@ -104,14 +111,17 @@ public final class RecreateStatic {
             return "0";
         }
         String text = String.format(Locale.ROOT, "%.9g", value);
-        if (text.indexOf('e') < 0 && text.indexOf('E') < 0 && text.indexOf('.') >= 0) {
-            while (text.endsWith("0")) {
-                text = text.substring(0, text.length() - 1);
+        int exponent = Math.max(text.indexOf('e'), text.indexOf('E'));
+        String suffix = exponent >= 0 ? text.substring(exponent) : "";
+        String mantissa = exponent >= 0 ? text.substring(0, exponent) : text;
+        if (mantissa.indexOf('.') >= 0) {
+            while (mantissa.endsWith("0")) {
+                mantissa = mantissa.substring(0, mantissa.length() - 1);
             }
-            if (text.endsWith(".")) {
-                text = text.substring(0, text.length() - 1);
+            if (mantissa.endsWith(".")) {
+                mantissa = mantissa.substring(0, mantissa.length() - 1);
             }
         }
-        return text;
+        return mantissa + suffix;
     }
 }

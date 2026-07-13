@@ -32,6 +32,21 @@ final class IdCollisionParityTest {
         actual.add(format("shape %d %d %d %d", shapeId.index1, shapeId.world0, shapeId.generation, b2StoreShapeId(shapeId)));
         actual.add(format("chain %d %d %d %d", chainId.index1, chainId.world0, chainId.generation, b2StoreChainId(chainId)));
         actual.add(format("joint %d %d %d %d", jointId.index1, jointId.world0, jointId.generation, b2StoreJointId(jointId)));
+        actual.add(format("idMacros %d %d %d %d %d %d %d %d %d %d",
+            B2_IS_NULL(b2_nullWorldId) ? 1 : 0,
+            B2_IS_NULL(b2_nullBodyId) ? 1 : 0,
+            B2_IS_NULL(b2_nullShapeId) ? 1 : 0,
+            B2_IS_NULL(b2_nullChainId) ? 1 : 0,
+            B2_IS_NULL(b2_nullJointId) ? 1 : 0,
+            B2_IS_NON_NULL(worldId) ? 1 : 0,
+            B2_IS_NON_NULL(bodyId) ? 1 : 0,
+            B2_IS_NON_NULL(shapeId) ? 1 : 0,
+            B2_IS_NON_NULL(chainId) ? 1 : 0,
+            B2_IS_NON_NULL(jointId) ? 1 : 0));
+        actual.add(format("emptyCache %d %d %d %d %d %d %d",
+            b2_emptySimplexCache.count,
+            b2_emptySimplexCache.indexA[0], b2_emptySimplexCache.indexA[1], b2_emptySimplexCache.indexA[2],
+            b2_emptySimplexCache.indexB[0], b2_emptySimplexCache.indexB[1], b2_emptySimplexCache.indexB[2]));
 
         b2AABB box = new b2AABB(new b2Vec2(-1.0f, -1.0f), new b2Vec2(-2.0f, -2.0f));
         actual.add(format("aabbInvalid %d", b2IsValidAABB(box) ? 1 : 0));

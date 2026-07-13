@@ -22,6 +22,13 @@ static void print_mass(const char* label, b2BodyId bodyId)
     printf("%s %.9g %.9g %.9g %.9g\n", label, mass.mass, mass.center.x, mass.center.y, mass.rotationalInertia);
 }
 
+static bool count_overlap(b2ShapeId shapeId, void* context)
+{
+    (void)shapeId;
+    *(int*)context += 1;
+    return true;
+}
+
 int main(void)
 {
     b2WorldDef worldDef = b2DefaultWorldDef();
@@ -54,6 +61,17 @@ int main(void)
            b2Body_GetLinearDamping(bodyId), b2Body_GetAngularDamping(bodyId), b2Body_GetGravityScale(bodyId),
            ownerWorldId.index1, ownerWorldId.generation, b2Body_GetShapeCount(bodyId), b2Body_IsValid(bodyId),
            b2Shape_IsValid(circleId));
+
+    b2Body_SetBullet(bodyId, false);
+    if (b2Body_IsBullet(bodyId))
+    {
+        return 2;
+    }
+    b2Body_SetBullet(bodyId, true);
+    if (!b2Body_IsBullet(bodyId))
+    {
+        return 3;
+    }
 
     b2ShapeId shapes[2] = { 0 };
     int shapeCount = b2Body_GetShapes(bodyId, shapes, 2);
@@ -101,6 +119,25 @@ int main(void)
     b2Body_Enable(bodyId);
     printf("enabled1 %d\n", b2Body_IsEnabled(bodyId));
 
+    b2DestroyWorld(worldId);
+
+    worldDef = b2DefaultWorldDef();
+    worldDef.gravity = b2Vec2_zero;
+    worldId = b2CreateWorld(&worldDef);
+    bodyDef = b2DefaultBodyDef();
+    bodyDef.type = b2_dynamicBody;
+    b2BodyId movingBody = b2CreateBody(worldId, &bodyDef);
+    bodyDef.position = (b2Vec2){10.0f, 0.0f};
+    b2BodyId otherBody = b2CreateBody(worldId, &bodyDef);
+    shapeDef = b2DefaultShapeDef();
+    circle = (b2Circle){b2Vec2_zero, 0.5f};
+    b2CreateCircleShape(movingBody, &shapeDef, &circle);
+    b2CreateCircleShape(otherBody, &shapeDef, &circle);
+    b2Body_SetTransform(movingBody, (b2Vec2){5.0f, 0.0f}, b2Rot_identity);
+    int hitCount = 0;
+    b2AABB oldBounds = {{-1.0f, -1.0f}, {1.0f, 1.0f}};
+    b2TreeStats stats = b2World_OverlapAABB(worldId, oldBounds, b2DefaultQueryFilter(), count_overlap, &hitCount);
+    printf("teleportTree %d %d %d\n", stats.nodeVisits, stats.leafVisits, hitCount);
     b2DestroyWorld(worldId);
     return 0;
 }

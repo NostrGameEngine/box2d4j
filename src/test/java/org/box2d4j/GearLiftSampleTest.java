@@ -13,18 +13,20 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 final class GearLiftSampleTest {
-    private static final int PARITY_STEP_COUNT = 10;
-    private static final float BODY_TOLERANCE = 1.0e-6f;
-    private static final float JOINT_METRIC_TOLERANCE = 5.0e-6f;
-    private static final float JOINT_FORCE_TOLERANCE = 2.0e-5f;
+    private static final int PARITY_STEP_COUNT = 2400;
 
     @Test
     void sampleMatchesUpstreamCGearLift() throws Exception {
-        String upstream = runProbe(PARITY_STEP_COUNT);
+        GearLift.Result result = GearLift.run(PARITY_STEP_COUNT);
+        assertMatches(runProbe(PARITY_STEP_COUNT, false), result, 0.0f, 0.0f, 0.0f);
+        assertMatches(runProbe(PARITY_STEP_COUNT, true), result, 0.0f, 0.0f, 0.0f);
+    }
+
+    private static void assertMatches(String upstream, GearLift.Result result, float bodyTolerance,
+                                      float jointMetricTolerance, float jointForceTolerance) {
         String[] parts = upstream.split("\\s+");
         assertEquals("gearLift", parts[0]);
 
-        GearLift.Result result = GearLift.run(PARITY_STEP_COUNT);
         assertEquals(Integer.parseInt(parts[1]), result.bodyCount);
         assertEquals(Integer.parseInt(parts[2]), result.shapeCount);
         assertEquals(Integer.parseInt(parts[3]), result.contactCount);
@@ -37,43 +39,45 @@ final class GearLiftSampleTest {
 
         int index = 8;
         for (int i = 0; i < bodyCount; ++i) {
-            assertBody(parts, index, result.bodies[i]);
+            assertBody(parts, index, result.bodies[i], bodyTolerance);
             index += 8;
         }
         for (int i = 0; i < jointCount; ++i) {
-            assertJoint(parts, index, result.joints[i]);
+            assertJoint(parts, index, result.joints[i], jointMetricTolerance, jointForceTolerance);
             index += 8;
         }
         assertEquals(parts.length, index);
     }
 
-    private static void assertBody(String[] parts, int index, GearLift.BodyState body) {
-        assertEquals(Float.parseFloat(parts[index]), body.x, BODY_TOLERANCE);
-        assertEquals(Float.parseFloat(parts[index + 1]), body.y, BODY_TOLERANCE);
-        assertEquals(Float.parseFloat(parts[index + 2]), body.cos, BODY_TOLERANCE);
-        assertEquals(Float.parseFloat(parts[index + 3]), body.sin, BODY_TOLERANCE);
-        assertEquals(Float.parseFloat(parts[index + 4]), body.velocityX, BODY_TOLERANCE);
-        assertEquals(Float.parseFloat(parts[index + 5]), body.velocityY, BODY_TOLERANCE);
-        assertEquals(Float.parseFloat(parts[index + 6]), body.angularVelocity, BODY_TOLERANCE);
+    private static void assertBody(String[] parts, int index, GearLift.BodyState body, float bodyTolerance) {
+        assertEquals(Float.parseFloat(parts[index]), body.x, bodyTolerance);
+        assertEquals(Float.parseFloat(parts[index + 1]), body.y, bodyTolerance);
+        assertEquals(Float.parseFloat(parts[index + 2]), body.cos, bodyTolerance);
+        assertEquals(Float.parseFloat(parts[index + 3]), body.sin, bodyTolerance);
+        assertEquals(Float.parseFloat(parts[index + 4]), body.velocityX, bodyTolerance);
+        assertEquals(Float.parseFloat(parts[index + 5]), body.velocityY, bodyTolerance);
+        assertEquals(Float.parseFloat(parts[index + 6]), body.angularVelocity, bodyTolerance);
         assertEquals(Integer.parseInt(parts[index + 7]), body.contactCapacity);
     }
 
-    private static void assertJoint(String[] parts, int index, GearLift.JointState joint) {
+    private static void assertJoint(String[] parts, int index, GearLift.JointState joint,
+                                    float jointMetricTolerance, float jointForceTolerance) {
         assertEquals(Integer.parseInt(parts[index]), joint.type);
-        assertEquals(Float.parseFloat(parts[index + 1]), joint.linearSeparation, JOINT_METRIC_TOLERANCE);
-        assertEquals(Float.parseFloat(parts[index + 2]), joint.metricA, JOINT_METRIC_TOLERANCE);
-        assertEquals(Float.parseFloat(parts[index + 3]), joint.metricB, JOINT_FORCE_TOLERANCE);
-        assertEquals(Float.parseFloat(parts[index + 4]), joint.metricC, JOINT_METRIC_TOLERANCE);
-        assertEquals(Float.parseFloat(parts[index + 5]), joint.forceX, JOINT_FORCE_TOLERANCE);
-        assertEquals(Float.parseFloat(parts[index + 6]), joint.forceY, JOINT_FORCE_TOLERANCE);
-        assertEquals(Float.parseFloat(parts[index + 7]), joint.torque, JOINT_FORCE_TOLERANCE);
+        assertEquals(Float.parseFloat(parts[index + 1]), joint.linearSeparation, jointMetricTolerance);
+        assertEquals(Float.parseFloat(parts[index + 2]), joint.metricA, jointMetricTolerance);
+        assertEquals(Float.parseFloat(parts[index + 3]), joint.metricB, jointForceTolerance);
+        assertEquals(Float.parseFloat(parts[index + 4]), joint.metricC, jointMetricTolerance);
+        assertEquals(Float.parseFloat(parts[index + 5]), joint.forceX, jointForceTolerance);
+        assertEquals(Float.parseFloat(parts[index + 6]), joint.forceY, jointForceTolerance);
+        assertEquals(Float.parseFloat(parts[index + 7]), joint.torque, jointForceTolerance);
     }
 
-    private static String runProbe(int stepCount) throws Exception {
+    private static String runProbe(int stepCount, boolean disableSimd) throws Exception {
         Path root = new File(".").getCanonicalFile().toPath();
         Path outputDir = root.resolve("build/parity");
         Files.createDirectories(outputDir);
-        Path probe = outputDir.resolve("box2d_gear_lift_sample_probe");
+        Path probe = outputDir.resolve(disableSimd
+            ? "box2d_gear_lift_scalar_sample_probe" : "box2d_gear_lift_sample_probe");
 
         List<String> sources = new ArrayList<>();
         try (java.util.stream.Stream<Path> stream = Files.list(root.resolve("vendor/box2d/src"))) {
@@ -85,6 +89,9 @@ final class GearLiftSampleTest {
         List<String> command = new ArrayList<>();
         command.add("clang");
         command.add("-D_POSIX_C_SOURCE=200809L");
+        if (disableSimd) {
+            command.add("-DBOX2D_DISABLE_SIMD");
+        }
         command.add("-std=c17");
         command.add("-O2");
         command.add("-ffp-contract=off");

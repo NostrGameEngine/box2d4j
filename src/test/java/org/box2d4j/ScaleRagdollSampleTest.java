@@ -13,7 +13,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 final class ScaleRagdollSampleTest {
-    private static final int PARITY_STEP_COUNT = 60;
+    private static final int PARITY_STEP_COUNT = 2400;
 
     @Test
     void sampleMatchesUpstreamCScaleRagdoll() throws Exception {

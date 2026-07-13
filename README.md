@@ -38,7 +38,20 @@ finite for tests and C/Java parity probes.
 ## Allocator
 
 Native-style allocations default to `ByteBuffer.allocateDirect`. Engines can
-install their own allocator globally before creating Box2D objects:
+install their own allocator/free pair globally before creating Box2D objects:
+
+```java
+B2.b2SetAllocator(
+    (size, alignment) -> engineAllocator.allocate(size, alignment),
+    engineAllocator::free);
+```
+
+The exact `b2AllocFcn`/`b2FreeFcn` pair receives every allocation and free,
+which allows an engine to keep ownership and accounting in its native memory
+system. The allocation callback receives a 32-byte-rounded size and a 32-byte
+alignment.
+
+When explicit release is unnecessary, `B2Allocator` is the shorter form:
 
 ```java
 B2.b2SetAllocator((size, alignment) -> engineAllocator.allocate(size, alignment));
@@ -51,8 +64,8 @@ the requested size:
 B2.b2SetAllocator(engineAllocator::allocate);
 ```
 
-Box2D forwards a 32-byte-rounded size and 32-byte alignment to
-`B2Allocator`. The `IntFunction` adapter receives the rounded size.
+The `IntFunction` adapter receives the rounded size. The one-callback forms use
+a no-op free callback because their buffers are expected to be JVM-managed.
 
 ## Multithreading
 

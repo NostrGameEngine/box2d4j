@@ -2,6 +2,7 @@
 
 #include "box2d/box2d.h"
 
+#include <stdint.h>
 #include <stdio.h>
 
 static void print_aabb(const char* label, b2ShapeId shapeId)
@@ -30,6 +31,17 @@ static void print_point(const char* label, b2ShapeId shapeId, b2Vec2 point)
     printf("%s %d %.9g %.9g\n", label, b2Shape_TestPoint(shapeId, point) ? 1 : 0, closest.x, closest.y);
 }
 
+static uint32_t random_u32(uint32_t* state)
+{
+    *state = *state * 1664525u + 1013904223u;
+    return *state;
+}
+
+static float random_grid_float(uint32_t* state)
+{
+    return ((int)(random_u32(state) % 4097u) - 2048) / 256.0f;
+}
+
 int main(void)
 {
     b2WorldDef worldDef = b2DefaultWorldDef();
@@ -51,6 +63,13 @@ int main(void)
     b2ShapeId circleShapeId = b2CreateCircleShape(bodyId, &shapeDef, &circle);
     b2Segment segment = { { -0.7f, -0.4f }, { 0.8f, -0.1f } };
     b2ShapeId segmentShapeId = b2CreateSegmentShape(bodyId, &shapeDef, &segment);
+    b2Vec2 chainPoints[] = { { -1.5f, 0.4f }, { -0.75f, 0.1f }, { 0.75f, 0.1f }, { 1.5f, 0.4f } };
+    b2ChainDef chainDef = b2DefaultChainDef();
+    chainDef.points = chainPoints;
+    chainDef.count = 4;
+    b2ChainId chainId = b2CreateChain(bodyId, &chainDef);
+    b2ShapeId chainShapeId;
+    b2Chain_GetSegments(chainId, &chainShapeId, 1);
 
     print_aabb("aabb-poly", polygonShapeId);
     print_mass("mass-poly", polygonShapeId);
@@ -75,6 +94,28 @@ int main(void)
     print_point("point-segment", segmentShapeId, (b2Vec2){ 1.0f, -0.8f });
     print_ray("ray-segment", segmentShapeId,
               (b2RayCastInput){ .origin = { 0.3f, -1.0f }, .translation = { 1.6f, 1.0f }, .maxFraction = 1.0f });
+
+    print_ray("ray-chain-front", chainShapeId,
+              (b2RayCastInput){ .origin = { 1.25f, -1.5f }, .translation = { 0.0f, 2.5f }, .maxFraction = 1.0f });
+    print_ray("ray-chain-back", chainShapeId,
+              (b2RayCastInput){ .origin = { 1.25f, 0.5f }, .translation = { 0.0f, -2.5f }, .maxFraction = 1.0f });
+
+    b2ShapeId shapeIds[] = { polygonShapeId, capsuleShapeId, circleShapeId, segmentShapeId, chainShapeId };
+    uint32_t state = 0x8d12e47bu;
+    for (int i = 0; i < 512; ++i)
+    {
+        int shapeIndex = (int)(random_u32(&state) % 5u);
+        b2RayCastInput input = {
+            .origin = { random_grid_float(&state), random_grid_float(&state) },
+            .translation = { random_grid_float(&state), random_grid_float(&state) },
+            .maxFraction = (float)(1u + random_u32(&state) % 8u) * 0.125f,
+        };
+        b2CastOutput output = b2Shape_RayCast(shapeIds[shapeIndex], &input);
+        printf("fuzz-ray %d %.9g %.9g %.9g %.9g %.9g %d %.9g %.9g %.9g %.9g %.9g %d\n", shapeIndex,
+               input.origin.x, input.origin.y, input.translation.x, input.translation.y, input.maxFraction,
+               output.hit ? 1 : 0, output.point.x, output.point.y, output.normal.x, output.normal.y, output.fraction,
+               output.iterations);
+    }
 
     b2DestroyWorld(worldId);
     return 0;

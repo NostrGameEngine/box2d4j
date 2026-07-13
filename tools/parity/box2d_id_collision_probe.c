@@ -27,6 +27,13 @@ int main(void)
            (unsigned long long)b2StoreChainId(chainId));
     printf("joint %d %u %u %llu\n", jointId.index1, jointId.world0, jointId.generation,
            (unsigned long long)b2StoreJointId(jointId));
+    printf("idMacros %d %d %d %d %d %d %d %d %d %d\n",
+           B2_IS_NULL(b2_nullWorldId), B2_IS_NULL(b2_nullBodyId), B2_IS_NULL(b2_nullShapeId),
+           B2_IS_NULL(b2_nullChainId), B2_IS_NULL(b2_nullJointId), B2_IS_NON_NULL(worldId),
+           B2_IS_NON_NULL(bodyId), B2_IS_NON_NULL(shapeId), B2_IS_NON_NULL(chainId), B2_IS_NON_NULL(jointId));
+    printf("emptyCache %u %u %u %u %u %u %u\n", b2_emptySimplexCache.count,
+           b2_emptySimplexCache.indexA[0], b2_emptySimplexCache.indexA[1], b2_emptySimplexCache.indexA[2],
+           b2_emptySimplexCache.indexB[0], b2_emptySimplexCache.indexB[1], b2_emptySimplexCache.indexB[2]);
 
     b2AABB box;
     box.lowerBound = (b2Vec2){-1.0f, -1.0f};

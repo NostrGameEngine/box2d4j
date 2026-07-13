@@ -13,15 +13,15 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 final class CardHouseSampleTest {
-    private static final float DEFAULT_STEP_TOLERANCE = 2.0e-6f;
+    private static final int LONG_HORIZON_STEP_COUNT = 2400;
 
     @Test
     void sampleMatchesUpstreamCCardHouse() throws Exception {
-        String upstream = runProbe();
+        String upstream = runProbe(LONG_HORIZON_STEP_COUNT, false);
         String[] parts = upstream.split("\\s+");
         assertEquals("cardHouse", parts[0]);
 
-        CardHouse.Result result = CardHouse.run();
+        CardHouse.Result result = CardHouse.run(LONG_HORIZON_STEP_COUNT);
         assertEquals(Integer.parseInt(parts[1]), result.bodyCount);
         assertEquals(Integer.parseInt(parts[2]), result.shapeCount);
         assertEquals(Integer.parseInt(parts[3]), result.contactCount);
@@ -32,7 +32,7 @@ final class CardHouseSampleTest {
 
         int index = 7;
         for (int i = 0; i < bodyCount; ++i) {
-            assertBody(parts, index, result.bodies[i], DEFAULT_STEP_TOLERANCE);
+            assertBody(parts, index, result.bodies[i], 0.0f);
             index += 9;
         }
         assertEquals(parts.length, index);
@@ -40,11 +40,20 @@ final class CardHouseSampleTest {
 
     @Test
     void shortHorizonMatchesUpstreamCCardHouseExactly() throws Exception {
-        String upstream = runProbe(2);
+        assertRunMatchesExactly(2, false);
+    }
+
+    @Test
+    void scalarSolverMatchesUpstreamAtLongHorizonExactly() throws Exception {
+        assertRunMatchesExactly(LONG_HORIZON_STEP_COUNT, true);
+    }
+
+    private static void assertRunMatchesExactly(int stepCount, boolean disableSimd) throws Exception {
+        String upstream = runProbe(stepCount, disableSimd);
         String[] parts = upstream.split("\\s+");
         assertEquals("cardHouse", parts[0]);
 
-        CardHouse.Result result = CardHouse.run(2);
+        CardHouse.Result result = CardHouse.run(stepCount);
         assertEquals(Integer.parseInt(parts[1]), result.bodyCount);
         assertEquals(Integer.parseInt(parts[2]), result.shapeCount);
         assertEquals(Integer.parseInt(parts[3]), result.contactCount);
@@ -73,15 +82,12 @@ final class CardHouseSampleTest {
         assertEquals(Integer.parseInt(parts[index + 8]), body.contactCapacity);
     }
 
-    private static String runProbe() throws Exception {
-        return runProbe(null);
-    }
-
-    private static String runProbe(Integer stepCount) throws Exception {
+    private static String runProbe(Integer stepCount, boolean disableSimd) throws Exception {
         Path root = new File(".").getCanonicalFile().toPath();
         Path outputDir = root.resolve("build/parity");
         Files.createDirectories(outputDir);
-        Path probe = outputDir.resolve("box2d_card_house_sample_probe");
+        Path probe = outputDir.resolve(disableSimd
+            ? "box2d_card_house_scalar_sample_probe" : "box2d_card_house_sample_probe");
 
         List<String> sources = new ArrayList<>();
         try (java.util.stream.Stream<Path> stream = Files.list(root.resolve("vendor/box2d/src"))) {
@@ -93,6 +99,9 @@ final class CardHouseSampleTest {
         List<String> command = new ArrayList<>();
         command.add("clang");
         command.add("-D_POSIX_C_SOURCE=200809L");
+        if (disableSimd) {
+            command.add("-DBOX2D_DISABLE_SIMD");
+        }
         command.add("-std=c17");
         command.add("-O2");
         command.add("-ffp-contract=off");

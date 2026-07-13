@@ -4,9 +4,11 @@
 #include "box2d/math_functions.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
-int main(void)
+int main(int argc, char** argv)
 {
+    int stepCount = argc > 1 ? atoi(argv[1]) : 90;
     b2WorldDef worldDef = b2DefaultWorldDef();
     worldDef.gravity = (b2Vec2){0.0f, -10.0f};
     b2WorldId worldId = b2CreateWorld(&worldDef);
@@ -29,7 +31,7 @@ int main(void)
     shapeDef.material.friction = 0.3f;
     b2CreatePolygonShape(bodyId, &shapeDef, &dynamicBox);
 
-    for (int i = 0; i < 90; ++i)
+    for (int i = 0; i < stepCount; ++i)
     {
         b2World_Step(worldId, 1.0f / 60.0f, 4);
     }

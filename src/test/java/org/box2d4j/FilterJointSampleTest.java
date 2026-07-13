@@ -13,13 +13,15 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 final class FilterJointSampleTest {
+    private static final int STEP_COUNT = 2400;
+
     @Test
     void sampleMatchesUpstreamCFilterJoint() throws Exception {
-        String upstream = runProbe();
+        String upstream = runProbe(STEP_COUNT);
         String[] parts = upstream.split("\\s+");
         assertEquals("filterJoint", parts[0]);
 
-        FilterJoint.Result result = FilterJoint.run();
+        FilterJoint.Result result = FilterJoint.run(STEP_COUNT);
         assertEquals(Integer.parseInt(parts[1]), result.bodyCount);
         assertEquals(Integer.parseInt(parts[2]), result.shapeCount);
         assertEquals(Integer.parseInt(parts[3]), result.contactCount);
@@ -45,7 +47,7 @@ final class FilterJointSampleTest {
         assertEquals(Float.parseFloat(parts[index + 6]), body.angularVelocity, 0.0f);
     }
 
-    private static String runProbe() throws Exception {
+    private static String runProbe(int stepCount) throws Exception {
         Path root = new File(".").getCanonicalFile().toPath();
         Path outputDir = root.resolve("build/parity");
         Files.createDirectories(outputDir);
@@ -76,7 +78,8 @@ final class FilterJointSampleTest {
         String compileOutput = new String(compile.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
         assertEquals(0, compile.waitFor(), compileOutput);
 
-        Process run = new ProcessBuilder(probe.toString()).directory(root.toFile()).redirectErrorStream(true).start();
+        Process run = new ProcessBuilder(probe.toString(), Integer.toString(stepCount)).directory(root.toFile())
+            .redirectErrorStream(true).start();
         String output = new String(run.getInputStream().readAllBytes(), StandardCharsets.UTF_8).trim();
         assertEquals(0, run.waitFor(), output);
         return output;

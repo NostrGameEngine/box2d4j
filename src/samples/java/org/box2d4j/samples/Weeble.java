@@ -16,10 +16,16 @@ import java.util.Locale;
 import static org.box2d4j.B2.*;
 
 public final class Weeble {
+    private static final int DEFAULT_STEP_COUNT = 240;
+
     private Weeble() {
     }
 
     public static Result run() {
+        return run(DEFAULT_STEP_COUNT);
+    }
+
+    public static Result run(int stepCount) {
         b2WorldId worldId = b2CreateWorld(b2DefaultWorldDef());
         b2World_SetFrictionCallback(worldId, (frictionA, materialA, frictionB, materialB) -> 0.1f);
         b2World_SetRestitutionCallback(worldId, (restitutionA, materialA, restitutionB, materialB) -> 1.0f);
@@ -67,7 +73,7 @@ public final class Weeble {
         SampleRuntime.slider("weeble.magnitude", "Magnitude", magnitude[0], -100.0f, 100.0f, 1.0f,
             value -> magnitude[0] = value);
 
-        for (int step = 0; step < 240; ++step) {
+        for (int step = 0; step < stepCount; ++step) {
             b2World_Step(worldId, 1.0f / 60.0f, 4);
         }
 
@@ -92,7 +98,8 @@ public final class Weeble {
     }
 
     public static void main(String[] args) {
-        System.out.println(run().toLine());
+        int stepCount = args.length == 0 ? DEFAULT_STEP_COUNT : Integer.parseInt(args[0]);
+        System.out.println(run(stepCount).toLine());
     }
 
     public static final class Result {

@@ -4,6 +4,7 @@
 #include "box2d/math_functions.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 static void print_body(b2BodyId bodyId)
 {
@@ -22,8 +23,9 @@ static void print_body(b2BodyId bodyId)
            massData.rotationalInertia);
 }
 
-int main(void)
+int main(int argc, char** argv)
 {
+    int stepCount = argc > 1 ? atoi(argv[1]) : 120;
     b2WorldDef worldDef = b2DefaultWorldDef();
     b2WorldId worldId = b2CreateWorld(&worldDef);
 
@@ -64,7 +66,7 @@ int main(void)
         b2CreateCapsuleShape(normalBodyId, &shapeDef, &capsule);
     }
 
-    for (int step = 0; step < 120; ++step)
+    for (int step = 0; step < stepCount; ++step)
     {
         b2World_Step(worldId, 1.0f / 60.0f, 4);
         b2Body_ApplyForceToCenter(badBodyId, (b2Vec2){0.0f, 10.0f}, true);

@@ -70,14 +70,15 @@ final class ContinuousCasesSampleTest {
 
         int index = 7;
         for (ContinuousSampleResult.BodyState state : result.states) {
+            String context = result.name + " step " + state.step;
             assertEquals(Integer.parseInt(parts[index++]), state.step);
-            assertEquals(Float.parseFloat(parts[index++]), state.x, 0.0f);
-            assertEquals(Float.parseFloat(parts[index++]), state.y, 0.0f);
-            assertEquals(Float.parseFloat(parts[index++]), state.rotationCos, 0.0f);
-            assertEquals(Float.parseFloat(parts[index++]), state.rotationSin, 0.0f);
-            assertEquals(Float.parseFloat(parts[index++]), state.velocityX, 0.0f);
-            assertEquals(Float.parseFloat(parts[index++]), state.velocityY, 0.0f);
-            assertEquals(Float.parseFloat(parts[index++]), state.angularVelocity, 0.0f);
+            assertEquals(Float.parseFloat(parts[index++]), state.x, 0.0f, context + " x");
+            assertEquals(Float.parseFloat(parts[index++]), state.y, 0.0f, context + " y");
+            assertEquals(Float.parseFloat(parts[index++]), state.rotationCos, 0.0f, context + " rotation cosine");
+            assertEquals(Float.parseFloat(parts[index++]), state.rotationSin, 0.0f, context + " rotation sine");
+            assertEquals(Float.parseFloat(parts[index++]), state.velocityX, 0.0f, context + " velocity x");
+            assertEquals(Float.parseFloat(parts[index++]), state.velocityY, 0.0f, context + " velocity y");
+            assertEquals(Float.parseFloat(parts[index++]), state.angularVelocity, 0.0f, context + " angular velocity");
             assertEquals(Integer.parseInt(parts[index++]), state.contactCount);
             assertEquals(Integer.parseInt(parts[index++]) != 0, state.awake);
         }

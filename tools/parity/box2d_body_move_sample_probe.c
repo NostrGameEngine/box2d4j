@@ -9,7 +9,7 @@
 
 enum
 {
-    DEFAULT_STEP_COUNT = 108,
+    DEFAULT_STEP_COUNT = 113,
     MAX_COUNT = 50
 };
 

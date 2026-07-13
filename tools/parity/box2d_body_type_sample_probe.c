@@ -235,15 +235,31 @@ static void print_body(b2BodyId bodyId)
 int main(int argc, char** argv)
 {
     int stepCount = argc > 1 ? atoi(argv[1]) : DEFAULT_STEP_COUNT;
+    int scriptPhaseCount = argc > 2 ? atoi(argv[2]) : 5;
     b2WorldDef worldDef = b2DefaultWorldDef();
     b2WorldId worldId = b2CreateWorld(&worldDef);
     Scene scene;
     create_scene(worldId, &scene);
-    set_type(&scene, b2_kinematicBody);
-    set_enabled(&scene, false);
-    set_enabled(&scene, true);
-    set_type(&scene, b2_staticBody);
-    set_type(&scene, b2_dynamicBody);
+    if (scriptPhaseCount >= 1)
+    {
+        set_type(&scene, b2_kinematicBody);
+    }
+    if (scriptPhaseCount >= 2)
+    {
+        set_enabled(&scene, false);
+    }
+    if (scriptPhaseCount >= 3)
+    {
+        set_enabled(&scene, true);
+    }
+    if (scriptPhaseCount >= 4)
+    {
+        set_type(&scene, b2_staticBody);
+    }
+    if (scriptPhaseCount >= 5)
+    {
+        set_type(&scene, b2_dynamicBody);
+    }
 
     for (int step = 0; step < stepCount; ++step)
     {

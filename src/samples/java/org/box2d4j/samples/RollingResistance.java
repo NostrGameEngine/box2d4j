@@ -15,6 +15,7 @@ import java.util.Locale;
 import static org.box2d4j.B2.*;
 
 public final class RollingResistance {
+    private static final int DEFAULT_STEP_COUNT = 240;
     private static final int COUNT = 20;
     private static final int[] SAMPLE_INDICES = {0, 5, 10, 15, 19};
 
@@ -22,6 +23,10 @@ public final class RollingResistance {
     }
 
     public static Result run() {
+        return run(DEFAULT_STEP_COUNT);
+    }
+
+    public static Result run(int stepCount) {
         b2WorldId worldId = b2CreateWorld(b2DefaultWorldDef());
 
         b2BodyId[] bodies = new b2BodyId[COUNT];
@@ -51,7 +56,7 @@ public final class RollingResistance {
         SampleRuntime.action("rolling.uphill", "Uphill", "2", () -> resetSlope(groundShapes, bodies, 5.0f));
         SampleRuntime.action("rolling.downhill", "Downhill", "3", () -> resetSlope(groundShapes, bodies, -5.0f));
 
-        for (int step = 0; step < 240; ++step) {
+        for (int step = 0; step < stepCount; ++step) {
             b2World_Step(worldId, 1.0f / 60.0f, 4);
         }
 
@@ -84,7 +89,8 @@ public final class RollingResistance {
     }
 
     public static void main(String[] args) {
-        System.out.println(run().toLine());
+        int stepCount = args.length == 0 ? DEFAULT_STEP_COUNT : Integer.parseInt(args[0]);
+        System.out.println(run(stepCount).toLine());
     }
 
     public static final class Result {

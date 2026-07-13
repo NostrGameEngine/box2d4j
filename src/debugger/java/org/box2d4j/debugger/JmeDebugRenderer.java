@@ -1,10 +1,14 @@
 package org.box2d4j.debugger;
 
 import com.jme3.asset.AssetManager;
+import com.jme3.font.BitmapFont;
+import com.jme3.font.BitmapText;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState;
+import com.jme3.math.ColorRGBA;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
+import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.util.BufferUtils;
@@ -15,8 +19,11 @@ final class JmeDebugRenderer {
     private final Mesh lineMesh = new Mesh();
     private final Geometry fillGeometry = new Geometry("Box2D fills", fillMesh);
     private final Geometry lineGeometry = new Geometry("Box2D outlines", lineMesh);
+    private final Node labelNode = new Node("Box2D labels");
+    private final BitmapFont font;
 
     JmeDebugRenderer(AssetManager assetManager) {
+        font = assetManager.loadFont("Interface/Fonts/Default.fnt");
         fillMesh.setMode(Mesh.Mode.Triangles);
         lineMesh.setMode(Mesh.Mode.Lines);
         Material fillMaterial = vertexColorMaterial(assetManager, true);
@@ -36,6 +43,10 @@ final class JmeDebugRenderer {
         return lineGeometry;
     }
 
+    Node labelNode() {
+        return labelNode;
+    }
+
     WorldDrawBatch capture(b2WorldId worldId, WorldDrawBatch.DrawOptions options, ViewTransform view) {
         return WorldDrawBatch.capture(worldId, options, 3.0f / view.pixelsPerMeter);
     }
@@ -45,11 +56,24 @@ final class JmeDebugRenderer {
             0.48f);
         uploadMesh(lineMesh, lineGeometry, batch.lineVertices, batch.lineColors, view, contentWidth, viewportHeight,
             0.96f);
+        labelNode.detachAllChildren();
+        for (WorldDrawBatch.Label label : batch.labels) {
+            BitmapText text = new BitmapText(font);
+            text.setText(label.text);
+            text.setSize(12.0f);
+            text.setColor(toColor(label.color));
+            text.setLocalTranslation(
+                0.5f * contentWidth + (label.x - view.centerX) * view.pixelsPerMeter,
+                0.5f * viewportHeight + (label.y - view.centerY) * view.pixelsPerMeter,
+                3.0f);
+            labelNode.attachChild(text);
+        }
     }
 
     void clear() {
         fillGeometry.setCullHint(Spatial.CullHint.Always);
         lineGeometry.setCullHint(Spatial.CullHint.Always);
+        labelNode.detachAllChildren();
     }
 
     private static void uploadMesh(Mesh mesh, Geometry geometry, WorldDrawBatch.FloatList vertices,
@@ -99,6 +123,14 @@ final class JmeDebugRenderer {
             material.getAdditionalRenderState().setDepthWrite(false);
         }
         return material;
+    }
+
+    private static ColorRGBA toColor(int color) {
+        return new ColorRGBA(
+            ((color >>> 16) & 0xFF) / 255.0f,
+            ((color >>> 8) & 0xFF) / 255.0f,
+            (color & 0xFF) / 255.0f,
+            1.0f);
     }
 
     static final class ViewTransform {

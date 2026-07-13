@@ -101,6 +101,11 @@ final class ManifoldParityTest {
             b2CollideChainSegmentAndPolygon(chain, b2Transform_identity,
                 b2MakeOffsetBox(0.45f, 0.2f, new b2Vec2(1.0f, 0.25f), b2MakeRot(0.05f)),
                 b2Transform_identity, new b2SimplexCache()));
+
+        assertEquals(1034, lines.length);
+        for (int i = 10; i < lines.length; ++i) {
+            assertRandomizedManifold(lines[i], i - 10);
+        }
     }
 
     private static void assertManifold(String line, String label, b2Manifold actual) {
@@ -131,5 +136,105 @@ final class ManifoldParityTest {
         assertEquals(Float.parseFloat(parts[19]), point2.point.y, 0.0f);
         assertEquals(Float.parseFloat(parts[20]), point2.separation, 0.0f);
         assertEquals(Integer.parseInt(parts[21]), point2.id);
+    }
+
+    private static void assertRandomizedManifold(String line, int caseIndex) {
+        String[] parts = line.split("\\s+");
+        assertEquals("fuzz", parts[0]);
+        int type = Integer.parseInt(parts[1]);
+        assertEquals(caseIndex & 7, type);
+        int inputCount = Integer.parseInt(parts[2]);
+        float[] input = new float[inputCount];
+        int cursor = 3;
+        for (int i = 0; i < inputCount; ++i) {
+            input[i] = Float.intBitsToFloat(Integer.parseUnsignedInt(parts[cursor++], 16));
+        }
+
+        b2Manifold actual;
+        if (type == 0) {
+            b2Circle a = new b2Circle(new b2Vec2(input[0], input[1]), input[2]);
+            b2Transform transformA = transform(input, 3);
+            b2Circle b = new b2Circle(new b2Vec2(input[7], input[8]), input[9]);
+            actual = b2CollideCircles(a, transformA, b, transform(input, 10));
+        } else if (type == 1) {
+            b2Capsule a = new b2Capsule(new b2Vec2(input[0], input[1]), new b2Vec2(input[2], input[3]), input[4]);
+            b2Transform transformA = transform(input, 5);
+            b2Circle b = new b2Circle(new b2Vec2(input[9], input[10]), input[11]);
+            actual = b2CollideCapsuleAndCircle(a, transformA, b, transform(input, 12));
+        } else if (type == 2) {
+            b2Capsule a = new b2Capsule(new b2Vec2(input[0], input[1]), new b2Vec2(input[2], input[3]), input[4]);
+            b2Transform transformA = transform(input, 5);
+            b2Capsule b = new b2Capsule(new b2Vec2(input[9], input[10]), new b2Vec2(input[11], input[12]), input[13]);
+            actual = b2CollideCapsules(a, transformA, b, transform(input, 14));
+        } else if (type == 3) {
+            b2Polygon a = b2MakeRoundedBox(input[0], input[1], input[2]);
+            b2Transform transformA = transform(input, 3);
+            b2Polygon b = b2MakeRoundedBox(input[7], input[8], input[9]);
+            actual = b2CollidePolygons(a, transformA, b, transform(input, 10));
+        } else if (type == 4) {
+            b2Segment a = new b2Segment(new b2Vec2(input[0], input[1]), new b2Vec2(input[2], input[3]));
+            b2Transform transformA = transform(input, 4);
+            b2Circle b = new b2Circle(new b2Vec2(input[8], input[9]), input[10]);
+            actual = b2CollideSegmentAndCircle(a, transformA, b, transform(input, 11));
+        } else if (type == 5) {
+            b2Segment a = new b2Segment(new b2Vec2(input[0], input[1]), new b2Vec2(input[2], input[3]));
+            b2Transform transformA = transform(input, 4);
+            b2Capsule b = new b2Capsule(new b2Vec2(input[8], input[9]), new b2Vec2(input[10], input[11]), input[12]);
+            actual = b2CollideSegmentAndCapsule(a, transformA, b, transform(input, 13));
+        } else if (type == 6) {
+            b2Segment a = new b2Segment(new b2Vec2(input[0], input[1]), new b2Vec2(input[2], input[3]));
+            b2Transform transformA = transform(input, 4);
+            b2Polygon b = b2MakeRoundedBox(input[8], input[9], input[10]);
+            actual = b2CollideSegmentAndPolygon(a, transformA, b, transform(input, 11));
+        } else {
+            b2Polygon a = b2MakeRoundedBox(input[0], input[1], input[2]);
+            b2Transform transformA = transform(input, 3);
+            b2Capsule b = new b2Capsule(new b2Vec2(input[7], input[8]), new b2Vec2(input[9], input[10]), input[11]);
+            actual = b2CollidePolygonAndCapsule(a, transformA, b, transform(input, 12));
+        }
+
+        String label = "case " + caseIndex + " type " + type;
+        assertEquals(Integer.parseInt(parts[cursor++]), actual.pointCount, label + " pointCount");
+        assertFloatBits(parts[cursor++], actual.normal.x, label + " normal.x");
+        assertFloatBits(parts[cursor++], actual.normal.y, label + " normal.y");
+        assertFloatBits(parts[cursor++], actual.rollingImpulse, label + " rollingImpulse");
+        for (int i = 0; i < 2; ++i) {
+            b2ManifoldPoint point = actual.points[i];
+            String[] expectedFloats = new String[11];
+            for (int field = 0; field < expectedFloats.length; ++field) {
+                expectedFloats[field] = parts[cursor++];
+            }
+            int expectedId = Integer.parseInt(parts[cursor++]);
+            boolean expectedPersisted = Integer.parseInt(parts[cursor++]) != 0;
+            if (i < actual.pointCount) {
+                float[] actualFloats = {
+                    point.point.x, point.point.y,
+                    point.anchorA.x, point.anchorA.y,
+                    point.anchorB.x, point.anchorB.y,
+                    point.separation, point.normalImpulse, point.tangentImpulse,
+                    point.totalNormalImpulse, point.normalVelocity
+                };
+                String[] names = {
+                    "point.x", "point.y", "anchorA.x", "anchorA.y", "anchorB.x", "anchorB.y",
+                    "separation", "normalImpulse", "tangentImpulse", "totalNormalImpulse", "normalVelocity"
+                };
+                for (int field = 0; field < actualFloats.length; ++field) {
+                    assertFloatBits(expectedFloats[field], actualFloats[field],
+                        label + " point[" + i + "]." + names[field]);
+                }
+                assertEquals(expectedId, point.id, label + " point[" + i + "].id");
+                assertEquals(expectedPersisted, point.persisted, label + " point[" + i + "].persisted");
+            }
+        }
+        assertEquals(parts.length, cursor, label + " field count");
+    }
+
+    private static b2Transform transform(float[] input, int offset) {
+        return new b2Transform(new b2Vec2(input[offset], input[offset + 1]),
+            new b2Rot(input[offset + 2], input[offset + 3]));
+    }
+
+    private static void assertFloatBits(String expected, float actual, String label) {
+        assertEquals(Integer.parseUnsignedInt(expected, 16), Float.floatToRawIntBits(actual), label);
     }
 }

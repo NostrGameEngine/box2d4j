@@ -16,7 +16,7 @@ import static org.box2d4j.B2.*;
 public final class VerticalStack {
     private static final int ROWS = 12;
     private static final int COLUMNS = 1;
-    private static final int STEP_COUNT = 240;
+    private static final int STEP_COUNT = 2400;
 
     private VerticalStack() {
     }

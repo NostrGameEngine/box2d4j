@@ -14,10 +14,16 @@ import java.util.Locale;
 import static org.box2d4j.B2.*;
 
 public final class SingleBox {
+    private static final int DEFAULT_STEP_COUNT = 120;
+
     private SingleBox() {
     }
 
     public static Result run() {
+        return run(DEFAULT_STEP_COUNT);
+    }
+
+    public static Result run(int stepCount) {
         b2WorldId worldId = b2CreateWorld(b2DefaultWorldDef());
 
         float extent = 1.0f;
@@ -40,7 +46,7 @@ public final class SingleBox {
         b2BodyId bodyId = b2CreateBody(worldId, bodyDef);
         b2CreatePolygonShape(bodyId, shapeDef, box);
 
-        for (int i = 0; i < 120; ++i) {
+        for (int i = 0; i < stepCount; ++i) {
             b2World_Step(worldId, 1.0f / 60.0f, 4);
         }
 
@@ -57,7 +63,8 @@ public final class SingleBox {
     }
 
     public static void main(String[] args) {
-        System.out.println(run().toLine());
+        int stepCount = args.length == 0 ? DEFAULT_STEP_COUNT : Integer.parseInt(args[0]);
+        System.out.println(run(stepCount).toLine());
     }
 
     public static final class Result {

@@ -14,12 +14,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 final class BodyTypeSampleTest {
     @Test
-    void sampleMatchesUpstreamCBodyType() throws Exception {
-        String upstream = runProbe();
+    void sampleAndScriptTransitionsMatchUpstreamCBodyType() throws Exception {
+        Path probe = compileProbe();
+        assertResult(runProbe(probe, 0, 5), BodyType.run());
+        for (int phase = 0; phase <= 5; ++phase) {
+            assertResult(runProbe(probe, 1, phase), BodyType.runScript(1, phase));
+        }
+        assertResult(runProbe(probe, 2400, 5), BodyType.runScript(2400, 5));
+    }
+
+    private static void assertResult(String upstream, BodyType.Result result) {
         String[] parts = upstream.split("\\s+");
         assertEquals("bodyType", parts[0]);
 
-        BodyType.Result result = BodyType.run();
         assertEquals(Integer.parseInt(parts[1]), result.bodyCount);
         assertEquals(Integer.parseInt(parts[2]), result.shapeCount);
         assertEquals(Integer.parseInt(parts[3]), result.contactCount);
@@ -48,7 +55,7 @@ final class BodyTypeSampleTest {
         assertEquals(Float.parseFloat(parts[index + 9]), body.angularVelocity, 0.0f);
     }
 
-    private static String runProbe() throws Exception {
+    private static Path compileProbe() throws Exception {
         Path root = new File(".").getCanonicalFile().toPath();
         Path outputDir = root.resolve("build/parity");
         Files.createDirectories(outputDir);
@@ -78,8 +85,13 @@ final class BodyTypeSampleTest {
         Process compile = new ProcessBuilder(command).directory(root.toFile()).redirectErrorStream(true).start();
         String compileOutput = new String(compile.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
         assertEquals(0, compile.waitFor(), compileOutput);
+        return probe;
+    }
 
-        Process run = new ProcessBuilder(probe.toString()).directory(root.toFile()).redirectErrorStream(true).start();
+    private static String runProbe(Path probe, int stepCount, int scriptPhaseCount) throws Exception {
+        Path root = new File(".").getCanonicalFile().toPath();
+        Process run = new ProcessBuilder(probe.toString(), Integer.toString(stepCount),
+            Integer.toString(scriptPhaseCount)).directory(root.toFile()).redirectErrorStream(true).start();
         String output = new String(run.getInputStream().readAllBytes(), StandardCharsets.UTF_8).trim();
         assertEquals(0, run.waitFor(), output);
         return output;

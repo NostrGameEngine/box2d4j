@@ -3,13 +3,53 @@
 Upstream reference: `vendor/box2d` at Box2D `v3.1.1`
 (`8c661469c9507d3ad6fbd2fea3f1aa71669c2fe3`).
 
+Audit date: 2026-07-12.
+
+## Current Snapshot
+
+- The public header surface is complete by name: all 422 upstream `B2_API`
+  functions and all 73 `B2_INLINE` functions are represented by public static
+  Java entry points. All 71 public struct definitions, 16 callback typedefs,
+  and six public `static const` values are represented by Java classes,
+  functional interfaces, or fields. All public struct field names are
+  represented except the five `b2DynamicTree` storage arrays explicitly
+  marked private upstream. All 168 values in the five public enums use exact
+  matching `int` constants.
+- The current test partition contains 173 suites and 205 tests with no overlap:
+  `unitTest` has 19 suites/37 tests and `parityTest` has 154 suites/168 tests.
+  Both tasks pass with zero failures, errors, or skips.
+- Native parity uses 153 C probe sources and one C++ multithreading probe. The
+  C17 commands define `_POSIX_C_SOURCE=200809L` and link `libm`, so the same
+  probes pass with Apple Clang on macOS and Clang/glibc on the Ubuntu CI runner.
+- The headless catalog contains all 110 active upstream sample creators plus
+  HelloWorld. Fifty-nine inventoried interactive entries register controls for
+  the graphical debugger through `SampleRuntime`.
+- The Java 11 core artifact, source JAR, Javadoc JAR, and Maven POM are produced
+  by Gradle. GitHub Actions runs independent build, unit, and parity jobs and
+  gates Maven Central snapshot/release publishing on all three jobs succeeding.
+- This is broad behavioral parity, not a claim that finite tests prove every
+  unbounded simulation or callback sequence. No divergence remains in the
+  currently registered or extended-audit scenarios.
+  `FEATURE_PARITY.md` is the concise gap matrix; the sections below preserve
+  detailed implementation evidence.
+
 ## Implemented
 
-- Gradle Java 11 project with wrapper.
+- Gradle Java 11 project with wrapper, separate core/sample/debugger source
+  sets, sources/Javadoc artifacts, Maven publishing/signing, and Nexus Publish
+  Plugin configuration for `org.ngengine:box2d4j`.
+- A single GitHub Actions workflow with independent `build`, `unit-tests`, and
+  `parity-tests` jobs plus gated snapshot publishing on branch pushes and
+  Maven Central release publishing on `release.published`.
 - C-style public names for structs and functions under `org.box2d4j`.
-- Configurable allocator hook via `B2Allocator` or `IntFunction<ByteBuffer>`,
-  defaulting to `ByteBuffer.allocateDirect`, with C parity for zero-size
-  allocation, 32-byte size/alignment forwarding, and byte-count accounting.
+- `DefaultDefinitionsParityTest` compares all 17 public `b2Default...`
+  constructors with C, including null callback/context fields, worker count,
+  filters/materials, event flags, definition cookies, explosion parameters,
+  debug-draw callbacks, and every non-zero joint default.
+- Exact configurable `b2AllocFcn`/`b2FreeFcn` hook pair plus Java-friendly
+  `B2Allocator` and `IntFunction<ByteBuffer>` conveniences, defaulting to
+  `ByteBuffer.allocateDirect`. C parity covers zero-size allocation, 32-byte
+  size/alignment forwarding, free-callback invocation, and byte accounting.
 - Box2D-compatible user task hooks on `b2WorldDef`, plus the Java-friendly
   `B2TaskScheduler` contract. The core intentionally ships no scheduler and
   has no `ExecutorService` dependency. Broad-phase
@@ -29,14 +69,23 @@ Upstream reference: `vendor/box2d` at Box2D `v3.1.1`
   QuickHull helper,
   with shape mass/AABB/point/raycast and AABB validity/overlap/containment/
   raycast parity against upstream C.
+- Offset polygon factories now preserve upstream arithmetic ordering by
+  transforming vertices before recomputing normals and centroid. Raw-float
+  parity covers plain and rounded offset polygons, capsule AABBs, and capsule
+  point tests. Proxy factories clamp oversized point counts to
+  `B2_MAX_POLYGON_VERTICES`, matching the fixed-size C representation while
+  also respecting the Java source-array length.
 - Shape surface material API with C parity for friction, restitution, material
   id, rolling resistance, tangent speed, custom color, and defensive material
   copying.
 - Shape filter and event flag API with C parity for filter copying, filter
   reset/contact destruction, and sensor/contact/pre-solve/hit event toggles.
+  Contact begin/end and discrete pre-solve flags are captured when the contact
+  is created, matching upstream behavior when a shape flag changes later.
 - Sensor overlap state and begin/end event generation with C parity for
   per-step begin, persisted overlap without duplicate events, end events after
-  separation, overlap capacity, visitor ids, and generation-preserving ids.
+  separation, overlap capacity, visitor ids, generation-preserving ids, and
+  distinct sensor-versus-visitor destruction timing across zero/positive steps.
 - Shape geometry getter/setter API with C parity for circle, capsule, segment,
   and polygon copying, type changes, contact reset, and proxy recreation.
 - Shape accessor/property API with C parity for `b2Shape_GetBody`,
@@ -46,14 +95,23 @@ Upstream reference: `vendor/box2d` at Box2D `v3.1.1`
 - World-level capsule shape creation with C parity for shape copying, body mass
   integration, contact creation, contact manifold point counts, and explicit
   mass refresh after geometry mutation.
+- Capsule creation now preserves upstream's short-axis fallback: endpoints at
+  or below the linear slop create a circle at their midpoint. Shape type,
+  center, radius, mass, and rotational inertia compare raw-float exact with C.
 - Shape query API with C parity for `b2Shape_GetAABB`,
   `b2Shape_GetMassData`, `b2Shape_TestPoint`, `b2Shape_RayCast`, and
-  `b2Shape_GetClosestPoint` across polygon, capsule, circle, and segment
-  shapes.
+  `b2Shape_GetClosestPoint`. Ray-cast evidence includes 512 deterministic
+  world-space cases across polygon, capsule, circle, segment, and chain
+  segment shapes, with misses and explicit front/back one-sided chain casts.
 - Direct Java port of Box2D's GJK `b2ShapeDistance` and conservative
   advancement `b2ShapeCast`, upstream `b2SegmentDistance`, and
   separation-function `b2TimeOfImpact`, including the public circle/capsule/
   segment/polygon shape-cast wrappers.
+- QuickHull validation now includes upstream's consecutive-vertex collinearity
+  pass in addition to the edge half-plane test. A direct C regression rejects
+  a strictly convex five-point hull whose middle edge deviates by only 0.001 m,
+  while retaining a valid box; 512 deterministic point clouds additionally
+  compare hull count, validity, vertex order, and raw coordinate bits.
 - Manifold/contact generation routines with exact C parity for circle-circle,
   capsule-circle, polygon-circle, segment-circle, capsule-capsule, and
   polygon-polygon, segment-polygon, chain-circle, chain-capsule, and
@@ -61,7 +119,11 @@ Upstream reference: `vendor/box2d` at Box2D `v3.1.1`
 - Initial dynamic tree port with C parity for query, ray-cast, and shape-cast
   hits and visit statistics, proxy counts, category bits, user data, root
   bounds, insertion/removal, movement, enlargement, balancing rotations, and
-  partial/full median rebuild.
+  partial/full median rebuild. Direct coverage also exercises proxy AABB
+  access, category-bit mutation, and the no-enlarged invariant.
+- Dynamic-tree public preconditions now mirror upstream bounds, valid-AABB,
+  proxy-range/leaf, enlargement, and accessor assertions. The dedicated probe
+  compares 14 independent invalid-input outcomes before mutation.
 - Dynamic-tree byte accounting now uses the upstream 72-byte
   `sizeof(b2DynamicTree)` value on the target ARM64 ABI, matching C accounting
   for both plain trees and rebuild scratch capacity.
@@ -70,6 +132,21 @@ Upstream reference: `vendor/box2d` at Box2D `v3.1.1`
   sleeping bodies.
 - World counters now expose all 12 upstream constraint-graph color counts,
   including the overflow color, as the combined contact and joint totals.
+- World counters now report exact C-parity static-tree and maximum dynamic/
+  kinematic-tree heights. `taskCount` is reset per positive step and counts
+  Java task stages; `stackUsed` remains zero because Java heap scratch data
+  replaces the upstream arena allocator.
+- All 22 `b2Profile` fields are now populated at the corresponding Box2D 3.1.1
+  pipeline boundaries: pairs, collide, solve, island merge/split, stage and
+  constraint preparation, velocity/position integration, warm-start,
+  solve/relax impulses, restitution, impulse storage, transforms, hit events,
+  refit, bullets, sleeping, sensors, and total step. A native activity-mask
+  probe requires every solver phase observed in C to be observed in Java.
+  Empty conditional stages remain zero where appropriate, zero-time steps clear
+  the profile, and `b2World_GetProfile` returns a defensive copy. A measured
+  phase receives the minimum positive float when `System.nanoTime()` returns
+  the same tick at both boundaries, preventing an executed empty stage from
+  being misreported as inactive.
 - Body, shape, chain, and joint ids now use upstream-style LIFO free lists and
   preserve generations across reuse. Body contact lists use head insertion and
   linked-list destruction order, while solver body/contact arrays preserve
@@ -85,7 +162,30 @@ Upstream reference: `vendor/box2d` at Box2D `v3.1.1`
   for HelloWorld contact counts.
 - World-level custom filter and pre-solve callback hooks with C parity for
   callback registration, broad-phase contact suppression, pre-solve manifold
-  visibility, per-step contact disabling, and conservative contact capacity.
+  visibility, contact-creation-time flag capture, per-step contact disabling,
+  and conservative contact capacity.
+- Friction and restitution callbacks now follow the exact contact lifecycle:
+  they run once when a contact is created and again at every active narrow-phase
+  update, before pre-solve, with their mixed values stored on the contact for
+  the solver. Raw-bit parity covers argument order, material-id changes on a
+  persistent contact, invocation counts, and resetting both callbacks to the
+  defaults.
+- Upstream-compatible world locking now covers every public API family routed
+  through `world->locked`, `b2GetWorldLocked`, or `b2GetJointSimCheckType` in
+  Box2D 3.1.1. Reentrant stepping and guarded creation, destruction, mutation,
+  event access, query, draw, and joint calls assert while stepping and return
+  the corresponding null, empty, or no-op Java result. A `finally` boundary
+  always unlocks the world when user callbacks or task hooks throw.
+- `b2World_Step` now asserts valid `timeStep` and positive `subStepCount`, clears
+  transient body/sensor/contact events and profile data before early return,
+  and skips broad-phase, contact, solve, and sensor work when `timeStep == 0`.
+  `WorldStepParityTest` compares contact creation, transient events, transforms,
+  callback locking, and neutral locked-call results directly with upstream C;
+  `WorldStepTest` covers invalid arguments and exception-safe unlocking.
+- `b2World_EnableSpeculative` now affects contact update like Box2D 3.1.1:
+  disabling it filters the first overly separated point from a two-point
+  speculative manifold. A raw-float probe compares the enabled two-point and
+  disabled one-point cases at a 0.015 m gap.
 - Contact hit-event generation with C parity for world hit threshold,
   shape/body hit-event flags, post-solver normal velocity, total normal
   impulse gating, hit point, normal, shape ids, and approach speed.
@@ -95,7 +195,8 @@ Upstream reference: `vendor/box2d` at Box2D `v3.1.1`
   ray hit collection, and dynamic-tree traversal stats.
 - World-level mover cast/collision API with C parity for `b2World_CastMover`
   and `b2World_CollideMover`, including capsule mover shape-casts and plane
-  result callbacks.
+  result callbacks. A locked mover cast returns the upstream neutral fraction
+  `1.0f` rather than reporting an immediate zero-fraction clip.
 - World shape casts now mirror upstream `shape.c` frame handling exactly by
   transforming the moving proxy into each target shape's local frame and
   transforming the result back to world space. This removes the few-ulp drift
@@ -113,6 +214,12 @@ Upstream reference: `vendor/box2d` at Box2D `v3.1.1`
   surface material custom-color parity. Contact debug draw callbacks now cover
   contact points, graph colors, contact normals, normal impulses, feature ids,
   and friction impulses.
+- Type-specific distance, filter, mouse, prismatic, revolute, and wheel joint
+  drawing now matches upstream callback geometry and colors; motor and weld
+  joints retain the upstream common-anchor rendering. Revolute angle labels
+  honor `drawSize` and `drawJointExtras`, and `drawIslands` emits the fat-AABB
+  union for each live non-static island. The jMonkey debugger exposes both
+  modes and renders world-space joint labels instead of discarding strings.
 - Chain shape API with C parity for open/loop chain creation, segment shape
   ids, ghost vertices, parent-chain lookup, per-segment material cloning, chain
   material propagation, overlap/raycast visibility, destroy invalidation, and
@@ -159,6 +266,11 @@ Upstream reference: `vendor/box2d` at Box2D `v3.1.1`
 - Body proxy synchronization now mirrors upstream `body.c`: speculative shape
   AABBs update every step, while fat AABBs and broad-phase move buffering only
   update when the speculative AABB escapes the registered fat proxy.
+- Direct `b2Body_SetTransform` synchronization now uses
+  `b2BroadPhase_MoveProxy`, matching `body.c`, while solver-driven deferred
+  updates retain the `EnlargeProxy` path. A two-body teleport regression proves
+  that querying the abandoned location visits one root node like C instead of
+  traversing three nodes through a stale parent AABB.
 - Small FallingHinges-style determinism slices with C parity for four, eight,
   sixteen, twenty-four, thirty-two, forty-eight, sixty-four, and 120 dynamic
   rounded boxes, two, four, eight, twelve, sixteen, twenty-four, thirty-two,
@@ -178,6 +290,13 @@ Upstream reference: `vendor/box2d` at Box2D `v3.1.1`
   while bullet bodies are deferred until all target transforms are final and
   then sweep against static, kinematic, and dynamic non-bullet shapes. This
   provides exact bullet-versus-dynamic TOI clipping for the Pinball sample.
+- Dedicated CCD edge probes now cover bullet impact against a moving kinematic
+  target and pre-solve callbacks during TOI. The kinematic target uses the
+  upstream predicted-final degenerate sweep. Non-bullet dynamic targets also
+  use a final-transform degenerate sweep because their finalization precedes
+  the deferred bullet stage. TOI pre-solve receives the temporary manifold
+  and target/fast-shape id order used by C; returning false allows the bullet
+  to continue through the candidate impact.
 - Prismatic joint API with C parity for local-axis normalization, local anchors,
   reference angle, current translation and speed, spring controls, limit
   controls, motor controls, and force/torque accessors.
@@ -204,6 +323,10 @@ Upstream reference: `vendor/box2d` at Box2D `v3.1.1`
   contacted sleep island before graph insertion. When an island sleeps, its
   touching contacts and joints leave the awake constraint graph in upstream
   island-list order and return in sleeping-set order when the island wakes.
+  Awake non-touching contacts now use their own append/remove-swap array, and
+  awake body states use the same compact remove-swap/append lifecycle as C
+  solver sets. Sleeping roots retain sleeping-set allocation order for global
+  wake operations.
   Touching and non-touching contacts whose dynamic endpoints are all asleep are
   left out of narrow-phase recomputation, mirroring upstream sleeping and
   disabled solver sets while preserving warm-start manifolds and broad-phase
@@ -216,16 +339,49 @@ Upstream reference: `vendor/box2d` at Box2D `v3.1.1`
   enabled state, fixed rotation, bullet flag, body-wide contact/hit event
   toggles, owner world lookup, shape enumeration, body AABB computation, and
   shape validity checks.
+- Body/joint/shape lifecycle wake propagation now mirrors upstream: explicit
+  joint destruction wakes both endpoints; body disabling wakes bodies whose
+  touching contacts are removed; contact and joint island linking wakes a
+  sleeping endpoint when the other endpoint is awake; and explicit shape or
+  chain destruction wakes touching bodies. Body destruction also wakes bodies
+  attached through joints; its already-removed shapes retain the distinct
+  internal no-wake path used by upstream.
+- Body disable now destroys contacts while the body can still wake, preserving
+  upstream partial sleep-timer behavior, then detaches the body from its sleep
+  island. Enable creates a fresh island and appends the body to the awake solver
+  order, matching disabled-to-awake solver-set transfer.
+- Joint creation now preserves upstream solver-set placement: a joint with a
+  disabled endpoint remains outside the constraint graph, a joint between two
+  sleeping bodies remains in their sleeping set, and each enters the graph only
+  when body enabling or island wake makes its endpoints awake.
+- Target-transform updates on disabled bodies now stop when no awake body state
+  exists, so disable/target/enable cannot leak linear or angular velocity into
+  the newly enabled body.
+- Initial linear/angular velocity now exists only when body creation selects the
+  awake solver set. Static, initially sleeping, and initially disabled bodies
+  expose zero linear, angular, local-point, and world-point velocities and wake
+  or enable with an identity state, matching upstream `b2BodyState` lifetime.
 - Additional non-debug public API coverage with C parity for body type changes,
   target-transform velocity setup, shape destruction, sensor-overlap retrieval,
   world profile/rebuild/speculative/memory-stat entry points, restitution and
   hit-event threshold clamping, friction/restitution callback storage, world
   lifecycle/id validity/recycling behavior, and common joint
   separation/constraint-tuning accessors.
+- `b2World_DumpMemoryStats` now preserves the upstream report structure for id
+  pools, world arrays, broad phase, solver sets, constraint graph, and stack
+  allocation. Dynamic-tree and hash-set byte counts remain concrete;
+  Java-managed collections are explicitly marked `n/a` with live counts,
+  `stackUsed` is identified as non-applicable, and allocations made through the
+  native hook are reported separately.
 - World contact tuning setter mirrors upstream non-negative float clamping for
   contact hertz, damping ratio, and max push speed.
 - Body type changes now clear velocity/force state when entering static mode,
-  matching the upstream observable state after static-to-dynamic toggles.
+  transfer connected joints sequentially through the constraint graph, relink
+  sleep islands, and force broad-phase pair creation across type/enable
+  transitions. Kinematic bodies retain awake-set solver states, and disabled
+  bodies expose/reset velocity state like upstream solver sets. Contact-island
+  wake occurs before dynamic-to-static transfer, while static-to-movable
+  transfer enters the awake set afterward, matching the two upstream branches.
 - Body force/impulse API with C parity for awake dynamic bodies, including
   force/torque accumulation, linear/angular impulse application, integration
   before damping, maximum linear speed clamping, and force/torque reset after
@@ -233,13 +389,46 @@ Upstream reference: `vendor/box2d` at Box2D `v3.1.1`
 - Initial body sleep/awake API with C parity for awake state, sleep enablement,
   sleep-disabled body creation as awake, started-touching contact wake guards
   for static and sleep-disabled sources, and sleep threshold controls.
+- Body bullet mutation, chain owner-world lookup, and explicit joint endpoint
+  waking are exercised against the corresponding C entry points; joint waking
+  also compares both body states and constraint-graph placement.
+- Disabling sleeping at world scope now wakes every sleeping solver island
+  immediately, matching upstream awake counts and per-body state; re-enabling
+  sleeping allows those bodies to return to sleep normally.
+- Audited public numeric preconditions now preserve upstream assertions for
+  shape definitions and materials, degenerate segments, polygon radius, body
+  mass/damping/gravity values, shape density/friction/restitution, chain
+  materials, and maximum world linear speed.
+- Every world/body/shape/chain/joint factory now enforces the upstream secret
+  definition cookie. Joint creation limits, generic joint anchors/axes,
+  mouse/weld setters, body-definition/transform values, world overlap/ray/
+  shape-cast inputs, and conditional debug drawing bounds are joined by
+  dynamic-tree, geometry/manifold, GJK/TOI, mover/explosion, and constraint
+  tuning checks. Non-aborting native probes compare 110 outcomes: 104 expected
+  assertions and six intentional non-assert controls.
 - Initial dynamic-body kinematics in `b2World_Step` with C parity for free-body
   sub-step velocity integration, damping, angular integration, center/transform
   finalization, and maximum speed clamps.
 - Kinematic body target-transform stepping mirrors upstream awake-set
   integration, including zero-gravity/inv-mass handling and awake body counts
   that include enabled kinematic bodies.
-- Minimal world/body/shape API sufficient for the ported world API tests.
+- Kinematic mass refresh now computes shape `minExtent`/`maxExtent` around the
+  local origin just like upstream. A raw-float parity probe proves that an
+  off-center rotating shape stays awake while the centered control sleeps.
+- Exhausting all `B2_MAX_WORLDS` slots now returns `b2_nullWorldId` instead of
+  throwing; freeing one slot recycles its index and incremented generation
+  exactly like C.
+- Explicit world/body/shape/chain/joint destruction now asserts on stale
+  handles like upstream. Null handles returned from Java APIs are fresh value
+  objects, so mutating one result cannot corrupt the public null constants or
+  another call's result.
+- Java array-output APIs cap C-style `capacity` by the actual array length and
+  treat negative capacities as zero across chain segments, body shapes/joints/
+  contacts, shape contacts, and sensor overlaps.
+- Java 11 platform utility tests cover version 3.1.1, monotonic timer/reset
+  contracts, thread yielding, assert callback forwarding, configurable length
+  units, and public vector/rotation/plane/ray validation helpers.
+- World/body/shape API coverage used by the public surface and parity suites.
 - Headless sample entry points under `src/samples/java`, including the
   HelloWorld physics sample wired to the same 90-step scenario used by the
   upstream C parity probe and the Determinism/Falling Hinges sample wired to
@@ -362,8 +551,17 @@ Upstream reference: `vendor/box2d` at Box2D `v3.1.1`
 
 ## Verification
 
-- `./gradlew test --rerun-tasks` currently runs 154 tests in 138 suites; all
-  154 pass with zero skips, failures, or errors (6m33s on the audit machine).
+- `./gradlew unitTest --rerun-tasks` currently runs 37 tests in 19 suites; all
+  pass with zero skips, failures, or errors.
+- `./gradlew parityTest --rerun-tasks` currently runs 168 tests in 154 suites;
+  all pass with zero skips, failures, or errors. On the current worktree it
+  completed in 8m26s; the separate `unitTest assemble --rerun-tasks` gate
+  completed in 7s on the audit machine.
+  The preceding 125-suite partition passed on the Ubuntu GitHub Actions runner
+  in 15m14s after the native commands were made C17/glibc portable.
+- The task filters cover all 173 test classes exactly once: unit tests exclude
+  parity/sample/multithreading classes, while parity tests include those three
+  groups.
 - `./gradlew runDebugger` has been visually verified on macOS through the
   compositor with HelloWorld, Joints/Ragdoll, and Benchmark/Spinner; the
   rendered scene, controls, catalog, and live counters remain visible under
@@ -378,9 +576,11 @@ Upstream reference: `vendor/box2d` at Box2D `v3.1.1`
   disabled experimental `Mover2` block under `#if 0` is excluded from this
   inventory.
 - `PublicApiSurfaceTest` derives the public inventory from the vendored headers
-  and finds all 422 `B2_API` function names represented in Java, including
-  `b2InternalAssertFcn`. Allocator callback typedefs are represented by
-  `B2Allocator` and the `IntFunction<ByteBuffer>` adapter.
+  and finds all 422 `B2_API` and 73 `B2_INLINE` function names, all 71 struct
+  definitions and their public fields, all 16 callback typedefs, all six
+  public `static const` values, and all 168 public enumerators represented in
+  Java. A repository-wide test/probe inventory finds zero exported names
+  without a direct reference.
 - `MultithreadingTest` compiles a C++17 thread-pool probe against the upstream
   C17 Box2D sources and matches the official Falling Hinges sleep step (`288`)
   and transform hash (`0x35467e1e`) in both C++ and Java using 1, 2, 4, and 8
@@ -396,10 +596,10 @@ Upstream reference: `vendor/box2d` at Box2D `v3.1.1`
 - `LargeWorldSampleTest` passes exact C parity for all 513 bodies, 5,303 shapes,
   257 joints, graph counters, raw body-state hash, and four steps containing two
   explosions.
-- `AllocatorParityTest` passes for custom `B2Allocator` behavior,
-  `IntFunction<ByteBuffer>` adapter behavior, 32-byte allocation rounding,
-  alignment forwarding, zero-size allocation, and byte-count accounting against
-  upstream C.
+- `AllocatorParityTest` passes for the exact `b2AllocFcn`/`b2FreeFcn` pair,
+  custom `B2Allocator` behavior, `IntFunction<ByteBuffer>` adapter behavior,
+  32-byte allocation rounding, alignment forwarding, free-callback invocation,
+  zero-size allocation, and byte-count accounting against upstream C.
 - `MathParityTest` passes for selected `b2Atan2`, `b2MakeRot`,
   `b2UnwindAngle`, transform composition/inversion,
   `b2ComputeRotationBetweenUnitVectors`, and `b2NLerp` outputs against
@@ -412,254 +612,264 @@ Upstream reference: `vendor/box2d` at Box2D `v3.1.1`
 - `ShapeUnitParityTest` passes for upstream shape mass, capsule mass bounds,
   shape AABB, point-in-shape, and ray-cast unit slices against upstream C.
 - `SingleBoxSampleTest` passes for the upstream Stacking/Single Box sample's
-  120-step body transform, velocity, contact count, and awake count against
+  body transform, velocity, contact count, and awake count after 2400 steps against
   upstream C.
 - `TiltedStackSampleTest` passes for the upstream Stacking/Tilted Stack
   sample's final contact and awake counts plus representative box transforms
-  and velocities after 180 steps against upstream C.
+  and velocities after 2400 steps against upstream C.
 - `VerticalStackSampleTest` passes for the upstream Stacking/Vertical Stack
   sample's default one-column rounded-box setup, final body/shape/contact/awake
-  counts, and all twelve box transforms and velocities after 240 steps against
+  counts, and all twelve box transforms and velocities after 2400 steps against
   upstream C.
 - `DoubleDominoSampleTest` passes for the upstream Stacking/Double Domino
   sample's impulse-driven domino setup, final body/shape/contact/awake counts,
-  and all fifteen domino transforms and velocities after both 54 and 240 steps
+  and all fifteen domino transforms and velocities after both 54 and 2400 steps
   against upstream C.
 - `KinematicBodySampleTest` passes for the upstream Bodies/Kinematic sample's
   target-transform stepping, final transform, velocity, elapsed time, and awake
-  count against upstream C.
+  count after 2400 steps against upstream C.
 - `PivotSampleTest` passes for the upstream Bodies/Pivot sample's body
   transform, velocity, pivot-point velocity, local/world point velocity, contact
-  count, and awake count after 120 steps against upstream C.
+  count, and awake count after 2400 steps against upstream C.
 - `WeebleSampleTest` passes for the upstream Bodies/Weeble sample's custom
   friction/restitution callbacks, shifted mass data, body transform, local/world
-  point velocities, contact count, and awake count after 240 steps against
+  point velocities, contact count, and awake count after 2400 steps against
   upstream C.
 - `BodyTypeSampleTest` passes for the upstream Bodies/Body Type sample setup
   plus deterministic GUI-style type and enable toggles, including body
   type/enabled/awake state, proxy/contact counters, joint count, and all tracked
-  body transforms and velocities against upstream C. Advancing the
-  kinematic/joint simulation beyond the scripted toggles currently enters joint
-  solver drift and remains solver follow-up work.
+  body transforms and velocities against upstream C. The staged transitions
+  are exact independently and the complete static/dynamic, sleep/wake, and
+  contact sequence remains bit-exact through 2400 simulated steps.
 - `FilterJointSampleTest` passes for the upstream Joints/Filter Joint sample's
   static ground, two dynamic square bodies, non-colliding filter joint, final
   world counters, joint type/collide flag, contact capacities, and body
-  transforms and velocities after 120 steps against upstream C.
+  transforms and velocities after 2400 steps against upstream C.
 - `RevoluteJointSampleTest` passes for the upstream Joints/Revolute sample's
   default capsule, ball, and lever setup, including final world counters, all
   dynamic body transforms and velocities, contact capacities, revolute angles,
-  motor torque, and constraint force/torque after 120 steps against upstream C.
+  motor torque, and constraint force/torque after 2400 steps against upstream C.
 - `MotorJointSampleTest` passes for the upstream Joints/Motor Joint sample's
   animated motor target, final world counters, target offsets, constraint
   force/torque, body transform, velocity, and contact capacity after 110 steps
-  against upstream C. Step 111 currently diverges by a few ulps through the
-  sinusoidal target and accumulated motor impulse, so longer horizons remain
-  solver/trig follow-up work.
+  against upstream C. On macOS ARM64 the first difference at step 111 is already
+  present in the target because C `sinf(float)` and Java's narrowed
+  `Math.sin(double)` select adjacent floats. A deterministic-target variant
+  using Box2D's `b2ComputeCosSin` on both sides is bit-exact through 2400 steps,
+  proving that the motor-joint solver itself does not drift over that horizon.
 - `DistanceJointSampleTest` passes for the upstream Joints/Distance Joint
   sample's default one-body distance chain, including final world counters, body
   transform and velocity, contact capacity, current joint length, motor force,
-  and constraint force/torque after 120 steps against upstream C.
+  and constraint force/torque after 2400 steps against upstream C.
 - `PrismaticJointSampleTest` passes for the upstream Joints/Prismatic sample's
   default diagonal-axis prismatic joint, including final world counters, body
   transform and velocity, contact capacity, joint translation/speed, motor force,
-  and constraint force/torque after 120 steps against upstream C.
+  and constraint force/torque after 2400 steps against upstream C.
 - `WheelJointSampleTest` passes for the upstream Joints/Wheel sample's default
   capsule suspension setup, including final world counters, body transform and
   velocity, contact capacity, linear separation, motor torque, and constraint
-  force/torque after 120 steps against upstream C.
+  force/torque after 2400 steps against upstream C.
 - `BridgeSampleTest` passes for the upstream Joints/Bridge sample's 160-plank
   spring/motor revolute bridge plus triangle and circle payloads, including
   final world counters, all 165 dynamic body transforms and velocities, contact
   capacities, and all 161 revolute joint angles, motor torques, and constraint
-  force/torque values after 120 steps against upstream C. The assertion is
+  force/torque values after 2400 steps against upstream C. The assertion is
   field-by-field numeric parity because Java and C may choose different
   shortest decimal spellings for the same float with `%.9g`-style formatting.
 - `BallAndChainSampleTest` passes for the upstream Joints/Ball & Chain sample's
   30-capsule filtered chain plus heavy ball setup, including final world
   counters, all 31 dynamic body transforms and velocities, contact capacities,
   and all 31 revolute joint angles, motor torques, and constraint force/torque
-  values after 120 steps against upstream C.
+  values after 2400 steps against upstream C.
 - `CantileverSampleTest` passes for the upstream Joints/Cantilever sample's
   eight sleeping capsule bodies joined by weld joints, including final world
   counters, all body transforms and velocities, contact capacities, weld
-  hertz/damping settings, and constraint force/torque values after 120 steps
+  hertz/damping settings, and constraint force/torque values after 2400 steps
   against upstream C.
 - `FixedRotationSampleTest` passes for the upstream Joints/Fixed Rotation
   sample's six fixed-rotation dynamic boxes using distance, motor, prismatic,
   revolute, weld, and wheel joints, including final world counters, all body
   transforms and velocities, fixed-rotation flags, joint types, type-specific
   joint metrics, linear separation, and constraint force/torque values after
-  120 steps against upstream C.
+  2400 steps against upstream C.
 - `BreakableJointSampleTest` passes for the upstream Joints/Breakable sample's
   six non-sleeping dynamic boxes using distance, motor, prismatic, revolute,
   weld, and wheel joints, including break-force joint destruction decisions,
   final world counters, all body transforms and velocities, remaining joint
   types, type-specific joint metrics, linear separation, and constraint
-  force/torque values after 120 steps against upstream C.
+  force/torque values after 2400 steps against upstream C.
 - `JointSeparationSampleTest` passes for the upstream Joints/Separation
   sample's five non-sleeping dynamic boxes using distance, prismatic, revolute,
   weld, and wheel joints, including final world counters, all body transforms
   and velocities, joint types, type-specific joint metrics, linear and angular
-  separation, and constraint force/torque values after 120 steps against
+  separation, and constraint force/torque values after 2400 steps against
   upstream C.
 - `UserConstraintSampleTest` passes for the upstream Joints/User Constraint
   sample's custom post-step two-anchor constraint on a damped dynamic box,
   including final world counters, body transform and velocities, mass and
   rotational inertia, world center of mass, accumulated impulses, and reported
-  forces after 120 steps against upstream C.
+  forces after 2400 steps against upstream C.
 - `DrivingSampleTest` passes for the upstream Joints/Driving sample's default
   terrain chain, teeter, bridge, box stack, and two-wheel car setup, including
   final world counters, representative body transforms and velocities for the
   car, bridge, teeter, and boxes, wheel motor/spring settings, motor torque,
-  linear separation, and constraint torque after 120 steps against upstream C.
-  Wheel axle force-vector diagnostics are compared within `2e-5f`; all other
-  tracked values are exact float parity.
+  linear separation, constraint force, and constraint torque after 2400 steps
+  against both native and scalar upstream C with exact float parity. The wheel
+  force getter preserves upstream's cached, one-frame-behind prepared axis.
 - `RagdollSampleTest` passes for the upstream Joints/Ragdoll sample's default
   `CreateHuman` setup, including final world counters, all eleven bone
   transforms and velocities, per-bone shape/contact capacities, and all ten
   revolute joint angles, motor/spring settings, constraint force, and
-  constraint torque values after 120 steps against upstream C compiled with
+  constraint torque values after 2400 steps against upstream C compiled with
   `shared/human.c`.
 - `SoftBodySampleTest` passes for the upstream Joints/Soft Body sample's
   seven-body donut setup, including final world counters, all capsule body
   transforms and velocities, contact capacities, weld joint linear/angular
   separation, hertz settings, constraint force, and constraint torque values
-  after 120 steps against upstream C.
+  after 2400 steps against upstream C.
 - `DoohickeySampleTest` passes for the upstream Joints/Doohickey sample's four
   helper instances, including final world counters, all sixteen wheel/bar body
   transforms and velocities, contact capacities, all revolute/prismatic joint
   types, type-specific joint metrics, linear separation, constraint force, and
-  constraint torque values after 120 steps against upstream C.
+  constraint torque values after 2400 steps against upstream C.
 - `ScissorLiftSampleTest` passes for the upstream Joints/Scissor Lift sample's
   three-stage lift plus car payload using 8 sub-steps, including final world
   counters, all tracked link/platform/car body transforms and velocities,
   contact capacities, all tracked revolute/wheel/distance joint types,
   type-specific joint metrics, linear separation, and constraint torque values
-  after 120 steps against upstream C. Joint force-vector diagnostics are
-  compared within `5e-4f`; all other tracked values are exact float parity.
+  after 2400 steps against both native and scalar upstream C. Joint
+  force-vector diagnostics and all other tracked values have exact float parity.
 - `GearLiftSampleTest` passes for the upstream Joints/Gear Lift sample's
   parsed chain terrain, two toothed gears, forty-link chain, sliding door, and
   200 random polygon payload bodies, including world counters, all 243 dynamic
   body states, contact capacities, all 44 revolute/prismatic joint types,
   type-specific joint metrics, linear separation, and constraint force/torque
-  diagnostics after 10 steps against upstream C. Body floats are compared
-  within `1e-6f`, joint scalar metrics within `5e-6f`, and joint force/torque
-  diagnostics within `2e-5f`; counts and capacities are exact.
+  diagnostics after 2400 steps against both native ARM64 NEON and scalar
+  upstream C with zero tolerance for every tracked float, count, and capacity.
 - `DoorSampleTest` passes for the upstream Joints/Door sample's top-down
   revolute door setup plus deterministic impulse-button action, including
   final world counters, door transform and velocities, contact capacity,
   maximum translation error, revolute spring/limit/constraint tuning settings,
-  angle/separation metrics, and constraint force/torque values after 120 steps
+  angle/separation metrics, and constraint force/torque values after 2400 steps
   against upstream C.
 - `ScaleRagdollSampleTest` passes for the upstream Joints/Scale Ragdoll sample's
   ground box, `CreateHuman` setup, deterministic random torso angular impulse,
   and scripted `Human_SetScale(1.75f)` slider action, including world counters,
   all eleven bone transforms, velocities, shape/contact capacities, scaled
   masses/inertia, and all ten revolute joint settings/separation/force
-  diagnostics after 60 pre-contact steps against upstream C compiled with
+  diagnostics after 2400 steps against upstream C compiled with
   `shared/human.c`.
 - `SleepSampleTest` passes for the upstream Bodies/Sleep sample setup plus
   deterministic invoker create/destroy actions, including sleep-disabled body
   creation, sensor touch event accumulation, body awake/sleep flags, contact
-  capacities, counters, and all tracked body states after 20 steps against
-  upstream C. Longer horizons currently enter box contact solver drift and
-  remain solver follow-up work.
+  capacities, counters, and all tracked body states against upstream C. The
+  step-22 touching-contact wake transition is covered directly and the complete
+  scene remains exact through 2400 steps.
 - `BadBodySampleTest` passes for the upstream Bodies/Bad sample's zero-density
   dynamic body behavior, including force application, transforms, velocities,
-  mass data, contact count, and awake count after 120 steps against upstream C.
+  mass data, contact count, and awake count after 2400 steps against upstream C.
 - `CircleStackSampleTest` passes for the upstream Stacking/Circle Stack
   sample's accumulated hit events, shape user-data pair checksum, final contact
   and awake counts, and first/last circle transforms and velocities against
-  upstream C.
+  upstream C after 2400 steps.
 - `CapsuleStackSampleTest` passes for the upstream Stacking/Capsule Stack
   sample's final contact and awake counts plus bottom/middle/top capsule
-  transforms and velocities after 180 steps against upstream C.
+  transforms and velocities after 2400 steps against upstream C.
 - `CliffSampleTest` passes for the upstream Stacking/Cliff sample's multi-shape
   static cliff/platform ground plus scripted Flip action, including final world
   counters and all nine dynamic capsule/box/circle body transforms, velocities,
-  shape counts, and contact capacities after 120 steps against upstream C.
+  shape counts, and contact capacities after 2400 steps against upstream C.
 - `ArchSampleTest` passes for the upstream Stacking/Arch sample's ground
   segment, 17 arch blocks, and four top boxes, including final world counters
   and all 21 dynamic body transforms, velocities, shape counts, and contact
-  capacities after 120 steps against upstream C.
+  capacities after 2400 steps against upstream C.
 - `ConfinedSampleTest` passes for the upstream Stacking/Confined sample's
   four-capsule boundary and 25-by-25 zero-gravity circle grid, including final
   world counters and nine distributed dynamic body transforms, velocities,
-  shape counts, and contact capacities after 120 steps against upstream C.
+  shape counts, and contact capacities after 2400 steps against upstream C.
 - `CardHouseSampleTest` passes for the upstream Stacking/Card House sample's
   five-level card construction, including final world counters and all 40
   dynamic body transforms, velocities, shape counts, and contact capacities
-  against upstream C. The setup and first two steps are bit-exact; the
-  default 120-step final state is within `2e-6f` after tiny solver drift.
+  against upstream C. The setup and first two steps remain directly covered;
+  all 40 body states are bit-exact through 2400 registered steps against both
+  native ARM64 NEON C and C compiled using `BOX2D_DISABLE_SIMD`.
 - `FrictionSampleTest` passes for the upstream Shapes/Friction sample's final
   contact and awake counts plus all five dynamic box transforms and velocities
-  after 240 steps against upstream C.
+  after 2400 steps against upstream C.
 - `RestitutionSampleTest` passes for the upstream Shapes/Restitution sample's
   circle variant, including final contact and awake counts plus five
-  representative circle transforms and velocities after 240 steps against
+  representative circle transforms and velocities after 2400 steps against
   upstream C.
 - `RollingResistanceSampleTest` passes for the upstream Shapes/Rolling
   Resistance sample's default flat-lift scene, including final contact and
   awake counts plus representative circle transforms, linear velocities, and
-  angular velocities after 240 steps against upstream C.
+  angular velocities after 2400 steps against upstream C.
 - `ConveyorBeltSampleTest` passes for the upstream Shapes/Conveyor Belt sample,
   including final contact and awake counts plus all five dynamic box
-  transforms and velocities after 240 steps against upstream C.
+  transforms and velocities after 2400 steps against upstream C.
 - `TangentSpeedSampleTest` passes for the upstream Shapes/Tangent Speed sample's
   SVG chain parsing, loop-chain setup, world counters, drop cadence, and all ten
-  dropped body trajectories against upstream C.
+  dropped body trajectories after 2400 steps against upstream C.
 - `ShapeFilterSampleTest` passes for the upstream Shapes/Filter sample setup
   plus deterministic filter-mask toggles corresponding to the sample UI,
   including final filters, contact capacities, world counters, and all three
-  body transforms and velocities against upstream C.
+  body transforms and velocities after 2400 steps in each phase against
+  upstream C.
 - `CustomFilterSampleTest` passes for the upstream Shapes/Custom Filter sample
   setup, including shape user-data, exact custom-filter callback counts,
   broad-phase existing-contact filtering order, world counters, and all ten body
-  transforms and velocities after 240 steps against upstream C.
+  transforms and velocities after 2400 steps against upstream C.
 - `SensorBookendSampleTest` passes for the upstream Events/Sensor Bookend
   sample setup, including cumulative begin/end sensor events, final visiting
   flags, sensor overlap counts/capacities, shape validity, and dynamic sensor
   plus visitor transforms, velocities, shape counts, and contact capacities
-  after 120 steps against upstream C.
+  after 2400 steps against upstream C.
 - `FootSensorSampleTest` passes for the upstream Events/Foot Sensor sample's
   chain ground filters and dynamic player capsule plus foot sensor, including
   cumulative begin/end events, tracked overlap count, sensor capacity/overlap
   count, final world counters, and player transform/velocity/shape/contact
-  state after 120 steps against upstream C.
+  state after 2400 steps against upstream C.
 - `ContactEventSampleTest` passes for the upstream Events/Contact sample's
   looped wall chain, zero-gravity bullet player, deterministic debris spawning,
   contact-event processing, debris attachment to the player, non-core player
   shape destruction path, final world counters, event/contact-data checksums,
-  and player/debris transforms and velocities after 120 steps against upstream
-  C.
+  and player/debris transforms and velocities after 2400 steps against upstream
+  C. `ContactEventEnableParityTest` additionally proves that the event-enable
+  flag is captured when a contact is created and that touching-contact shape or
+  body destruction publishes the deferred end event with upstream buffer timing.
 - `SensorTypesSampleTest` passes for the upstream Events/Sensor Types sample's
   static, kinematic, and dynamic sensors, filtered ground segments, falling
   ball, and ray cast, including cumulative sensor event counts, final
   per-sensor overlap capacities/checksums, body transforms/velocities, contact
-  capacities, and ray result after 120 steps against upstream C.
+  capacities, and ray result after 2400 steps against upstream C.
 - `SensorFunnelSampleTest` passes for the upstream Events/Sensor Funnel sample's
   looped chain funnel, three motorized paddles, human spawning cadence, sensor
   event setup, final world counters, active-spawn mask, and all active human
-  bone transforms/velocities/shape/contact states after 88 bit-exact steps
-  against upstream C. Longer runs enter multi-ragdoll contact drift starting at
-  step 89; counters remain aligned through 240 pre-destruction steps, while the
-  later sensor-destruction phase diverges and needs separate solver-order
-  investigation.
+  bone transforms/velocities/shape/contact states after 2400 bit-exact steps
+  against upstream C. The former step-89 gap was caused by forward Java fixture
+  traversal and global-shape CCD scanning: continuous collision now follows the
+  upstream reverse body-shape list and dynamic-tree query order. Sensor overlap
+  collection also queries the three broad-phase trees, and the Java human helper
+  now enables sensor events on the torso only, matching `Human_EnableSensorEvents`.
+  The registered CI horizon is 2400 steps. The former step-996 gap was closed
+  by applying overflow restitution before graph-color restitution and preserving their distinct
+  scalar/SIMD arithmetic paths, matching upstream solver stage order.
 - `PlatformerSampleTest` passes for the upstream Events/Platformer sample's
   static ground, one-sided static and kinematic platforms, dynamic capsule
   player, pre-solve callback decisions, jump gating, final contact summaries,
-  world counters, and player/platform transforms and velocities after 120 steps
+  world counters, and player/platform transforms and velocities after 2400 steps
   against upstream C.
 - `BodyMoveSampleTest` passes for the upstream Events/Body Move sample's
   five-shape boundary, 50 spawned dynamic bodies with deterministic random
   polygons, body move events, sleep tracking, final world counters, and all
   tracked dynamic body transforms/velocities/shape/contact/sleep states after
-  108 bit-exact steps against upstream C. The longer 120-step horizon enters
-  body-state solver drift while preserving event and counter parity.
+  2400 bit-exact CI steps against native upstream C. The corrected continuous
+  collision shape traversal and dynamic-tree query close the former step-171
+  gap.
 - `MoverSampleTest` passes for the upstream Character/Mover sample's two SVG
   terrain chains, 50-link bridge, soft mover, falling ball, kinematic elevator,
   pogo shape cast, collision-plane solve/cast loop, final world counters, and
-  representative body states after 120 steps against upstream C with zero
+  representative body states after 2400 steps against upstream C with zero
   tolerance.
 - `RayCastSampleTest` passes for the upstream Collision/Ray Cast sample's
   circle, capsule, box, triangle, and segment sequence, including progressive
@@ -711,30 +921,31 @@ Upstream reference: `vendor/box2d` at Box2D `v3.1.1`
 - `RecreateStaticSampleTest` passes for the upstream Shapes/Recreate Static
   sample's per-step static body destruction/recreation with immediate contact
   creation, final dynamic transform/velocity, counters, contact data count, and
-  awake count against upstream C.
+  awake count after 2400 steps against upstream C.
 - `CompoundShapesSampleTest` passes for the upstream Shapes/Compound Shapes
   sample setup plus deterministic Intrude action, including compound body mass
   data, body AABBs, final counters, and all eight relevant body transforms and
-  velocities after 10 steps against upstream C. Longer horizons currently
-  diverge after early contact solving and remain solver follow-up work.
+  velocities through 2400 steps against upstream C. Shape proxy synchronization
+  follows upstream `headShapeId` order, preserving move-buffer/contact-color
+  ordering when several shapes on one body contact the ground together.
 - `ChainShapeSampleTest` passes for the upstream Shapes/Chain Shape sample's
   loop-chain scene, material setup, and circle/capsule/box launch variants,
-  including final counters and body transforms and velocities after 240 steps
+  including final counters and body transforms and velocities after 2400 steps
   against upstream C.
 - `ChainLinkSampleTest` passes for the upstream Shapes/Chain Link sample's
   linked open-chain ground setup, circle/capsule/polygon dynamic bodies, final
-  counters, and all three body transforms and velocities after 240 steps
+  counters, and all three body transforms and velocities after 2400 steps
   against upstream C.
 - `RoundedShapesSampleTest` passes for the upstream Shapes/Rounded sample's
   random rounded polygon stack, generated shape descriptors, final counters,
-  and representative body transforms and velocities after 240 steps against
+  and representative body transforms and velocities after 2400 steps against
   upstream C.
 - `EllipseShapeSampleTest` passes for the upstream Shapes/Ellipse sample's
   rounded diamond hull stack, final counters, and representative body
-  transforms and velocities after 240 steps against upstream C.
+  transforms and velocities after 2400 steps against upstream C.
 - `ExplosionSampleTest` passes for the upstream Shapes/Explosion sample's
   welded ring setup, deterministic explode action, rotating reference angles,
-  final counters, and all twelve body transforms and velocities after 120 steps
+  final counters, and all twelve body transforms and velocities after 2400 steps
   against upstream C.
 - `ConvexHullSampleTest` passes for the upstream Geometry/Convex Hull sample's
   deterministic XorShift32 point generation, rotated/clamped input points,
@@ -749,9 +960,16 @@ Upstream reference: `vendor/box2d` at Box2D `v3.1.1`
   simplex-count behavior against upstream C.
 - `DistanceParityTest` passes with exact C/Java parity for
   `b2SegmentDistance`, `b2ShapeDistance`, `b2ShapeCast`, and
-  `b2TimeOfImpact`.
+  `b2TimeOfImpact`, plus 2048 deterministic raw-bit cases covering segment
+  closest points, cold and warm GJK simplex caches, shape-cast hit state and
+  iterations, and TOI state/fraction.
 - `ManifoldParityTest` passes with exact C/Java parity for selected
-  single-point and two-point manifold generation, including chain segment
+  single-point and two-point manifold generation plus 1024 deterministic
+  raw-bit cases across circle-circle, capsule-circle, capsule-capsule,
+  polygon-polygon, segment-circle, segment-capsule, segment-polygon, and
+  polygon-capsule pairs. Only points below `pointCount` are compared because
+  upstream C intentionally leaves unused manifold slots unspecified. The
+  selected cases include chain segment
   contacts.
 - `DynamicTreeParityTest` passes for observable broad-phase query behavior,
   traversal visit statistics, and rebuild metrics.
@@ -765,13 +983,20 @@ Upstream reference: `vendor/box2d` at Box2D `v3.1.1`
   velocity clipping against upstream C.
 - `ExplosionParityTest` passes for world explosion impulses across circle,
   capsule, polygon, and mask-filtered dynamic bodies against upstream C.
-- `CallbackParityTest` passes for custom contact filtering and pre-solve
-  callback contact disabling against upstream C.
+- `CallbackParityTest` passes for custom contact filtering, pre-solve callback
+  contact disabling, exact controlled A/B shape order, sensor exclusion, and
+  OFF-to-ON/ON-to-OFF pre-solve flag capture against upstream C. Random-world
+  coverage compares directional callback argument multisets for pre-solve and
+  material mixers; custom-filter candidate frequency is intentionally checked
+  only in controlled scenes because broad-phase candidates and task scheduling
+  do not define a stable invocation count.
 - `HitEventParityTest` passes for post-solver contact hit event count, shape
   ids, hit point, normal, and approach speed against upstream C.
 - `SensorEventParityTest` passes for sensor begin/end events, persisted
   overlaps, overlap capacity, visitor ids, and shape generations against
-  upstream C.
+  upstream C. `SensorDestroyEventParityTest` covers sensor shape/body
+  destruction through the deferred end-event buffer and visitor shape/body
+  destruction through the following positive sensor query.
 - `DebugDrawParityTest` passes for debug draw shape, bounds, body-name, and
   mass callbacks against upstream C.
 - `DebugContactDrawParityTest` passes for debug draw contact points, normal
@@ -827,6 +1052,23 @@ Upstream reference: `vendor/box2d` at Box2D `v3.1.1`
 - `WorldLifecycleParityTest` passes for upstream empty-world stepping,
   destroy-all-bodies counters, body/world id invalidation, and world recycling
   across `B2_MAX_WORLDS / 2` worlds for 100 iterations against upstream C.
+- `RandomWorldParityTest` reconstructs eight configurations emitted by scalar
+  upstream C and compares 96 dynamic/kinematic circle, capsule, and box bodies
+  after 600 steps per scene. Gravity, transforms, velocities, sleep, bullet,
+  density, friction, and restitution vary deterministically. Scripted runtime
+  actions exercise teleport, disable/enable, dynamic/kinematic switching,
+  sleeping and continuous-collision policy toggles, filter removal/restoration,
+  capsule replacement, friction and fixed-rotation mutation, impulses, gravity
+  and gravity-scale changes, and velocity setters. Each world also contains a
+  distance spring, revolute motor, and weld joint; length, motor speed, weld
+  hertz, validity, and destruction are exercised during the run. A static
+  sensor additionally checks overlap capacity/count, overlap-ID checksum, and
+  transient begin/end events while sensor events and filtering are toggled.
+  Contact and awake counters, per-body contact capacities, joint validity, and
+  two tracked body states compare at every one of the 4800 steps. Pre-solve,
+  friction, and restitution callback counts and directional argument multisets
+  are checked per step while a custom filter actively affects contact creation;
+  all final body states remain exact.
 - `ShapeMaterialParityTest` passes for shape friction/restitution/material and
   full surface material APIs.
 - `ShapeFilterParityTest` passes for shape filters, contact reset after filter
@@ -838,13 +1080,46 @@ Upstream reference: `vendor/box2d` at Box2D `v3.1.1`
   generation parity.
 - `CapsuleShapeParityTest` passes for capsule shape creation, getter/setter
   defensive copies, body mass data, contact capacity, and manifold point count.
+- `DegenerateCapsuleParityTest` proves the short-capsule circle fallback and
+  compares shape type plus raw center/radius/mass/inertia bits against C.
 - `ShapeQueryParityTest` passes for shape AABB, mass data, point tests,
-  ray-casts, and closest-point queries across polygon, capsule, circle, and
-  segment shapes.
+  ray-casts, and closest-point queries. Its ray corpus covers 512 deterministic
+  cases across polygon, capsule, circle, segment, and one-sided chain segment
+  shapes, including explicit front/back chain casts and misses.
+- `RemainingGeometryParityTest` compares raw bits for transformed polygon
+  vertices, normals, centroids, capsule AABBs, and capsule point tests;
+  it also covers the near-collinear hull validation regression and 512
+  deterministic QuickHull point clouds. `ShapeProxyClampParityTest` covers
+  point counts above the eight-vertex C limit.
 - `BodyAccessParityTest` passes for body type/name/user data, owner world,
   shape count/enumeration order, AABB, transform mutation, velocity setters,
   point velocities, damping/gravity, fixed rotation, event toggles, and
-  enable/disable state.
+  enable/disable state, and bullet mutation. It additionally compares world
+  query node, leaf, and hit counts after a direct body teleport to ensure exact
+  dynamic-tree proxy reinsertion.
+- `BodyDisableParityTest` proves that disabling one endpoint destroys its
+  touching contact and wakes the sleeping body at the other endpoint.
+- `JointDestroyParityTest` proves explicit joint destruction wakes both
+  sleeping endpoints, body destruction wakes a joint-only peer, and collision
+  creation resumes after proxy movement.
+- `IslandWakeParityTest` covers sleeping-island wake propagation from joint
+  creation, body re-enabling through a joint, and a newly touching contact.
+- `JointSolverSetParityTest` covers disabled, sleeping, and awake joint
+  placement plus explicit endpoint waking through public constraint-graph
+  color counters.
+- `ShapeDestroyWakeParityTest` covers the distinct explicit shape and chain
+  destruction wake paths, including `updateBodyMass == false`.
+- `DisabledTargetTransformParityTest` covers disable/target/enable state and
+  verifies that no velocity survives the disabled solver-set boundary.
+- `BodyTypeWakeParityTest` proves that changing a sleeping dynamic body to
+  static wakes the former touching island before the contact is removed.
+- Awake contact processing now follows the upstream awake solver set rather
+  than requiring an awake dynamic endpoint. This ensures a moving kinematic
+  body prunes a separated contact even when its dynamic peer is sleeping; the
+  generated-world regression exposed the former stale contact ten frames after
+  a dynamic-to-kinematic transition.
+- `InitialVelocityParityTest` covers static, sleeping, disabled, enabled, woken,
+  and awake creation states plus linear, angular, and point-velocity getters.
 - `BodyForceParityTest` passes for body force/torque accumulation, linear and
   angular impulses, force integration across sub-steps, and force reset against
   upstream C.
@@ -852,19 +1127,37 @@ Upstream reference: `vendor/box2d` at Box2D `v3.1.1`
   body-space/world-space transforms, point velocity, and angular velocity.
 - `BodySleepParityTest` passes for body awake/sleep enablement and sleep
   threshold APIs.
+- `WorldSleepingToggleParityTest` covers immediate whole-world wake on sleeping
+  disable, idempotent disable, persistent awake state while disabled, and
+  normal sleep after re-enabling.
+- `PublicInputValidationTest` covers the audited upstream numeric assertions
+  without mutating valid world state after rejection.
+- `FactoryValidationParityTest`, `JointSetterValidationParityTest`,
+  `BodyWorldValidationParityTest`, `DynamicTreeValidationParityTest`,
+  `GeometryValidationParityTest`, and `DistanceValidationParityTest` compare
+  110 definition-cookie, tree, geometry/manifold, GJK/TOI, joint-limit/setter,
+  body, mover/explosion, query/cast, and debug-bound outcomes directly with C.
+- `SpeculativeContactParityTest` proves the runtime speculative toggle changes
+  a raw-bit-matched two-point manifold into the same one-point manifold as C.
 - `KinematicsParityTest` passes for contact-free dynamic body stepping with
   exact C parity across sub-stepped linear/angular integration.
+- `KinematicExtentParityTest` compares centered/off-center kinematic sleep and
+  raw final rotation bits against C.
+- `WorldCapacityParityTest` covers null return on pool exhaustion plus exact
+  slot index/generation reuse; `ArrayCapacityTest` covers bounded Java outputs.
+- `StaleDestroyParityTest` compares all five explicit destruction families on
+  expired handles with C; `NullIdIsolationTest` protects Java value semantics.
 - `ContactCreationParityTest` passes for broad-phase pair update/contact
   creation counts in the HelloWorld scenario.
 - `ContactDataParityTest` passes for contact capacity, contact data count,
   begin/end event totals, and manifold point count in the HelloWorld scenario.
 - `ContactSolverParityTest` passes for HelloWorld contact-solver settling and
-  sleeping against upstream C with a tight tolerance.
+  sleeping against upstream C with zero tolerance.
 - `ParityTest.helloWorldMatchesUpstreamC` passes with zero tolerance for the
   simulated HelloWorld body transform after 90 steps.
 - `HelloWorldSampleTest` passes with zero tolerance for the headless
   `org.box2d4j.samples.HelloWorld` sample result and output line against the
-  upstream C probe.
+  upstream C probe after 2400 steps.
 - `FallingHingesSampleTest` passes for the headless
   `org.box2d4j.samples.FallingHinges` sample sleep step (`288`) and transform
   hash (`0x35467e1e`) against the upstream C determinism helper.
@@ -881,14 +1174,9 @@ Current Java solver result:
 hello -8.30699282e-05 0.999911129 -5.57434032e-06
 ```
 
-## Remaining Work
+## Known Gaps
 
-The current evidence and known gaps are maintained in `FEATURE_PARITY.md`.
-The concrete closure order is:
-
-1. Enforce upstream world locking during callbacks/reentrant stepping and fix
-   zero-time-step event semantics.
-2. Populate detailed profile timings and stack/tree/task counter telemetry.
-3. Add upstream joint-extra and island-AABB debug drawing.
-4. Expand exact long-horizon and CCD parity probes, especially moving
-   kinematic targets and custom pre-solve behavior around TOI.
+No Box2D v3.1.1 implementation gap is currently known. The evidence boundary
+and deliberate Java/runtime adaptations are maintained in `FEATURE_PARITY.md`;
+additional generated cases and longer horizons remain useful regression work,
+not missing port functionality.

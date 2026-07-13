@@ -29,6 +29,7 @@ static void print_body(b2BodyId bodyId)
 int main(int argc, char** argv)
 {
     int stepCount = argc > 1 ? atoi(argv[1]) : DEFAULT_STEP_COUNT;
+    bool deterministicTarget = argc > 2 && atoi(argv[2]) != 0;
     b2WorldDef worldDef = b2DefaultWorldDef();
     b2WorldId worldId = b2CreateWorld(&worldDef);
 
@@ -69,8 +70,16 @@ int main(int argc, char** argv)
     for (int step = 0; step < stepCount; ++step)
     {
         time += 1.0f / 60.0f;
-        linearOffset.x = 6.0f * sinf(2.0f * time);
-        linearOffset.y = 8.0f + 4.0f * sinf(time);
+        if (deterministicTarget)
+        {
+            linearOffset.x = 6.0f * b2ComputeCosSin(2.0f * time).sine;
+            linearOffset.y = 8.0f + 4.0f * b2ComputeCosSin(time).sine;
+        }
+        else
+        {
+            linearOffset.x = 6.0f * sinf(2.0f * time);
+            linearOffset.y = 8.0f + 4.0f * sinf(time);
+        }
         angularOffset = 2.0f * time;
         b2MotorJoint_SetLinearOffset(jointId, linearOffset);
         b2MotorJoint_SetAngularOffset(jointId, angularOffset);

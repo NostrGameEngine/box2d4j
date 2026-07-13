@@ -301,6 +301,14 @@ public final class Ragdoll {
             }
         }
 
+        void enableSensorEvents(boolean enable) {
+            b2ShapeId[] shapeIds = new b2ShapeId[1];
+            int shapeCount = b2Body_GetShapes(bodies[1], shapeIds, shapeIds.length);
+            if (shapeCount == 1) {
+                b2Shape_EnableSensorEvents(shapeIds[0], enable);
+            }
+        }
+
         void destroy() {
             for (b2BodyId body : bodies) {
                 if (b2Body_IsValid(body)) {

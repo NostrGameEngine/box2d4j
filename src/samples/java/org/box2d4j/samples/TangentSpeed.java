@@ -28,6 +28,10 @@ public final class TangentSpeed {
     }
 
     public static Result run() {
+        return run(STEP_COUNT);
+    }
+
+    public static Result run(int stepCount) {
         b2WorldId worldId = b2CreateWorld(b2DefaultWorldDef());
         b2Vec2[] points = b2Vec2.array(20);
         int pointCount;
@@ -92,7 +96,7 @@ public final class TangentSpeed {
             reset.run();
         });
         SampleRuntime.beforeStep(() -> dropScheduledBall(worldId, bodies, material, runtimeStep[0]++));
-        for (int step = 0; step < STEP_COUNT; ++step) {
+        for (int step = 0; step < stepCount; ++step) {
             if (!interactive) {
                 dropScheduledBall(worldId, bodies, material, step);
             }
@@ -235,7 +239,8 @@ public final class TangentSpeed {
     }
 
     public static void main(String[] args) {
-        System.out.println(run().toLine());
+        int stepCount = args.length == 0 ? STEP_COUNT : Integer.parseInt(args[0]);
+        System.out.println(run(stepCount).toLine());
     }
 
     public static final class Result {

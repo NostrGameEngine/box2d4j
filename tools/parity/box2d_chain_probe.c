@@ -49,6 +49,11 @@ int main(void)
 
     printf("chain %d %d %d %d %d\n", chainId.index1, chainId.world0, chainId.generation, b2Chain_IsValid(chainId),
            b2Chain_GetSegmentCount(chainId));
+    b2WorldId chainWorld = b2Chain_GetWorld(chainId);
+    if (chainWorld.index1 != worldId.index1 || chainWorld.generation != worldId.generation)
+    {
+        return 2;
+    }
     b2ShapeId segments[4] = { 0 };
     int segmentCount = b2Chain_GetSegments(chainId, segments, 4);
     printf("segments %d %d %d\n", segmentCount, segments[0].index1, segments[1].index1);

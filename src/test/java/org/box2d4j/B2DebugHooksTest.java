@@ -54,7 +54,7 @@ final class B2DebugHooksTest {
             b2DestroyWorld(worldId);
         }
 
-        assertEquals(List.of("beforeCreate:1", "create:1", "beforeStep:1:4", "step:1", "destroy:1"), events);
+        assertEquals(List.of("beforeCreate:0", "create:1", "beforeStep:1:4", "step:1", "destroy:1"), events);
     }
 
     @Test

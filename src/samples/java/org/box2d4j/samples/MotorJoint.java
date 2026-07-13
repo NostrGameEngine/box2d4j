@@ -27,6 +27,14 @@ public final class MotorJoint {
     }
 
     public static Result run(int stepCount) {
+        return run(stepCount, false);
+    }
+
+    public static Result runDeterministic(int stepCount) {
+        return run(stepCount, true);
+    }
+
+    private static Result run(int stepCount, boolean deterministicTarget) {
         b2WorldId worldId = b2CreateWorld(b2DefaultWorldDef());
 
         b2BodyId groundId;
@@ -74,13 +82,13 @@ public final class MotorJoint {
             value -> b2MotorJoint_SetCorrectionFactor(jointId, value));
         SampleRuntime.action("motorJoint.impulse", "Apply Impulse",
             () -> b2Body_ApplyLinearImpulseToCenter(bodyId, new b2Vec2(100.0f, 0.0f), true));
-        SampleRuntime.beforeStep(() -> updateTarget(state, jointId));
+        SampleRuntime.beforeStep(() -> updateTarget(state, jointId, deterministicTarget));
 
         b2Vec2 linearOffset = new b2Vec2();
         float angularOffset = 0.0f;
         for (int step = 0; step < stepCount; ++step) {
             if (!interactive) {
-                updateTarget(state, jointId);
+                updateTarget(state, jointId, deterministicTarget);
             }
             b2World_Step(worldId, 1.0f / 60.0f, 4);
         }
@@ -96,12 +104,20 @@ public final class MotorJoint {
         return result;
     }
 
-    private static void updateTarget(RuntimeState state, b2JointId jointId) {
+    private static void updateTarget(RuntimeState state, b2JointId jointId, boolean deterministicTarget) {
         if (state.go) {
             state.time += 1.0f / 60.0f;
         }
-        state.linearOffset = new b2Vec2(6.0f * (float) Math.sin(2.0f * state.time),
-            8.0f + 4.0f * (float) Math.sin(state.time));
+        float sin2;
+        float sin1;
+        if (deterministicTarget) {
+            sin2 = b2ComputeCosSin(2.0f * state.time).sine;
+            sin1 = b2ComputeCosSin(state.time).sine;
+        } else {
+            sin2 = (float) Math.sin(2.0f * state.time);
+            sin1 = (float) Math.sin(state.time);
+        }
+        state.linearOffset = new b2Vec2(6.0f * sin2, 8.0f + 4.0f * sin1);
         state.angularOffset = 2.0f * state.time;
         b2MotorJoint_SetLinearOffset(jointId, state.linearOffset);
         b2MotorJoint_SetAngularOffset(jointId, state.angularOffset);
