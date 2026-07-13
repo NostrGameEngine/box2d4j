@@ -181,6 +181,7 @@ tasks.register('runDebugger', JavaExec) {
     description = 'Runs the interactive jMonkeyEngine Box2D sample debugger.'
     classpath = sourceSets.debugger.runtimeClasspath
     mainClass = 'org.box2d4j.debugger.Box2D4JDebugger'
+    environment '__GL_THREADED_OPTIMIZATIONS', '0'
     javaLauncher = javaToolchains.launcherFor {
         languageVersion = JavaLanguageVersion.of(11)
     }
