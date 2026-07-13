@@ -37,6 +37,7 @@ sourceSets {
 
 dependencies {
     testImplementation sourceSets.samples.output
+    testImplementation sourceSets.debugger.output
     testImplementation platform('org.junit:junit-bom:5.13.2')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -71,6 +72,7 @@ tasks.register('unitTest', Test) {
     useJUnitPlatform()
     filter {
         includeTestsMatching('org.box2d4j.*')
+        includeTestsMatching('org.box2d4j.debugger.*')
         parityTestClassPatterns.each { classPattern ->
             excludeTestsMatching(classPattern)
         }

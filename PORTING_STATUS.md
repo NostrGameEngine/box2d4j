@@ -16,7 +16,7 @@ Audit date: 2026-07-12.
   marked private upstream. All 168 values in the five public enums use exact
   matching `int` constants.
 - The current test partition contains 173 suites and 205 tests with no overlap:
-  `unitTest` has 19 suites/37 tests and `parityTest` has 154 suites/168 tests.
+  `unitTest` has 20 suites/38 tests and `parityTest` has 154 suites/168 tests.
   Both tasks pass with zero failures, errors, or skips.
 - Native parity uses 153 C probe sources and one C++ multithreading probe. The
   C17 commands define `_POSIX_C_SOURCE=200809L` and link `libm`, so the same
@@ -551,15 +551,15 @@ Audit date: 2026-07-12.
 
 ## Verification
 
-- `./gradlew unitTest --rerun-tasks` currently runs 37 tests in 19 suites; all
+- `./gradlew unitTest --rerun-tasks` currently runs 38 tests in 20 suites; all
   pass with zero skips, failures, or errors.
 - `./gradlew parityTest --rerun-tasks` currently runs 168 tests in 154 suites;
   all pass with zero skips, failures, or errors. On the current worktree it
   completed in 8m26s; the separate `unitTest assemble --rerun-tasks` gate
-  completed in 7s on the audit machine.
+  completed in 11s on the audit machine.
   The preceding 125-suite partition passed on the Ubuntu GitHub Actions runner
   in 15m14s after the native commands were made C17/glibc portable.
-- The task filters cover all 173 test classes exactly once: unit tests exclude
+- The task filters cover all 174 test classes exactly once: unit tests exclude
   parity/sample/multithreading classes, while parity tests include those three
   groups.
 - `./gradlew runDebugger` has been visually verified on macOS through the
@@ -571,6 +571,10 @@ Audit date: 2026-07-12.
   3,715 while a held `D` advanced Speed from `0.0` to `0.3` and rotated the
   lift gears. A four-worker HelloWorld session was also rendered through the
   debugger-owned executor bridge and displayed `Workers 4` in the status bar.
+- `MouseDragControllerTest` exercises the debugger's default dynamic-body
+  pick, mouse-joint target update, and release cleanup. The temporary ground
+  body now uses `b2DefaultBodyDef()` so its definition cookie is valid and a
+  failed drag cannot terminate the sample session or clear the debug draw.
 - The headless suite contains 111 entry points: all 110 active upstream
   `RegisterSample` creators plus the standalone HelloWorld tutorial. The
   disabled experimental `Mover2` block under `#if 0` is excluded from this

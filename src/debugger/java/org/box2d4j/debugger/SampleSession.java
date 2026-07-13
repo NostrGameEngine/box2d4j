@@ -1,12 +1,6 @@
 package org.box2d4j.debugger;
 
 import org.box2d4j.B2DebugHooks;
-import org.box2d4j.b2AABB;
-import org.box2d4j.b2BodyDef;
-import org.box2d4j.b2BodyId;
-import org.box2d4j.b2JointId;
-import org.box2d4j.b2MouseJointDef;
-import org.box2d4j.b2Vec2;
 import org.box2d4j.b2WorldId;
 import org.box2d4j.samples.SampleCatalog;
 import org.box2d4j.samples.SampleRuntime;
@@ -53,8 +47,7 @@ final class SampleSession implements AutoCloseable {
     private volatile int simulationSubStepCount = 4;
     private float accumulator;
     private float targetHz = 60.0f;
-    private b2JointId mouseJointId = b2_nullJointId;
-    private b2BodyId mouseGroundId = b2_nullBodyId;
+    private final MouseDragController mouseDragController = new MouseDragController();
     private volatile SampleRuntime.CameraPosition cameraPosition;
     private volatile Supplier<?> snapshotSupplier;
     private volatile Boolean drawBounds;
@@ -472,45 +465,7 @@ final class SampleSession implements AutoCloseable {
     }
 
     private void handleDefaultPointer(b2WorldId steppedWorldId, PointerEvent event) {
-        if (event.type == PointerEvent.DOWN && event.button == 0 && B2_IS_NULL(mouseJointId)) {
-            b2Vec2 point = new b2Vec2(event.worldX, event.worldY);
-            b2Vec2 extent = new b2Vec2(0.001f, 0.001f);
-            b2AABB aabb = new b2AABB(b2Sub(point, extent), b2Add(point, extent));
-            b2BodyId[] pickedBody = {b2_nullBodyId};
-            b2World_OverlapAABB(steppedWorldId, aabb, b2DefaultQueryFilter(), shapeId -> {
-                b2BodyId bodyId = b2Shape_GetBody(shapeId);
-                if (b2Body_GetType(bodyId) != b2_dynamicBody || !b2Shape_TestPoint(shapeId, point)) {
-                    return true;
-                }
-                pickedBody[0] = bodyId;
-                return false;
-            });
-            if (!B2_IS_NULL(pickedBody[0])) {
-                mouseGroundId = b2CreateBody(steppedWorldId, new b2BodyDef());
-                b2MouseJointDef jointDef = b2DefaultMouseJointDef();
-                jointDef.bodyIdA = mouseGroundId;
-                jointDef.bodyIdB = pickedBody[0];
-                jointDef.target = point;
-                jointDef.hertz = 10.0f;
-                jointDef.dampingRatio = 0.7f;
-                jointDef.maxForce = 1000.0f * b2Body_GetMass(pickedBody[0])
-                    * b2Length(b2World_GetGravity(steppedWorldId));
-                mouseJointId = b2CreateMouseJoint(steppedWorldId, jointDef);
-                b2Body_SetAwake(pickedBody[0], true);
-            }
-        } else if (event.type == PointerEvent.MOVE && b2Joint_IsValid(mouseJointId)) {
-            b2MouseJoint_SetTarget(mouseJointId, new b2Vec2(event.worldX, event.worldY));
-            b2Body_SetAwake(b2Joint_GetBodyB(mouseJointId), true);
-        } else if (event.type == PointerEvent.UP && event.button == 0) {
-            if (b2Joint_IsValid(mouseJointId)) {
-                b2DestroyJoint(mouseJointId);
-            }
-            if (b2Body_IsValid(mouseGroundId)) {
-                b2DestroyBody(mouseGroundId);
-            }
-            mouseJointId = b2_nullJointId;
-            mouseGroundId = b2_nullBodyId;
-        }
+        mouseDragController.handle(steppedWorldId, event.type, event.worldX, event.worldY, event.button);
     }
 
     private void publishAndAwait(b2WorldId nextWorldId, boolean finalFrame, boolean abortWhenCancelled) {
