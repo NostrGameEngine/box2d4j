@@ -1,6 +1,40 @@
 # box2d4j
 
-Java 11 port of Box2D `v3.1.1`.
+> [!WARNING]
+> **box2d4j is an experimental, AI-assisted port with limited human review.**
+> Treat it as pre-production software and validate it against your own
+> workloads before relying on it in an engine or application.
+
+box2d4j is a pure Java 11 port of [Box2D `v3.1.1`](https://github.com/erincatto/box2d/tree/v3.1.1).
+The core has no JNI dependency and aims to preserve the upstream C API,
+behavior, data layout concepts, and simulation results as closely as Java
+reasonably allows. It is an independent port and is not an official Box2D
+project.
+
+## Project Status
+
+- [Porting status](PORTING_STATUS.md) inventories the implemented API, samples,
+  verification coverage, adaptations, and known gaps.
+- [Feature parity audit](FEATURE_PARITY.md) summarizes public-surface coverage
+  and the evidence behind each parity claim.
+
+Parity is backed by Java unit tests and native C/C++ comparison probes at the
+documented test horizons. It is not a proof that every possible callback
+sequence, workload, platform, or floating-point environment behaves
+identically.
+
+## AI Provenance
+
+Most of this port was produced with AI assistance and received only limited
+human review. The initial porting effort was developed with GPT-5.5 and
+GPT-5.6-Sol; subsequent porting, parity work, debugger development, and fixes
+were developed with GPT-5.6-Sol. Human involvement primarily consisted of
+requirements, review, testing, and project direction.
+
+Git commits retain the human operator as the accountable Git author and use
+`AI-Assisted-by` trailers to record the model involved. This avoids inventing
+GitHub accounts or email identities for models while keeping provenance
+machine-readable in the commit history.
 
 The source in `vendor/box2d` is the upstream reference checkout used while
 porting and for parity tests. Java code intentionally keeps C-style `b2...`
