@@ -17,6 +17,8 @@ project.
   verification coverage, adaptations, and known gaps.
 - [Feature parity audit](FEATURE_PARITY.md) summarizes public-surface coverage
   and the evidence behind each parity claim.
+- [Upstream porting guide](UPSTREAM_PORTING_GUIDE.md) records deliberate Java
+  divergences and the workflow for updating the port to a newer Box2D release.
 
 Parity is backed by Java unit tests and native C/C++ comparison probes at the
 documented test horizons. It is not a proof that every possible callback
