@@ -1,6 +1,7 @@
 package org.box2d4j.debugger;
 
 import org.box2d4j.B2DebugHooks;
+import org.box2d4j.b2Counters;
 import org.box2d4j.b2WorldId;
 import org.box2d4j.samples.SampleCatalog;
 import org.box2d4j.samples.SampleRuntime;
@@ -19,7 +20,8 @@ import static org.box2d4j.B2.*;
 
 final class SampleSession implements AutoCloseable {
     private final SampleCatalog.Entry entry;
-    private final SimulationFrameGate frameGate = new SimulationFrameGate();
+    private final SimulationClock clock = new SimulationClock();
+    private final LatestFrameExchange frameExchange = new LatestFrameExchange();
     private final AtomicReference<b2WorldId> worldId = new AtomicReference<>();
     private final AtomicReference<Object> result = new AtomicReference<>();
     private final AtomicReference<b2WorldId> retainedWorld = new AtomicReference<>();
@@ -36,19 +38,18 @@ final class SampleSession implements AutoCloseable {
     private final Thread thread;
     private final int workerCount;
 
-    private volatile boolean playing = true;
     private volatile boolean cancelled;
     private volatile boolean finished;
     private volatile boolean finalFrame;
     private volatile Throwable error;
     private volatile float simulationTimeStep = 1.0f / 60.0f;
     private volatile int simulationSubStepCount = 4;
-    private float accumulator;
-    private float targetHz = 60.0f;
     private final MouseDragController mouseDragController = new MouseDragController();
     private volatile SampleRuntime.CameraPosition cameraPosition;
     private volatile Supplier<?> snapshotSupplier;
     private volatile Boolean drawBounds;
+    private final AtomicReference<CaptureSettings> captureSettings = new AtomicReference<>(
+        new CaptureSettings(new WorldDrawBatch.DrawOptions(), 0.1f));
 
     SampleSession(SampleCatalog.Entry entry, int workerCount) {
         this.entry = entry;
@@ -80,7 +81,7 @@ final class SampleSession implements AutoCloseable {
     }
 
     boolean isPlaying() {
-        return playing;
+        return clock.isPlaying();
     }
 
     boolean isFinished() {
@@ -113,8 +114,8 @@ final class SampleSession implements AutoCloseable {
 
     long bindingsVersion() {
         long value = bindingsVersion.get();
-        for (SampleRuntime.Binding binding : bindings) {
-            value += binding.revision();
+        for (int i = 0, count = bindings.size(); i < count; ++i) {
+            value += bindings.get(i).revision();
         }
         return value;
     }
@@ -198,41 +199,42 @@ final class SampleSession implements AutoCloseable {
     }
 
     float targetHz() {
-        return targetHz;
+        return clock.targetHz();
     }
 
     void setTargetHz(float targetHz) {
-        this.targetHz = Math.max(1.0f, Math.min(240.0f, targetHz));
+        clock.setTargetHz(targetHz);
     }
 
     void togglePlaying() {
-        playing = !playing;
-        accumulator = 0.0f;
+        clock.togglePlaying();
     }
 
     void setPlaying(boolean playing) {
-        this.playing = playing;
-        accumulator = 0.0f;
-    }
-
-    void advance(float timePerFrame) {
-        if (!playing || finished || !frameGate.isAwaiting()) {
-            return;
-        }
-        accumulator += timePerFrame;
-        float period = 1.0f / targetHz;
-        if (accumulator >= period) {
-            accumulator %= period;
-            frameGate.grant();
-        }
+        clock.setPlaying(playing);
     }
 
     void stepOnce() {
-        playing = false;
-        accumulator = 0.0f;
         if (!finished) {
-            frameGate.grant();
+            clock.stepOnce();
         }
+    }
+
+    void setCaptureSettings(WorldDrawBatch.DrawOptions options, float pointSize) {
+        CaptureSettings current = captureSettings.get();
+        if (current.options.sameAs(options) && Float.compare(current.pointSize, pointSize) == 0) {
+            return;
+        }
+        captureSettings.set(new CaptureSettings(options, pointSize));
+        clock.requestRefresh();
+    }
+
+    DebugFrame pollLatestFrame() {
+        return frameExchange.pollLatest();
+    }
+
+    void releaseFrame(DebugFrame frame) {
+        frameExchange.release(frame);
     }
 
     private void runSample() {
@@ -294,6 +296,7 @@ final class SampleSession implements AutoCloseable {
 
             @Override
             public void beforeWorldStep(b2WorldId steppedWorldId, float timeStep, int subStepCount) {
+                awaitStepPermission(steppedWorldId);
                 simulationTimeStep = timeStep;
                 simulationSubStepCount = subStepCount;
                 drainPointerEvents(steppedWorldId);
@@ -318,7 +321,7 @@ final class SampleSession implements AutoCloseable {
                     }
                 }
                 stepCount.incrementAndGet();
-                publishAndAwait(steppedWorldId, false, true);
+                publishFrame(steppedWorldId);
             }
 
             @Override
@@ -385,7 +388,14 @@ final class SampleSession implements AutoCloseable {
         }
         while (!cancelled) {
             try {
-                frameGate.publishAndAwait(version::incrementAndGet);
+                int action = clock.awaitAction();
+                if (action == SimulationClock.CANCELLED) {
+                    return;
+                }
+                if (action == SimulationClock.REFRESH) {
+                    version.incrementAndGet();
+                    continue;
+                }
             } catch (InterruptedException exception) {
                 Thread.currentThread().interrupt();
                 cancelled = true;
@@ -458,22 +468,46 @@ final class SampleSession implements AutoCloseable {
         mouseDragController.handle(steppedWorldId, event.type, event.worldX, event.worldY, event.button);
     }
 
-    private void publishAndAwait(b2WorldId nextWorldId, boolean finalFrame, boolean abortWhenCancelled) {
-        if (cancelled && !abortWhenCancelled) {
-            return;
-        }
+    private void awaitStepPermission(b2WorldId steppedWorldId) {
         try {
-            frameGate.publishAndAwait(() -> {
-                this.finalFrame = finalFrame;
-                worldId.set(new b2WorldId(nextWorldId.index1, nextWorldId.generation));
-                version.incrementAndGet();
-            });
+            int action;
+            while ((action = clock.awaitAction()) == SimulationClock.REFRESH) {
+                publishFrame(steppedWorldId);
+            }
+            if (action == SimulationClock.CANCELLED) {
+                throw new SessionCancelled();
+            }
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
             cancelled = true;
-        }
-        if (cancelled && abortWhenCancelled) {
             throw new SessionCancelled();
+        }
+    }
+
+    private void publishFrame(b2WorldId nextWorldId) {
+        if (cancelled || !b2World_IsValid(nextWorldId)) {
+            return;
+        }
+        DebugFrame frame = frameExchange.acquireWritable();
+        if (frame == null) {
+            return;
+        }
+        try {
+            CaptureSettings settings = captureSettings.get();
+            frame.batch.captureInto(nextWorldId, settings.options, settings.pointSize);
+            b2Counters counters = b2World_GetCounters(nextWorldId);
+            frame.stepCount = stepCount.get();
+            frame.bodyCount = counters.bodyCount;
+            frame.shapeCount = counters.shapeCount;
+            frame.contactCount = counters.contactCount;
+            frame.jointCount = counters.jointCount;
+            frame.awakeBodyCount = b2World_GetAwakeBodyCount(nextWorldId);
+            frame.version = version.incrementAndGet();
+            worldId.set(copy(nextWorldId));
+            frameExchange.publish(frame);
+        } catch (RuntimeException | Error exception) {
+            frameExchange.release(frame);
+            throw exception;
         }
     }
 
@@ -484,7 +518,7 @@ final class SampleSession implements AutoCloseable {
     @Override
     public void close() {
         cancelled = true;
-        frameGate.cancel();
+        clock.cancel();
         thread.interrupt();
         try {
             thread.join(2000L);
@@ -495,6 +529,16 @@ final class SampleSession implements AutoCloseable {
 
     private static final class SessionCancelled extends RuntimeException {
         private static final long serialVersionUID = 1L;
+    }
+
+    private static final class CaptureSettings {
+        final WorldDrawBatch.DrawOptions options;
+        final float pointSize;
+
+        CaptureSettings(WorldDrawBatch.DrawOptions options, float pointSize) {
+            this.options = new WorldDrawBatch.DrawOptions(options);
+            this.pointSize = pointSize;
+        }
     }
 
     private static final class PointerEvent {

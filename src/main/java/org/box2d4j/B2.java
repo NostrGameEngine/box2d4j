@@ -202,6 +202,13 @@ public final class B2 {
     public static final b2JointId b2_nullJointId = new b2JointId();
     public static final b2SimplexCache b2_emptySimplexCache = new b2SimplexCache();
 
+    private static final b2BodyMoveEvent[] EMPTY_BODY_MOVE_EVENTS = new b2BodyMoveEvent[0];
+    private static final b2SensorBeginTouchEvent[] EMPTY_SENSOR_BEGIN_EVENTS = new b2SensorBeginTouchEvent[0];
+    private static final b2SensorEndTouchEvent[] EMPTY_SENSOR_END_EVENTS = new b2SensorEndTouchEvent[0];
+    private static final b2ContactBeginTouchEvent[] EMPTY_CONTACT_BEGIN_EVENTS = new b2ContactBeginTouchEvent[0];
+    private static final b2ContactEndTouchEvent[] EMPTY_CONTACT_END_EVENTS = new b2ContactEndTouchEvent[0];
+    private static final b2ContactHitEvent[] EMPTY_CONTACT_HIT_EVENTS = new b2ContactHitEvent[0];
+
     private static final AtomicInteger BYTE_COUNT = new AtomicInteger();
     private static final WorldSlot[] WORLDS = new WorldSlot[B2_MAX_WORLDS];
     private static final int[] WORLD_GENERATIONS = new int[B2_MAX_WORLDS];
@@ -238,6 +245,11 @@ public final class B2 {
         final java.util.ArrayList<ContactSlot>[] contactGraphColors = b2CreateContactGraphColors();
         final java.util.ArrayList<JointSlot>[] jointGraphColors = b2CreateJointGraphColors();
         final java.util.HashSet<Integer>[] graphBodySets = b2CreateGraphBodySets();
+        final java.util.ArrayList<SolverBodyState> solverStates = new java.util.ArrayList<>();
+        final java.util.ArrayList<ContactConstraint> solverContactConstraints = new java.util.ArrayList<>();
+        final ConstraintColor[] solverConstraintColors = b2CreateConstraintColors();
+        final Softness solverContactSoftness = new Softness();
+        final Softness solverStaticSoftness = new Softness();
         int nextContactIndex;
         int contactCount;
         boolean sleepEnabled;
@@ -252,9 +264,17 @@ public final class B2 {
         boolean locked;
         b2SensorEvents sensorEvents = new b2SensorEvents();
         final java.util.ArrayList<b2SensorEndTouchEvent> pendingSensorEndEvents = new java.util.ArrayList<>();
+        final java.util.ArrayList<b2SensorBeginTouchEvent> sensorBeginEventsScratch = new java.util.ArrayList<>();
+        final java.util.ArrayList<b2SensorEndTouchEvent> sensorEndEventsScratch = new java.util.ArrayList<>();
         b2ContactEvents contactEvents = new b2ContactEvents();
         final java.util.ArrayList<b2ContactEndTouchEvent> pendingContactEndEvents = new java.util.ArrayList<>();
         b2BodyEvents bodyEvents = new b2BodyEvents();
+        final java.util.ArrayList<b2BodyMoveEvent> bodyMoveEventsScratch = new java.util.ArrayList<>();
+        final java.util.ArrayList<b2ContactBeginTouchEvent> contactBeginEventsScratch = new java.util.ArrayList<>();
+        final java.util.ArrayList<b2ContactEndTouchEvent> contactEndEventsScratch = new java.util.ArrayList<>();
+        final java.util.ArrayList<b2ContactHitEvent> contactHitEventsScratch = new java.util.ArrayList<>();
+        final java.util.ArrayList<ContactSlot> contactStepOrder = new java.util.ArrayList<>();
+        byte[] contactStepState = new byte[0];
         final java.util.HashMap<Integer, SensorOverlapState> sensorOverlaps = new java.util.HashMap<>();
         b2CustomFilterFcn customFilterFcn;
         Object customFilterContext;
@@ -324,6 +344,8 @@ public final class B2 {
         float sleepThreshold;
         float sleepTime;
         int sleepIslandId = B2_NULL_INDEX;
+        int solverIndex = B2_NULL_INDEX;
+        final SolverBodyState solverState = new SolverBodyState();
         String name = "";
         Object userData;
         float mass;
@@ -483,6 +505,8 @@ public final class B2 {
         boolean wheelEnableSpring;
         boolean wheelEnableMotor;
         boolean wheelEnableLimit;
+        Object solverConstraint;
+        Object preparedConstraint;
     }
 
     private static final class ContactSlot {
@@ -502,6 +526,8 @@ public final class B2 {
         int colorIndex = B2_NULL_INDEX;
         int localIndex = B2_NULL_INDEX;
         int nonTouchingIndex = B2_NULL_INDEX;
+        final ContactConstraint solverConstraint = new ContactConstraint();
+        ContactConstraint preparedConstraint;
     }
 
     private static final class SolverBodyState {
@@ -509,7 +535,7 @@ public final class B2 {
         b2Vec2 linearVelocity = new b2Vec2();
         float angularVelocity;
         b2Vec2 deltaPosition = new b2Vec2();
-        b2Rot deltaRotation = b2Rot_identity.copy();
+        b2Rot deltaRotation = new b2Rot(1.0f, 0.0f);
     }
 
     private static final class BulletSweep {
@@ -548,7 +574,7 @@ public final class B2 {
         float rollingResistance;
         float rollingMass;
         float rollingImpulse;
-        Softness softness;
+        final Softness softness = new Softness();
         int pointCount;
     }
 
@@ -579,8 +605,8 @@ public final class B2 {
         b2Vec2 anchorA = new b2Vec2();
         b2Vec2 anchorB = new b2Vec2();
         b2Vec2 deltaCenter = new b2Vec2();
-        Softness distanceSoftness;
-        Softness constraintSoftness;
+        final Softness distanceSoftness = new Softness();
+        final Softness constraintSoftness = new Softness();
         float axialMass;
     }
 
@@ -608,8 +634,8 @@ public final class B2 {
         b2Vec2 anchorB = new b2Vec2();
         b2Vec2 deltaCenter = new b2Vec2();
         b2Mat22 linearMass = new b2Mat22();
-        Softness linearSoftness;
-        Softness angularSoftness;
+        final Softness linearSoftness = new Softness();
+        final Softness angularSoftness = new Softness();
     }
 
     private static final class WeldConstraint {
@@ -625,8 +651,8 @@ public final class B2 {
         b2Vec2 deltaCenter = new b2Vec2();
         float deltaAngle;
         float axialMass;
-        Softness linearSoftness;
-        Softness angularSoftness;
+        final Softness linearSoftness = new Softness();
+        final Softness angularSoftness = new Softness();
     }
 
     private static final class RevoluteConstraint {
@@ -642,8 +668,8 @@ public final class B2 {
         b2Vec2 deltaCenter = new b2Vec2();
         float deltaAngle;
         float axialMass;
-        Softness springSoftness;
-        Softness constraintSoftness;
+        final Softness springSoftness = new Softness();
+        final Softness constraintSoftness = new Softness();
     }
 
     private static final class PrismaticConstraint {
@@ -660,8 +686,8 @@ public final class B2 {
         b2Vec2 deltaCenter = new b2Vec2();
         float deltaAngle;
         float axialMass;
-        Softness springSoftness;
-        Softness constraintSoftness;
+        final Softness springSoftness = new Softness();
+        final Softness constraintSoftness = new Softness();
     }
 
     private static final class WheelConstraint {
@@ -679,14 +705,202 @@ public final class B2 {
         float perpMass;
         float axialMass;
         float motorMass;
-        Softness springSoftness;
-        Softness constraintSoftness;
+        final Softness springSoftness = new Softness();
+        final Softness constraintSoftness = new Softness();
     }
 
     private static final class Softness {
         float biasRate;
         float massScale;
         float impulseScale;
+    }
+
+    private static final ThreadLocal<SolverScratch> SOLVER_SCRATCH =
+        ThreadLocal.withInitial(SolverScratch::new);
+    private static final ThreadLocal<TreeQueryScratch> TREE_QUERY_SCRATCH =
+        ThreadLocal.withInitial(TreeQueryScratch::new);
+    private static final ThreadLocal<PolygonCollisionScratch> POLYGON_COLLISION_SCRATCH =
+        ThreadLocal.withInitial(PolygonCollisionScratch::new);
+    private static final ThreadLocal<b2RebuildItem[]> REBUILD_STACK =
+        ThreadLocal.withInitial(B2::b2CreateRebuildStack);
+    private static final b2TaskCallback REBUILD_TREES_TASK =
+        (startIndex, endIndex, workerIndex, taskContext) ->
+            b2BroadPhase_RebuildTrees(((WorldSlot) taskContext).broadPhase);
+
+    private static final class PolygonCollisionScratch {
+        private Entry[] entries = {new Entry(), new Entry()};
+        private int depth;
+
+        Entry acquire() {
+            if (depth == entries.length) {
+                Entry[] next = new Entry[entries.length * 2];
+                System.arraycopy(entries, 0, next, 0, entries.length);
+                for (int i = entries.length; i < next.length; ++i) {
+                    next[i] = new Entry();
+                }
+                entries = next;
+            }
+            return entries[depth++];
+        }
+
+        void release() {
+            depth -= 1;
+        }
+
+        private static final class Entry {
+            final b2Polygon polygonA = new b2Polygon();
+            final b2Polygon polygonB = new b2Polygon();
+            final int[] edgeA = new int[1];
+            final int[] edgeB = new int[1];
+        }
+    }
+
+    private static b2RebuildItem[] b2CreateRebuildStack() {
+        b2RebuildItem[] stack = new b2RebuildItem[B2_TREE_STACK_SIZE];
+        for (int i = 0; i < stack.length; ++i) {
+            stack[i] = new b2RebuildItem();
+        }
+        return stack;
+    }
+
+    private static final class TreeQueryScratch {
+        private Entry[] entries = {new Entry(), new Entry()};
+        private int depth;
+
+        Entry acquire() {
+            if (depth == entries.length) {
+                Entry[] next = new Entry[entries.length * 2];
+                System.arraycopy(entries, 0, next, 0, entries.length);
+                for (int i = entries.length; i < next.length; ++i) {
+                    next[i] = new Entry();
+                }
+                entries = next;
+            }
+            return entries[depth++];
+        }
+
+        void release() {
+            depth -= 1;
+        }
+
+        private static final class Entry {
+            final int[] stack = new int[B2_TREE_STACK_SIZE];
+            final b2RayCastInput rayInput = new b2RayCastInput();
+            final b2ShapeCastInput shapeInput = new b2ShapeCastInput();
+            final b2AABB boundsA = new b2AABB();
+            final b2AABB boundsB = new b2AABB();
+        }
+    }
+
+    private static final class SolverScratch {
+        private b2Vec2[] vectors = b2Vec2.array(64);
+        private b2Rot[] rotations = createRotations(8);
+        private b2Mat22[] matrices = createMatrices(4);
+        private int vectorIndex;
+        private int rotationIndex;
+        private int matrixIndex;
+
+        int mark() {
+            return vectorIndex | rotationIndex << 12 | matrixIndex << 20;
+        }
+
+        void release(int mark) {
+            vectorIndex = mark & 0xFFF;
+            rotationIndex = mark >>> 12 & 0xFF;
+            matrixIndex = mark >>> 20;
+        }
+
+        b2Vec2 vec() {
+            if (vectorIndex == vectors.length) {
+                b2Vec2[] next = b2Vec2.array(vectors.length * 2);
+                System.arraycopy(vectors, 0, next, 0, vectors.length);
+                vectors = next;
+            }
+            return vectors[vectorIndex++];
+        }
+
+        b2Mat22 matrix() {
+            if (matrixIndex == matrices.length) {
+                b2Mat22[] next = createMatrices(matrices.length * 2);
+                System.arraycopy(matrices, 0, next, 0, matrices.length);
+                matrices = next;
+            }
+            return matrices[matrixIndex++];
+        }
+
+        b2Rot rotation() {
+            if (rotationIndex == rotations.length) {
+                b2Rot[] next = createRotations(rotations.length * 2);
+                System.arraycopy(rotations, 0, next, 0, rotations.length);
+                rotations = next;
+            }
+            return rotations[rotationIndex++];
+        }
+
+        b2Vec2 zero() {
+            return vec().set(0.0f, 0.0f);
+        }
+
+        b2Vec2 add(b2Vec2 a, b2Vec2 b) {
+            return vec().set(a.x + b.x, a.y + b.y);
+        }
+
+        b2Vec2 sub(b2Vec2 a, b2Vec2 b) {
+            return vec().set(a.x - b.x, a.y - b.y);
+        }
+
+        b2Vec2 mul(float scale, b2Vec2 value) {
+            return vec().set(scale * value.x, scale * value.y);
+        }
+
+        b2Vec2 mulAdd(b2Vec2 a, float scale, b2Vec2 b) {
+            return vec().set(a.x + scale * b.x, a.y + scale * b.y);
+        }
+
+        b2Vec2 mulSub(b2Vec2 a, float scale, b2Vec2 b) {
+            return vec().set(a.x - scale * b.x, a.y - scale * b.y);
+        }
+
+        b2Vec2 cross(float scale, b2Vec2 value) {
+            return vec().set(-scale * value.y, scale * value.x);
+        }
+
+        b2Vec2 rightPerp(b2Vec2 value) {
+            return vec().set(value.y, -value.x);
+        }
+
+        b2Vec2 rotate(b2Rot rotation, b2Vec2 value) {
+            return vec().set(rotation.c * value.x - rotation.s * value.y,
+                rotation.s * value.x + rotation.c * value.y);
+        }
+
+        b2Vec2 solve22(b2Mat22 matrix, b2Vec2 b) {
+            float a11 = matrix.cx.x;
+            float a12 = matrix.cy.x;
+            float a21 = matrix.cx.y;
+            float a22 = matrix.cy.y;
+            float det = a11 * a22 - a12 * a21;
+            if (det != 0.0f) {
+                det = 1.0f / det;
+            }
+            return vec().set(det * (a22 * b.x - a12 * b.y), det * (a11 * b.y - a21 * b.x));
+        }
+
+        private static b2Mat22[] createMatrices(int count) {
+            b2Mat22[] values = new b2Mat22[count];
+            for (int i = 0; i < count; ++i) {
+                values[i] = new b2Mat22();
+            }
+            return values;
+        }
+
+        private static b2Rot[] createRotations(int count) {
+            b2Rot[] values = new b2Rot[count];
+            for (int i = 0; i < count; ++i) {
+                values[i] = new b2Rot();
+            }
+            return values;
+        }
     }
 
     private static final class b2SeparationFunction {
@@ -2331,7 +2545,12 @@ public final class B2 {
                 b2TreeNode node = nodes[index];
                 b2TreeNode child1 = nodes[node.child1];
                 b2TreeNode child2 = nodes[node.child2];
-                node.aabb = b2AABB_Union(child1.aabb, child2.aabb);
+                node.aabb.lowerBound.set(
+                    b2MinFloat(child1.aabb.lowerBound.x, child2.aabb.lowerBound.x),
+                    b2MinFloat(child1.aabb.lowerBound.y, child2.aabb.lowerBound.y));
+                node.aabb.upperBound.set(
+                    b2MaxFloat(child1.aabb.upperBound.x, child2.aabb.upperBound.x),
+                    b2MaxFloat(child1.aabb.upperBound.y, child2.aabb.upperBound.y));
                 node.categoryBits = child1.categoryBits | child2.categoryBits;
                 node.height = 1 + Math.max(child1.height, child2.height);
                 index = node.parent;
@@ -2477,24 +2696,30 @@ public final class B2 {
             return result;
         }
 
-        int[] stack = new int[B2_TREE_STACK_SIZE];
-        int stackCount = 0;
-        stack[stackCount++] = tree.root;
-        while (stackCount > 0) {
-            int nodeId = stack[--stackCount];
-            b2TreeNode node = tree.nodes[nodeId];
-            result.nodeVisits += 1;
-            if (b2AABB_Overlaps(node.aabb, aabb) && (node.categoryBits & maskBits) != 0) {
-                if (b2IsLeaf(node)) {
-                    result.leafVisits += 1;
-                    if (!callback.invoke(nodeId, node.userData)) {
-                        return result;
+        TreeQueryScratch scratch = TREE_QUERY_SCRATCH.get();
+        TreeQueryScratch.Entry scratchEntry = scratch.acquire();
+        int[] stack = scratchEntry.stack;
+        try {
+            int stackCount = 0;
+            stack[stackCount++] = tree.root;
+            while (stackCount > 0) {
+                int nodeId = stack[--stackCount];
+                b2TreeNode node = tree.nodes[nodeId];
+                result.nodeVisits += 1;
+                if (b2AABB_Overlaps(node.aabb, aabb) && (node.categoryBits & maskBits) != 0) {
+                    if (b2IsLeaf(node)) {
+                        result.leafVisits += 1;
+                        if (!callback.invoke(nodeId, node.userData)) {
+                            return result;
+                        }
+                    } else if (stackCount < B2_TREE_STACK_SIZE - 1) {
+                        stack[stackCount++] = node.child1;
+                        stack[stackCount++] = node.child2;
                     }
-                } else if (stackCount < B2_TREE_STACK_SIZE - 1) {
-                    stack[stackCount++] = node.child1;
-                    stack[stackCount++] = node.child2;
                 }
             }
+        } finally {
+            scratch.release();
         }
         return result;
     }
@@ -2508,57 +2733,81 @@ public final class B2 {
 
         b2Vec2 p1 = input.origin;
         b2Vec2 d = input.translation;
-        b2Vec2 r = b2Normalize(d);
-        b2Vec2 v = b2CrossSV(1.0f, r);
-        b2Vec2 absV = b2Abs(v);
+        float length = (float) Math.sqrt(d.x * d.x + d.y * d.y);
+        float invLength = length < Math.ulp(1.0f) ? 0.0f : 1.0f / length;
+        float vx = -invLength * d.y;
+        float vy = invLength * d.x;
+        float absVx = b2AbsFloat(vx);
+        float absVy = b2AbsFloat(vy);
         float maxFraction = input.maxFraction;
-        b2Vec2 p2 = b2MulAdd(p1, maxFraction, d);
-        b2AABB segmentAABB = new b2AABB(b2Min(p1, p2), b2Max(p1, p2));
-        int[] stack = new int[B2_TREE_STACK_SIZE];
-        int stackCount = 0;
-        stack[stackCount++] = tree.root;
-        b2RayCastInput subInput = new b2RayCastInput();
-        subInput.origin = input.origin.copy();
-        subInput.translation = input.translation.copy();
+        float p2x = p1.x + maxFraction * d.x;
+        float p2y = p1.y + maxFraction * d.y;
 
-        while (stackCount > 0) {
-            int nodeId = stack[--stackCount];
-            b2TreeNode node = tree.nodes[nodeId];
-            result.nodeVisits += 1;
-            if ((node.categoryBits & maskBits) == 0 || !b2AABB_Overlaps(node.aabb, segmentAABB)) {
-                continue;
-            }
-            b2Vec2 c = b2AABB_Center(node.aabb);
-            b2Vec2 h = b2AABB_Extents(node.aabb);
-            float term1 = b2AbsFloat(b2Dot(v, b2Sub(p1, c)));
-            float term2 = b2Dot(absV, h);
-            if (term2 < term1) {
-                continue;
-            }
-            if (b2IsLeaf(node)) {
-                subInput.maxFraction = maxFraction;
-                float value = callback.invoke(subInput, nodeId, node.userData);
-                result.leafVisits += 1;
-                if (value == 0.0f) {
-                    return result;
+        TreeQueryScratch scratch = TREE_QUERY_SCRATCH.get();
+        TreeQueryScratch.Entry scratchEntry = scratch.acquire();
+        try {
+            b2AABB segmentAABB = scratchEntry.boundsA;
+            segmentAABB.lowerBound.set(b2MinFloat(p1.x, p2x), b2MinFloat(p1.y, p2y));
+            segmentAABB.upperBound.set(b2MaxFloat(p1.x, p2x), b2MaxFloat(p1.y, p2y));
+            b2RayCastInput subInput = scratchEntry.rayInput;
+            subInput.origin.set(input.origin);
+            subInput.translation.set(input.translation);
+
+            int[] stack = scratchEntry.stack;
+            int stackCount = 0;
+            stack[stackCount++] = tree.root;
+            while (stackCount > 0) {
+                int nodeId = stack[--stackCount];
+                b2TreeNode node = tree.nodes[nodeId];
+                result.nodeVisits += 1;
+                if ((node.categoryBits & maskBits) == 0 || !b2AABB_Overlaps(node.aabb, segmentAABB)) {
+                    continue;
                 }
-                if (0.0f < value && value <= maxFraction) {
-                    maxFraction = value;
-                    p2 = b2MulAdd(p1, maxFraction, d);
-                    segmentAABB.lowerBound = b2Min(p1, p2);
-                    segmentAABB.upperBound = b2Max(p1, p2);
+                float centerX = 0.5f * (node.aabb.lowerBound.x + node.aabb.upperBound.x);
+                float centerY = 0.5f * (node.aabb.lowerBound.y + node.aabb.upperBound.y);
+                float extentX = 0.5f * (node.aabb.upperBound.x - node.aabb.lowerBound.x);
+                float extentY = 0.5f * (node.aabb.upperBound.y - node.aabb.lowerBound.y);
+                float term1 = b2AbsFloat(vx * (p1.x - centerX) + vy * (p1.y - centerY));
+                float term2 = absVx * extentX + absVy * extentY;
+                if (term2 < term1) {
+                    continue;
                 }
-            } else if (stackCount < B2_TREE_STACK_SIZE - 1) {
-                b2Vec2 c1 = b2AABB_Center(tree.nodes[node.child1].aabb);
-                b2Vec2 c2 = b2AABB_Center(tree.nodes[node.child2].aabb);
-                if (b2DistanceSquared(c1, p1) < b2DistanceSquared(c2, p1)) {
-                    stack[stackCount++] = node.child2;
-                    stack[stackCount++] = node.child1;
-                } else {
-                    stack[stackCount++] = node.child1;
-                    stack[stackCount++] = node.child2;
+                if (b2IsLeaf(node)) {
+                    subInput.maxFraction = maxFraction;
+                    float value = callback.invoke(subInput, nodeId, node.userData);
+                    result.leafVisits += 1;
+                    if (value == 0.0f) {
+                        return result;
+                    }
+                    if (0.0f < value && value <= maxFraction) {
+                        maxFraction = value;
+                        p2x = p1.x + maxFraction * d.x;
+                        p2y = p1.y + maxFraction * d.y;
+                        segmentAABB.lowerBound.set(b2MinFloat(p1.x, p2x), b2MinFloat(p1.y, p2y));
+                        segmentAABB.upperBound.set(b2MaxFloat(p1.x, p2x), b2MaxFloat(p1.y, p2y));
+                    }
+                } else if (stackCount < B2_TREE_STACK_SIZE - 1) {
+                    b2AABB child1 = tree.nodes[node.child1].aabb;
+                    b2AABB child2 = tree.nodes[node.child2].aabb;
+                    float center1X = 0.5f * (child1.lowerBound.x + child1.upperBound.x);
+                    float center1Y = 0.5f * (child1.lowerBound.y + child1.upperBound.y);
+                    float center2X = 0.5f * (child2.lowerBound.x + child2.upperBound.x);
+                    float center2Y = 0.5f * (child2.lowerBound.y + child2.upperBound.y);
+                    float delta1X = center1X - p1.x;
+                    float delta1Y = center1Y - p1.y;
+                    float delta2X = center2X - p1.x;
+                    float delta2Y = center2Y - p1.y;
+                    if (delta1X * delta1X + delta1Y * delta1Y < delta2X * delta2X + delta2Y * delta2Y) {
+                        stack[stackCount++] = node.child2;
+                        stack[stackCount++] = node.child1;
+                    } else {
+                        stack[stackCount++] = node.child1;
+                        stack[stackCount++] = node.child2;
+                    }
                 }
             }
+        } finally {
+            scratch.release();
         }
         return result;
     }
@@ -2570,63 +2819,106 @@ public final class B2 {
             return stats;
         }
 
-        b2AABB originAABB = b2MakeAABB(input.proxy.points, input.proxy.count, input.proxy.radius);
-        b2Vec2 p1 = b2AABB_Center(originAABB);
-        b2Vec2 extension = b2AABB_Extents(originAABB);
-        b2Vec2 r = input.translation;
-        b2Vec2 v = b2CrossSV(1.0f, r);
-        b2Vec2 absV = b2Abs(v);
-        float maxFraction = input.maxFraction;
-        b2Vec2 t = b2MulSV(maxFraction, input.translation);
-        b2AABB totalAABB = new b2AABB(b2Min(originAABB.lowerBound, b2Add(originAABB.lowerBound, t)),
-            b2Max(originAABB.upperBound, b2Add(originAABB.upperBound, t)));
+        TreeQueryScratch scratch = TREE_QUERY_SCRATCH.get();
+        TreeQueryScratch.Entry scratchEntry = scratch.acquire();
+        try {
+            b2Vec2 firstPoint = input.proxy.points[0];
+            float lowerX = firstPoint.x;
+            float lowerY = firstPoint.y;
+            float upperX = firstPoint.x;
+            float upperY = firstPoint.y;
+            for (int i = 1; i < input.proxy.count; ++i) {
+                b2Vec2 point = input.proxy.points[i];
+                lowerX = b2MinFloat(lowerX, point.x);
+                lowerY = b2MinFloat(lowerY, point.y);
+                upperX = b2MaxFloat(upperX, point.x);
+                upperY = b2MaxFloat(upperY, point.y);
+            }
+            float radius = input.proxy.radius;
+            lowerX -= radius;
+            lowerY -= radius;
+            upperX += radius;
+            upperY += radius;
+            float p1x = 0.5f * (lowerX + upperX);
+            float p1y = 0.5f * (lowerY + upperY);
+            float extensionX = 0.5f * (upperX - lowerX);
+            float extensionY = 0.5f * (upperY - lowerY);
+            float vx = -input.translation.y;
+            float vy = input.translation.x;
+            float absVx = b2AbsFloat(vx);
+            float absVy = b2AbsFloat(vy);
+            float maxFraction = input.maxFraction;
+            float translationX = maxFraction * input.translation.x;
+            float translationY = maxFraction * input.translation.y;
 
-        b2ShapeCastInput subInput = new b2ShapeCastInput();
-        subInput.proxy = input.proxy;
-        subInput.translation = input.translation.copy();
-        subInput.canEncroach = input.canEncroach;
+            b2AABB totalAABB = scratchEntry.boundsB;
+            totalAABB.lowerBound.set(b2MinFloat(lowerX, lowerX + translationX),
+                b2MinFloat(lowerY, lowerY + translationY));
+            totalAABB.upperBound.set(b2MaxFloat(upperX, upperX + translationX),
+                b2MaxFloat(upperY, upperY + translationY));
 
-        int[] stack = new int[B2_TREE_STACK_SIZE];
-        int stackCount = 0;
-        stack[stackCount++] = tree.root;
-        while (stackCount > 0) {
-            int nodeId = stack[--stackCount];
-            b2TreeNode node = tree.nodes[nodeId];
-            stats.nodeVisits += 1;
-            if ((node.categoryBits & maskBits) == 0 || !b2AABB_Overlaps(node.aabb, totalAABB)) {
-                continue;
-            }
-            b2Vec2 c = b2AABB_Center(node.aabb);
-            b2Vec2 h = b2Add(b2AABB_Extents(node.aabb), extension);
-            float term1 = b2AbsFloat(b2Dot(v, b2Sub(p1, c)));
-            float term2 = b2Dot(absV, h);
-            if (term2 < term1) {
-                continue;
-            }
-            if (b2IsLeaf(node)) {
-                subInput.maxFraction = maxFraction;
-                float value = callback.invoke(subInput, nodeId, node.userData);
-                stats.leafVisits += 1;
-                if (value == 0.0f) {
-                    return stats;
+            b2ShapeCastInput subInput = scratchEntry.shapeInput;
+            subInput.proxy = input.proxy;
+            subInput.translation.set(input.translation);
+            subInput.canEncroach = input.canEncroach;
+
+            int[] stack = scratchEntry.stack;
+            int stackCount = 0;
+            stack[stackCount++] = tree.root;
+            while (stackCount > 0) {
+                int nodeId = stack[--stackCount];
+                b2TreeNode node = tree.nodes[nodeId];
+                stats.nodeVisits += 1;
+                if ((node.categoryBits & maskBits) == 0 || !b2AABB_Overlaps(node.aabb, totalAABB)) {
+                    continue;
                 }
-                if (0.0f < value && value < maxFraction) {
-                    maxFraction = value;
-                    t = b2MulSV(maxFraction, input.translation);
-                    totalAABB.lowerBound = b2Min(originAABB.lowerBound, b2Add(originAABB.lowerBound, t));
-                    totalAABB.upperBound = b2Max(originAABB.upperBound, b2Add(originAABB.upperBound, t));
+                float centerX = 0.5f * (node.aabb.lowerBound.x + node.aabb.upperBound.x);
+                float centerY = 0.5f * (node.aabb.lowerBound.y + node.aabb.upperBound.y);
+                float extentX = 0.5f * (node.aabb.upperBound.x - node.aabb.lowerBound.x) + extensionX;
+                float extentY = 0.5f * (node.aabb.upperBound.y - node.aabb.lowerBound.y) + extensionY;
+                float term1 = b2AbsFloat(vx * (p1x - centerX) + vy * (p1y - centerY));
+                float term2 = absVx * extentX + absVy * extentY;
+                if (term2 < term1) {
+                    continue;
                 }
-            } else if (stackCount < B2_TREE_STACK_SIZE - 1) {
-                b2Vec2 c1 = b2AABB_Center(tree.nodes[node.child1].aabb);
-                b2Vec2 c2 = b2AABB_Center(tree.nodes[node.child2].aabb);
-                if (b2DistanceSquared(c1, p1) < b2DistanceSquared(c2, p1)) {
-                    stack[stackCount++] = node.child2;
-                    stack[stackCount++] = node.child1;
-                } else {
-                    stack[stackCount++] = node.child1;
-                    stack[stackCount++] = node.child2;
+                if (b2IsLeaf(node)) {
+                    subInput.maxFraction = maxFraction;
+                    float value = callback.invoke(subInput, nodeId, node.userData);
+                    stats.leafVisits += 1;
+                    if (value == 0.0f) {
+                        return stats;
+                    }
+                    if (0.0f < value && value < maxFraction) {
+                        maxFraction = value;
+                        translationX = maxFraction * input.translation.x;
+                        translationY = maxFraction * input.translation.y;
+                        totalAABB.lowerBound.set(b2MinFloat(lowerX, lowerX + translationX),
+                            b2MinFloat(lowerY, lowerY + translationY));
+                        totalAABB.upperBound.set(b2MaxFloat(upperX, upperX + translationX),
+                            b2MaxFloat(upperY, upperY + translationY));
+                    }
+                } else if (stackCount < B2_TREE_STACK_SIZE - 1) {
+                    b2AABB child1 = tree.nodes[node.child1].aabb;
+                    b2AABB child2 = tree.nodes[node.child2].aabb;
+                    float center1X = 0.5f * (child1.lowerBound.x + child1.upperBound.x);
+                    float center1Y = 0.5f * (child1.lowerBound.y + child1.upperBound.y);
+                    float center2X = 0.5f * (child2.lowerBound.x + child2.upperBound.x);
+                    float center2Y = 0.5f * (child2.lowerBound.y + child2.upperBound.y);
+                    float delta1X = center1X - p1x;
+                    float delta1Y = center1Y - p1y;
+                    float delta2X = center2X - p1x;
+                    float delta2Y = center2Y - p1y;
+                    if (delta1X * delta1X + delta1Y * delta1Y < delta2X * delta2X + delta2Y * delta2Y) {
+                        stack[stackCount++] = node.child2;
+                        stack[stackCount++] = node.child1;
+                    } else {
+                        stack[stackCount++] = node.child1;
+                        stack[stackCount++] = node.child2;
+                    }
                 }
             }
+        } finally {
+            scratch.release();
         }
         return stats;
     }
@@ -2636,19 +2928,26 @@ public final class B2 {
             return count / 2;
         }
 
-        b2Vec2 lowerBound = centers[start];
-        b2Vec2 upperBound = centers[start];
+        float lowerX = centers[start].x;
+        float lowerY = centers[start].y;
+        float upperX = lowerX;
+        float upperY = lowerY;
         for (int i = 1; i < count; ++i) {
-            lowerBound = b2Min(lowerBound, centers[start + i]);
-            upperBound = b2Max(upperBound, centers[start + i]);
+            b2Vec2 center = centers[start + i];
+            lowerX = b2MinFloat(lowerX, center.x);
+            lowerY = b2MinFloat(lowerY, center.y);
+            upperX = b2MaxFloat(upperX, center.x);
+            upperY = b2MaxFloat(upperY, center.y);
         }
 
-        b2Vec2 d = b2Sub(upperBound, lowerBound);
-        b2Vec2 c = new b2Vec2(0.5f * (lowerBound.x + upperBound.x), 0.5f * (lowerBound.y + upperBound.y));
+        float dx = upperX - lowerX;
+        float dy = upperY - lowerY;
+        float centerX = 0.5f * (lowerX + upperX);
+        float centerY = 0.5f * (lowerY + upperY);
         int i1 = 0;
         int i2 = count;
-        if (d.x > d.y) {
-            float pivot = c.x;
+        if (dx > dy) {
+            float pivot = centerX;
             while (i1 < i2) {
                 while (i1 < i2 && centers[start + i1].x < pivot) {
                     i1 += 1;
@@ -2663,7 +2962,7 @@ public final class B2 {
                 }
             }
         } else {
-            float pivot = c.y;
+            float pivot = centerY;
             while (i1 < i2) {
                 while (i1 < i2 && centers[start + i1].y < pivot) {
                     i1 += 1;
@@ -2710,10 +3009,7 @@ public final class B2 {
             return leafIndices[0];
         }
 
-        b2RebuildItem[] stack = new b2RebuildItem[B2_TREE_STACK_SIZE];
-        for (int i = 0; i < stack.length; ++i) {
-            stack[i] = new b2RebuildItem();
-        }
+        b2RebuildItem[] stack = REBUILD_STACK.get();
         int top = 0;
         stack[0].nodeIndex = b2AllocateNode(tree);
         stack[0].childCount = -1;
@@ -4231,6 +4527,9 @@ public final class B2 {
     }
 
     public static b2Manifold b2CollidePolygons(b2Polygon polygonA, b2Transform xfA, b2Polygon polygonB, b2Transform xfB) {
+        PolygonCollisionScratch collisionScratch = POLYGON_COLLISION_SCRATCH.get();
+        PolygonCollisionScratch.Entry scratch = collisionScratch.acquire();
+        try {
         b2Vec2 origin = polygonA.vertices[0];
         float linearSlop = B2_LINEAR_SLOP();
         float speculativeDistance = B2_SPECULATIVE_DISTANCE();
@@ -4238,7 +4537,7 @@ public final class B2 {
         b2Transform sfA = new b2Transform(b2Add(xfA.p, b2RotateVector(xfA.q, origin)), xfA.q);
         b2Transform xf = b2InvMulTransforms(sfA, xfB);
 
-        b2Polygon localPolyA = new b2Polygon();
+        b2Polygon localPolyA = scratch.polygonA;
         localPolyA.count = polygonA.count;
         localPolyA.radius = polygonA.radius;
         localPolyA.vertices[0].set(b2Vec2_zero);
@@ -4248,7 +4547,7 @@ public final class B2 {
             localPolyA.normals[i].set(polygonA.normals[i]);
         }
 
-        b2Polygon localPolyB = new b2Polygon();
+        b2Polygon localPolyB = scratch.polygonB;
         localPolyB.count = polygonB.count;
         localPolyB.radius = polygonB.radius;
         for (int i = 0; i < localPolyB.count; ++i) {
@@ -4256,10 +4555,10 @@ public final class B2 {
             localPolyB.normals[i].set(b2RotateVector(xf.q, polygonB.normals[i]));
         }
 
-        int[] edgeARef = new int[1];
+        int[] edgeARef = scratch.edgeA;
         float separationA = b2FindMaxSeparation(edgeARef, localPolyA, localPolyB);
         int edgeA = edgeARef[0];
-        int[] edgeBRef = new int[1];
+        int[] edgeBRef = scratch.edgeB;
         float separationB = b2FindMaxSeparation(edgeBRef, localPolyB, localPolyA);
         int edgeB = edgeBRef[0];
 
@@ -4337,6 +4636,9 @@ public final class B2 {
 
         b2ConvertManifoldToWorld(manifold, xfA, xfB, origin);
         return manifold;
+        } finally {
+            collisionScratch.release();
+        }
     }
 
     private static b2Manifold vertexVertexManifold(b2Vec2 vA, b2Vec2 vB, float radiusA, float radiusB, float distance, float radius, int iA, int iB) {
@@ -7718,6 +8020,45 @@ public final class B2 {
         return counters;
     }
 
+    private static void b2ClearStepOutputs(WorldSlot world) {
+        world.bodyEvents.moveEvents = EMPTY_BODY_MOVE_EVENTS;
+        world.bodyEvents.moveCount = 0;
+        world.sensorEvents.beginEvents = EMPTY_SENSOR_BEGIN_EVENTS;
+        world.sensorEvents.endEvents = EMPTY_SENSOR_END_EVENTS;
+        world.sensorEvents.beginCount = 0;
+        world.sensorEvents.endCount = 0;
+        world.contactEvents.beginEvents = EMPTY_CONTACT_BEGIN_EVENTS;
+        world.contactEvents.endEvents = EMPTY_CONTACT_END_EVENTS;
+        world.contactEvents.hitEvents = EMPTY_CONTACT_HIT_EVENTS;
+        world.contactEvents.beginCount = 0;
+        world.contactEvents.endCount = 0;
+        world.contactEvents.hitCount = 0;
+
+        b2Profile profile = world.profile;
+        profile.step = 0.0f;
+        profile.pairs = 0.0f;
+        profile.collide = 0.0f;
+        profile.solve = 0.0f;
+        profile.mergeIslands = 0.0f;
+        profile.prepareStages = 0.0f;
+        profile.solveConstraints = 0.0f;
+        profile.prepareConstraints = 0.0f;
+        profile.integrateVelocities = 0.0f;
+        profile.warmStart = 0.0f;
+        profile.solveImpulses = 0.0f;
+        profile.integratePositions = 0.0f;
+        profile.relaxImpulses = 0.0f;
+        profile.applyRestitution = 0.0f;
+        profile.storeImpulses = 0.0f;
+        profile.splitIslands = 0.0f;
+        profile.transforms = 0.0f;
+        profile.hitEvents = 0.0f;
+        profile.refit = 0.0f;
+        profile.bullets = 0.0f;
+        profile.sleepIslands = 0.0f;
+        profile.sensors = 0.0f;
+    }
+
     public static void b2World_Step(b2WorldId worldId, float timeStep, int subStepCount) {
         b2Assert(b2IsValidFloat(timeStep), "timeStep is valid");
         b2Assert(subStepCount > 0, "subStepCount is greater than zero");
@@ -7728,15 +8069,16 @@ public final class B2 {
         }
 
         B2DebugHooks.beforeWorldStep(worldId, timeStep, subStepCount);
-        world.bodyEvents = new b2BodyEvents();
-        world.sensorEvents = new b2SensorEvents();
-        world.contactEvents = new b2ContactEvents();
-        world.profile = new b2Profile();
+        b2ClearStepOutputs(world);
         if (timeStep == 0.0f) {
-            world.sensorEvents.endEvents = world.pendingSensorEndEvents.toArray(new b2SensorEndTouchEvent[0]);
+            world.sensorEvents.endEvents = world.pendingSensorEndEvents.isEmpty()
+                ? EMPTY_SENSOR_END_EVENTS
+                : world.pendingSensorEndEvents.toArray(new b2SensorEndTouchEvent[world.pendingSensorEndEvents.size()]);
             world.sensorEvents.endCount = world.sensorEvents.endEvents.length;
             world.pendingSensorEndEvents.clear();
-            world.contactEvents.endEvents = world.pendingContactEndEvents.toArray(new b2ContactEndTouchEvent[0]);
+            world.contactEvents.endEvents = world.pendingContactEndEvents.isEmpty()
+                ? EMPTY_CONTACT_END_EVENTS
+                : world.pendingContactEndEvents.toArray(new b2ContactEndTouchEvent[world.pendingContactEndEvents.size()]);
             world.contactEvents.endCount = world.contactEvents.endEvents.length;
             world.pendingContactEndEvents.clear();
             world.invH = 0.0f;
@@ -7756,8 +8098,7 @@ public final class B2 {
             phaseStart = System.nanoTime();
             world.taskCount += 1;
             Object treeTask = world.enqueueTask.invoke(
-                (startIndex, endIndex, workerIndex, taskContext) -> b2BroadPhase_RebuildTrees(world.broadPhase),
-                1, 1, null, world.userTaskContext);
+                REBUILD_TREES_TASK, 1, 1, world, world.userTaskContext);
             try {
                 b2UpdateContacts(world);
             } finally {
@@ -7787,8 +8128,10 @@ public final class B2 {
             float maxLinearSpeedSquared = maxLinearSpeed * maxLinearSpeed;
             float maxAngularSpeed = B2_MAX_ROTATION() / timeStep;
             float maxAngularSpeedSquared = maxAngularSpeed * maxAngularSpeed;
-            java.util.ArrayList<b2BodyMoveEvent> moves = new java.util.ArrayList<>();
-            for (BodySlot body : world.bodies) {
+            java.util.ArrayList<b2BodyMoveEvent> moves = world.bodyMoveEventsScratch;
+            moves.clear();
+            for (int bodyIndex = 0; bodyIndex < world.bodies.size(); ++bodyIndex) {
+                BodySlot body = world.bodies.get(bodyIndex);
                 if (body == null || !body.alive || !body.enabled || body.type == b2_staticBody
                     || (body.type == b2_dynamicBody && !body.awake)) {
                     continue;
@@ -7831,7 +8174,8 @@ public final class B2 {
                 body.force = b2Vec2_zero.copy();
                 body.torque = 0.0f;
             }
-            world.bodyEvents.moveEvents = moves.toArray(new b2BodyMoveEvent[0]);
+            world.bodyEvents.moveEvents = moves.isEmpty()
+                ? EMPTY_BODY_MOVE_EVENTS : moves.toArray(new b2BodyMoveEvent[moves.size()]);
             world.bodyEvents.moveCount = world.bodyEvents.moveEvents.length;
             world.profile.solve = b2ElapsedMilliseconds(phaseStart);
             phaseStart = System.nanoTime();
@@ -9763,7 +10107,8 @@ public final class B2 {
     private static boolean b2ShouldBodiesCollide(BodySlot bodyA, BodySlot bodyB) {
         java.util.List<JointSlot> joints = bodyA.joints.size() < bodyB.joints.size() ? bodyA.joints : bodyB.joints;
         BodySlot other = joints == bodyA.joints ? bodyB : bodyA;
-        for (JointSlot joint : joints) {
+        for (int i = 0, count = joints.size(); i < count; ++i) {
+            JointSlot joint = joints.get(i);
             if (joint.alive && !joint.collideConnected && (joint.bodyA == other || joint.bodyB == other)) {
                 return false;
             }
@@ -9983,12 +10328,29 @@ public final class B2 {
     }
 
     private static void b2UpdateContacts(WorldSlot world) {
-        java.util.ArrayList<b2ContactBeginTouchEvent> beginEvents = new java.util.ArrayList<>();
-        java.util.ArrayList<b2ContactEndTouchEvent> endEvents =
-            new java.util.ArrayList<>(world.pendingContactEndEvents);
+        java.util.ArrayList<b2ContactBeginTouchEvent> beginEvents = world.contactBeginEventsScratch;
+        java.util.ArrayList<b2ContactEndTouchEvent> endEvents = world.contactEndEventsScratch;
+        beginEvents.clear();
+        endEvents.clear();
+        if (!world.pendingContactEndEvents.isEmpty()) {
+            endEvents.addAll(world.pendingContactEndEvents);
+        }
         world.pendingContactEndEvents.clear();
-        byte[] contactState = new byte[world.contacts.size()];
-        java.util.ArrayList<ContactSlot> updateOrder = new java.util.ArrayList<>(world.contactUpdateOrder.size());
+        if (world.contactCount == 0) {
+            world.contactEvents.endEvents = endEvents.isEmpty()
+                ? EMPTY_CONTACT_END_EVENTS : endEvents.toArray(new b2ContactEndTouchEvent[endEvents.size()]);
+            world.contactEvents.endCount = endEvents.size();
+            return;
+        }
+
+        int stateCount = world.contacts.size();
+        if (world.contactStepState.length < stateCount) {
+            world.contactStepState = new byte[b2MaxInt(stateCount, 2 * world.contactStepState.length + 8)];
+        }
+        byte[] contactState = world.contactStepState;
+        java.util.Arrays.fill(contactState, 0, stateCount, (byte) 0);
+        java.util.ArrayList<ContactSlot> updateOrder = world.contactStepOrder;
+        updateOrder.clear();
         for (int colorIndex = 0; colorIndex < B2_GRAPH_COLOR_COUNT; ++colorIndex) {
             updateOrder.addAll(world.contactGraphColors[colorIndex]);
         }
@@ -10041,7 +10403,7 @@ public final class B2 {
             }
         }, null);
 
-        for (int contactIndex = 0; contactIndex < contactState.length; ++contactIndex) {
+        for (int contactIndex = 0; contactIndex < stateCount; ++contactIndex) {
             byte state = contactState[contactIndex];
             if (state == 0) {
                 continue;
@@ -10077,14 +10439,13 @@ public final class B2 {
             }
         }
 
-        b2ContactEvents events = new b2ContactEvents();
-        events.beginEvents = beginEvents.toArray(new b2ContactBeginTouchEvent[0]);
-        events.endEvents = endEvents.toArray(new b2ContactEndTouchEvent[0]);
-        events.hitEvents = new b2ContactHitEvent[0];
+        b2ContactEvents events = world.contactEvents;
+        events.beginEvents = beginEvents.isEmpty()
+            ? EMPTY_CONTACT_BEGIN_EVENTS : beginEvents.toArray(new b2ContactBeginTouchEvent[beginEvents.size()]);
+        events.endEvents = endEvents.isEmpty()
+            ? EMPTY_CONTACT_END_EVENTS : endEvents.toArray(new b2ContactEndTouchEvent[endEvents.size()]);
         events.beginCount = beginEvents.size();
         events.endCount = endEvents.size();
-        events.hitCount = 0;
-        world.contactEvents = events;
     }
 
     private static boolean b2ContactHasAwakeBody(ContactSlot contact) {
@@ -10778,7 +11139,8 @@ public final class B2 {
 
     private static boolean b2SolveWorldContacts(WorldSlot world, float timeStep, int subStepCount) {
         long mergeStart = System.nanoTime();
-        for (BodySlot body : world.bodies) {
+        for (int bodyIndex = 0; bodyIndex < world.bodies.size(); ++bodyIndex) {
+            BodySlot body = world.bodies.get(bodyIndex);
             if (body != null && body.alive && body.enabled && body.type != b2_staticBody) {
                 b2GetBodySleepIsland(world, body);
             }
@@ -10786,28 +11148,38 @@ public final class B2 {
         world.profile.mergeIslands = b2ElapsedMilliseconds(mergeStart);
 
         long prepareStart = System.nanoTime();
-        java.util.ArrayList<SolverBodyState> states = new java.util.ArrayList<>();
-        java.util.IdentityHashMap<BodySlot, Integer> stateIndices = new java.util.IdentityHashMap<>();
-        for (BodySlot body : world.solverBodyOrder) {
+        java.util.ArrayList<SolverBodyState> states = world.solverStates;
+        states.clear();
+        for (int bodyIndex = 0; bodyIndex < world.solverBodyOrder.size(); ++bodyIndex) {
+            BodySlot body = world.solverBodyOrder.get(bodyIndex);
+            if (body != null) {
+                body.solverIndex = B2_NULL_INDEX;
+            }
             if (body == null || !body.alive || !body.enabled || !body.awake || body.type == b2_staticBody) {
                 continue;
             }
-            SolverBodyState state = new SolverBodyState();
+            SolverBodyState state = body.solverState;
             state.body = body;
-            state.linearVelocity = body.linearVelocity.copy();
+            state.linearVelocity.set(body.linearVelocity);
             state.angularVelocity = body.angularVelocity;
-            stateIndices.put(body, states.size());
+            state.deltaPosition.set(0.0f, 0.0f);
+            state.deltaRotation.set(1.0f, 0.0f);
+            body.solverIndex = states.size();
             states.add(state);
         }
         if (states.isEmpty()) {
             return false;
         }
 
-        java.util.ArrayList<ContactConstraint> constraints = new java.util.ArrayList<>();
-        ConstraintColor[] colors = b2CreateConstraintColors();
-        Softness contactSoftness = b2MakeSoftness(b2MinFloat(world.def.contactHertz, 0.125f * subStepCount / timeStep),
+        java.util.ArrayList<ContactConstraint> constraints = world.solverContactConstraints;
+        constraints.clear();
+        ConstraintColor[] colors = world.solverConstraintColors;
+        b2ClearConstraintColors(colors);
+        Softness contactSoftness = b2MakeSoftness(world.solverContactSoftness,
+            b2MinFloat(world.def.contactHertz, 0.125f * subStepCount / timeStep),
             world.def.contactDampingRatio, timeStep / subStepCount);
-        Softness staticSoftness = b2MakeSoftness(2.0f * b2MinFloat(world.def.contactHertz, 0.125f * subStepCount / timeStep),
+        Softness staticSoftness = b2MakeSoftness(world.solverStaticSoftness,
+            2.0f * b2MinFloat(world.def.contactHertz, 0.125f * subStepCount / timeStep),
             world.def.contactDampingRatio, timeStep / subStepCount);
         float contactSpeed = world.def.maxContactPushSpeed / staticSoftness.massScale;
         float h = timeStep / subStepCount;
@@ -10817,30 +11189,32 @@ public final class B2 {
         long prepareConstraintStart = System.nanoTime();
         for (int colorIndex = 0; colorIndex < B2_GRAPH_COLOR_COUNT; ++colorIndex) {
             java.util.ArrayList<JointSlot> colorJoints = world.jointGraphColors[colorIndex];
-            Object[] preparedJoints = new Object[colorJoints.size()];
             b2ParallelFor(world, colorJoints.size(), 4, (startIndex, endIndex, workerIndex, taskContext) -> {
                 for (int jointIndex = startIndex; jointIndex < endIndex; ++jointIndex) {
-                    preparedJoints[jointIndex] = b2PrepareJointConstraint(colorJoints.get(jointIndex), stateIndices,
-                        h, invH, world.warmStartingEnabled);
+                    JointSlot joint = colorJoints.get(jointIndex);
+                    joint.preparedConstraint = b2PrepareJointConstraint(joint, h, invH, world.warmStartingEnabled);
                 }
             }, null);
-            for (Object preparedJoint : preparedJoints) {
-                b2AddPreparedJointConstraint(colors[colorIndex], preparedJoint);
+            for (int jointIndex = 0; jointIndex < colorJoints.size(); ++jointIndex) {
+                JointSlot joint = colorJoints.get(jointIndex);
+                b2AddPreparedJointConstraint(colors[colorIndex], joint.preparedConstraint);
             }
 
             java.util.ArrayList<ContactSlot> colorContacts = world.contactGraphColors[colorIndex];
-            ContactConstraint[] preparedContacts = new ContactConstraint[colorContacts.size()];
             b2ParallelFor(world, colorContacts.size(), 4, (startIndex, endIndex, workerIndex, taskContext) -> {
                 for (int contactIndex = startIndex; contactIndex < endIndex; ++contactIndex) {
                     ContactSlot contact = colorContacts.get(contactIndex);
                     if (contact != null && contact.alive && contact.touching
                         && !contact.shapeA.def.isSensor && !contact.shapeB.def.isSensor) {
-                        preparedContacts[contactIndex] = b2PrepareContactConstraint(contact, stateIndices,
-                            contactSoftness, staticSoftness);
+                        contact.preparedConstraint = b2PrepareContactConstraint(contact, contactSoftness, staticSoftness);
+                    } else if (contact != null) {
+                        contact.preparedConstraint = null;
                     }
                 }
             }, null);
-            for (ContactConstraint constraint : preparedContacts) {
+            for (int contactIndex = 0; contactIndex < colorContacts.size(); ++contactIndex) {
+                ContactSlot contact = colorContacts.get(contactIndex);
+                ContactConstraint constraint = contact.preparedConstraint;
                 if (constraint != null) {
                     colors[colorIndex].contacts.add(constraint);
                     constraints.add(constraint);
@@ -10913,15 +11287,24 @@ public final class B2 {
         BulletSweep[] bulletSweepByState = new BulletSweep[states.size()];
         java.util.ArrayList<BulletSweep> bulletSweeps = new java.util.ArrayList<>();
         b2ParallelFor(world, states.size(), 64, (startIndex, endIndex, workerIndex, taskContext) -> {
+            SolverScratch scratch = SOLVER_SCRATCH.get();
             for (int stateIndex = startIndex; stateIndex < endIndex; ++stateIndex) {
+                int mark = scratch.mark();
                 SolverBodyState state = states.get(stateIndex);
                 BodySlot body = state.body;
                 body.linearVelocity = state.linearVelocity;
                 body.angularVelocity = state.angularVelocity;
-                b2Vec2 center1 = body.center;
-                b2Rot rotation1 = body.rotation;
-                b2Vec2 center2 = b2Add(body.center, state.deltaPosition);
-                b2Rot rotation2 = b2NormalizeRot(b2MulRot(state.deltaRotation, body.rotation));
+                b2Vec2 center1 = scratch.vec().set(body.center);
+                b2Rot rotation1 = scratch.rotation().set(body.rotation);
+                b2Vec2 center2 = scratch.add(body.center, state.deltaPosition);
+                float rotationC = state.deltaRotation.c * body.rotation.c
+                    - state.deltaRotation.s * body.rotation.s;
+                float rotationS = state.deltaRotation.s * body.rotation.c
+                    + state.deltaRotation.c * body.rotation.s;
+                float rotationMagnitude = (float) Math.sqrt(rotationS * rotationS + rotationC * rotationC);
+                float inverseRotationMagnitude = rotationMagnitude > 0.0f ? 1.0f / rotationMagnitude : 0.0f;
+                b2Rot rotation2 = scratch.rotation().set(
+                    rotationC * inverseRotationMagnitude, rotationS * inverseRotationMagnitude);
                 float maxVelocity = b2Length(state.linearVelocity) + b2AbsFloat(state.angularVelocity) * body.maxExtent;
                 boolean fastNonBullet = body.type == b2_dynamicBody && world.continuousEnabled && !body.bullet
                     && maxVelocity * timeStep > 0.5f * body.minExtent;
@@ -10931,21 +11314,29 @@ public final class B2 {
                 if (fastNonBullet) {
                     float fraction = b2SolveContinuous(world, body, center1, rotation1, center2, rotation2);
                     if (fraction < 1.0f) {
-                        center2 = b2Lerp(center1, center2, fraction);
-                        rotation2 = b2NLerp(rotation1, rotation2, fraction);
+                        float oneMinusFraction = 1.0f - fraction;
+                        center2 = scratch.vec().set(
+                            oneMinusFraction * center1.x + fraction * center2.x,
+                            oneMinusFraction * center1.y + fraction * center2.y);
+                        rotationC = oneMinusFraction * rotation1.c + fraction * rotation2.c;
+                        rotationS = oneMinusFraction * rotation1.s + fraction * rotation2.s;
+                        rotationMagnitude = (float) Math.sqrt(rotationS * rotationS + rotationC * rotationC);
+                        inverseRotationMagnitude = rotationMagnitude > 0.0f ? 1.0f / rotationMagnitude : 0.0f;
+                        rotation2 = scratch.rotation().set(
+                            rotationC * inverseRotationMagnitude, rotationS * inverseRotationMagnitude);
                         didHit = true;
                     }
                 }
-                body.center = center2;
-                body.rotation = rotation2;
-                body.position = b2Sub(body.center, b2RotateVector(body.rotation, body.localCenter));
+                body.center.set(center2);
+                body.rotation.set(rotation2);
+                body.position.set(scratch.sub(body.center, scratch.rotate(body.rotation, body.localCenter)));
                 if (fastBullet) {
                     BulletSweep sweep = new BulletSweep();
                     sweep.body = body;
-                    sweep.center1 = center1;
-                    sweep.rotation1 = rotation1;
-                    sweep.center2 = center2;
-                    sweep.rotation2 = rotation2;
+                    sweep.center1 = center1.copy();
+                    sweep.rotation1 = rotation1.copy();
+                    sweep.center2 = center2.copy();
+                    sweep.rotation2 = rotation2.copy();
                     bulletSweepByState[stateIndex] = sweep;
                 }
                 sleepReady[stateIndex] = b2UpdateSleepTimer(world, body, state, timeStep);
@@ -10954,8 +11345,9 @@ public final class B2 {
                 } else if (!fastBullet) {
                     b2SynchronizeBodyProxies(world, body, true);
                 }
-                body.force = b2Vec2_zero.copy();
+                body.force.set(0.0f, 0.0f);
                 body.torque = 0.0f;
+                scratch.release(mark);
             }
         }, null);
         for (BulletSweep sweep : bulletSweepByState) {
@@ -11083,7 +11475,8 @@ public final class B2 {
             world.splitSleepIslandId = splitCandidate;
         }
 
-        java.util.ArrayList<b2BodyMoveEvent> moves = new java.util.ArrayList<>();
+        java.util.ArrayList<b2BodyMoveEvent> moves = world.bodyMoveEventsScratch;
+        moves.clear();
         java.util.TreeSet<Integer> rootsFallingAsleep = new java.util.TreeSet<>(java.util.Collections.reverseOrder());
         for (int stateIndex = 0; stateIndex < states.size(); ++stateIndex) {
             SolverBodyState state = states.get(stateIndex);
@@ -11106,8 +11499,8 @@ public final class B2 {
         for (int root : rootsFallingAsleep) {
             b2SleepIslandGraph(world, root);
         }
-        world.bodyEvents = new b2BodyEvents();
-        world.bodyEvents.moveEvents = moves.toArray(new b2BodyMoveEvent[0]);
+        world.bodyEvents.moveEvents = moves.isEmpty()
+            ? EMPTY_BODY_MOVE_EVENTS : moves.toArray(new b2BodyMoveEvent[moves.size()]);
         world.bodyEvents.moveCount = world.bodyEvents.moveEvents.length;
         if (!rootsFallingAsleep.isEmpty()) {
             world.profile.sleepIslands = b2ElapsedMilliseconds(sleepStart);
@@ -11116,31 +11509,30 @@ public final class B2 {
     }
 
     private static Object b2PrepareJointConstraint(JointSlot joint,
-                                                   java.util.IdentityHashMap<BodySlot, Integer> stateIndices,
                                                    float h, float invH, boolean enableWarmStarting) {
         if (joint == null || !joint.alive) {
             return null;
         }
         if (joint.type == b2_distanceJoint) {
-            return b2PrepareDistanceConstraint(joint, stateIndices, h, invH, enableWarmStarting);
+            return b2PrepareDistanceConstraint(joint, h, invH, enableWarmStarting);
         }
         if (joint.type == b2_motorJoint) {
-            return b2PrepareMotorConstraint(joint, stateIndices, enableWarmStarting);
+            return b2PrepareMotorConstraint(joint, enableWarmStarting);
         }
         if (joint.type == b2_mouseJoint) {
-            return b2PrepareMouseConstraint(joint, stateIndices, h, enableWarmStarting);
+            return b2PrepareMouseConstraint(joint, h, enableWarmStarting);
         }
         if (joint.type == b2_prismaticJoint) {
-            return b2PreparePrismaticConstraint(joint, stateIndices, h, invH, enableWarmStarting);
+            return b2PreparePrismaticConstraint(joint, h, invH, enableWarmStarting);
         }
         if (joint.type == b2_revoluteJoint) {
-            return b2PrepareRevoluteConstraint(joint, stateIndices, h, invH, enableWarmStarting);
+            return b2PrepareRevoluteConstraint(joint, h, invH, enableWarmStarting);
         }
         if (joint.type == b2_weldJoint) {
-            return b2PrepareWeldConstraint(joint, stateIndices, h, invH, enableWarmStarting);
+            return b2PrepareWeldConstraint(joint, h, invH, enableWarmStarting);
         }
         if (joint.type == b2_wheelJoint) {
-            return b2PrepareWheelConstraint(joint, stateIndices, h, invH, enableWarmStarting);
+            return b2PrepareWheelConstraint(joint, h, invH, enableWarmStarting);
         }
         return null;
     }
@@ -11173,14 +11565,18 @@ public final class B2 {
                 float linearDamping = 1.0f / (1.0f + h * body.linearDamping);
                 float angularDamping = 1.0f / (1.0f + h * body.angularDamping);
                 float gravityScale = body.invMass > 0.0f ? body.gravityScale : 0.0f;
-                b2Vec2 linearVelocityDelta = b2Add(b2MulSV(h * body.invMass, body.force),
-                    b2MulSV(h * gravityScale, world.def.gravity));
+                float forceScale = h * body.invMass;
+                float gravityStep = h * gravityScale;
+                float linearVelocityDeltaX = forceScale * body.force.x + gravityStep * world.def.gravity.x;
+                float linearVelocityDeltaY = forceScale * body.force.y + gravityStep * world.def.gravity.y;
                 float angularVelocityDelta = h * body.invInertia * body.torque;
-                state.linearVelocity = b2MulAdd(linearVelocityDelta, linearDamping, state.linearVelocity);
+                state.linearVelocity.set(
+                    linearVelocityDeltaX + linearDamping * state.linearVelocity.x,
+                    linearVelocityDeltaY + linearDamping * state.linearVelocity.y);
                 state.angularVelocity = angularVelocityDelta + angularDamping * state.angularVelocity;
                 if (b2Dot(state.linearVelocity, state.linearVelocity) > maxLinearSpeedSquared) {
                     float ratio = maxLinearSpeed / b2Length(state.linearVelocity);
-                    state.linearVelocity = b2MulSV(ratio, state.linearVelocity);
+                    state.linearVelocity.set(ratio * state.linearVelocity.x, ratio * state.linearVelocity.y);
                 }
                 if (state.angularVelocity * state.angularVelocity > maxAngularSpeedSquared && !body.allowFastRotation) {
                     float ratio = maxAngularSpeed / b2AbsFloat(state.angularVelocity);
@@ -11194,8 +11590,15 @@ public final class B2 {
         b2ParallelFor(world, states.size(), 32, (startIndex, endIndex, workerIndex, taskContext) -> {
             for (int stateIndex = startIndex; stateIndex < endIndex; ++stateIndex) {
                 SolverBodyState state = states.get(stateIndex);
-                state.deltaRotation = b2IntegrateRotation(state.deltaRotation, h * state.angularVelocity);
-                state.deltaPosition = b2MulAdd(state.deltaPosition, h, state.linearVelocity);
+                float deltaAngle = h * state.angularVelocity;
+                float c = state.deltaRotation.c - deltaAngle * state.deltaRotation.s;
+                float s = state.deltaRotation.s + deltaAngle * state.deltaRotation.c;
+                float magnitude = (float) Math.sqrt(s * s + c * c);
+                float inverseMagnitude = magnitude > 0.0f ? 1.0f / magnitude : 0.0f;
+                state.deltaRotation.set(c * inverseMagnitude, s * inverseMagnitude);
+                state.deltaPosition.set(
+                    state.deltaPosition.x + h * state.linearVelocity.x,
+                    state.deltaPosition.y + h * state.linearVelocity.y);
             }
         }, null);
     }
@@ -11282,6 +11685,19 @@ public final class B2 {
             colors[i] = new ConstraintColor();
         }
         return colors;
+    }
+
+    private static void b2ClearConstraintColors(ConstraintColor[] colors) {
+        for (ConstraintColor color : colors) {
+            color.contacts.clear();
+            color.distances.clear();
+            color.motors.clear();
+            color.mice.clear();
+            color.welds.clear();
+            color.revolutes.clear();
+            color.prismatics.clear();
+            color.wheels.clear();
+        }
     }
 
     private static final class ContinuousContext {
@@ -11444,17 +11860,20 @@ public final class B2 {
     }
 
     private static DistanceConstraint b2PrepareDistanceConstraint(JointSlot joint,
-                                                                  java.util.IdentityHashMap<BodySlot, Integer> stateIndices,
                                                                   float h,
                                                                   float invH,
                                                                   boolean enableWarmStarting) {
-        int indexA = stateIndices.getOrDefault(joint.bodyA, B2_NULL_INDEX);
-        int indexB = stateIndices.getOrDefault(joint.bodyB, B2_NULL_INDEX);
+        int indexA = joint.bodyA.solverIndex;
+        int indexB = joint.bodyB.solverIndex;
         if (indexA == B2_NULL_INDEX && indexB == B2_NULL_INDEX) {
             return null;
         }
 
-        DistanceConstraint constraint = new DistanceConstraint();
+        DistanceConstraint constraint = (DistanceConstraint) joint.solverConstraint;
+        if (constraint == null) {
+            constraint = new DistanceConstraint();
+            joint.solverConstraint = constraint;
+        }
         constraint.joint = joint;
         constraint.indexA = indexA;
         constraint.indexB = indexB;
@@ -11462,9 +11881,9 @@ public final class B2 {
         constraint.invMassB = joint.bodyB.type == b2_dynamicBody ? joint.bodyB.invMass : 0.0f;
         constraint.invIA = joint.bodyA.type == b2_dynamicBody ? joint.bodyA.invInertia : 0.0f;
         constraint.invIB = joint.bodyB.type == b2_dynamicBody ? joint.bodyB.invInertia : 0.0f;
-        constraint.anchorA = b2RotateVector(joint.bodyA.rotation, b2Sub(joint.localAnchorA, joint.bodyA.localCenter));
-        constraint.anchorB = b2RotateVector(joint.bodyB.rotation, b2Sub(joint.localAnchorB, joint.bodyB.localCenter));
-        constraint.deltaCenter = b2Sub(joint.bodyB.center, joint.bodyA.center);
+        constraint.anchorA.set(b2RotateVector(joint.bodyA.rotation, b2Sub(joint.localAnchorA, joint.bodyA.localCenter)));
+        constraint.anchorB.set(b2RotateVector(joint.bodyB.rotation, b2Sub(joint.localAnchorB, joint.bodyB.localCenter)));
+        constraint.deltaCenter.set(b2Sub(joint.bodyB.center, joint.bodyA.center));
 
         b2Vec2 separation = b2Add(b2Sub(constraint.anchorB, constraint.anchorA), constraint.deltaCenter);
         b2Vec2 axis = b2Normalize(separation);
@@ -11472,9 +11891,9 @@ public final class B2 {
         float crB = b2Cross(constraint.anchorB, axis);
         float k = constraint.invMassA + constraint.invMassB + constraint.invIA * crA * crA + constraint.invIB * crB * crB;
         constraint.axialMass = k > 0.0f ? 1.0f / k : 0.0f;
-        constraint.distanceSoftness = b2MakeSoftness(joint.distanceHertz, joint.distanceDampingRatio, h);
+        b2MakeSoftness(constraint.distanceSoftness, joint.distanceHertz, joint.distanceDampingRatio, h);
         float hertz = b2MinFloat(joint.constraintHertz, 0.25f * invH);
-        constraint.constraintSoftness = b2MakeSoftness(hertz, joint.constraintDampingRatio, h);
+        b2MakeSoftness(constraint.constraintSoftness, hertz, joint.constraintDampingRatio, h);
 
         if (!enableWarmStarting) {
             joint.distanceImpulse = 0.0f;
@@ -11669,15 +12088,18 @@ public final class B2 {
     }
 
     private static MotorConstraint b2PrepareMotorConstraint(JointSlot joint,
-                                                            java.util.IdentityHashMap<BodySlot, Integer> stateIndices,
                                                             boolean enableWarmStarting) {
-        int indexA = stateIndices.getOrDefault(joint.bodyA, B2_NULL_INDEX);
-        int indexB = stateIndices.getOrDefault(joint.bodyB, B2_NULL_INDEX);
+        int indexA = joint.bodyA.solverIndex;
+        int indexB = joint.bodyB.solverIndex;
         if (indexA == B2_NULL_INDEX && indexB == B2_NULL_INDEX) {
             return null;
         }
 
-        MotorConstraint constraint = new MotorConstraint();
+        MotorConstraint constraint = (MotorConstraint) joint.solverConstraint;
+        if (constraint == null) {
+            constraint = new MotorConstraint();
+            joint.solverConstraint = constraint;
+        }
         constraint.joint = joint;
         constraint.indexA = indexA;
         constraint.indexB = indexB;
@@ -11685,9 +12107,9 @@ public final class B2 {
         constraint.invMassB = joint.bodyB.type == b2_dynamicBody ? joint.bodyB.invMass : 0.0f;
         constraint.invIA = joint.bodyA.type == b2_dynamicBody ? joint.bodyA.invInertia : 0.0f;
         constraint.invIB = joint.bodyB.type == b2_dynamicBody ? joint.bodyB.invInertia : 0.0f;
-        constraint.anchorA = b2RotateVector(joint.bodyA.rotation, b2Sub(joint.localAnchorA, joint.bodyA.localCenter));
-        constraint.anchorB = b2RotateVector(joint.bodyB.rotation, b2Sub(joint.localAnchorB, joint.bodyB.localCenter));
-        constraint.deltaCenter = b2Sub(b2Sub(joint.bodyB.center, joint.bodyA.center), joint.motorLinearOffset);
+        constraint.anchorA.set(b2RotateVector(joint.bodyA.rotation, b2Sub(joint.localAnchorA, joint.bodyA.localCenter)));
+        constraint.anchorB.set(b2RotateVector(joint.bodyB.rotation, b2Sub(joint.localAnchorB, joint.bodyB.localCenter)));
+        constraint.deltaCenter.set(b2Sub(b2Sub(joint.bodyB.center, joint.bodyA.center), joint.motorLinearOffset));
         constraint.deltaAngle = b2RelativeAngle(joint.bodyB.rotation, joint.bodyA.rotation) - joint.motorAngularOffset;
 
         b2Vec2 rA = constraint.anchorA;
@@ -11804,22 +12226,25 @@ public final class B2 {
     }
 
     private static MouseConstraint b2PrepareMouseConstraint(JointSlot joint,
-                                                            java.util.IdentityHashMap<BodySlot, Integer> stateIndices,
                                                             float h,
                                                             boolean enableWarmStarting) {
-        int indexB = stateIndices.getOrDefault(joint.bodyB, B2_NULL_INDEX);
+        int indexB = joint.bodyB.solverIndex;
         if (indexB == B2_NULL_INDEX) {
             return null;
         }
 
-        MouseConstraint constraint = new MouseConstraint();
+        MouseConstraint constraint = (MouseConstraint) joint.solverConstraint;
+        if (constraint == null) {
+            constraint = new MouseConstraint();
+            joint.solverConstraint = constraint;
+        }
         constraint.joint = joint;
         constraint.indexB = indexB;
         constraint.invMassB = joint.bodyB.type == b2_dynamicBody ? joint.bodyB.invMass : 0.0f;
         constraint.invIB = joint.bodyB.type == b2_dynamicBody ? joint.bodyB.invInertia : 0.0f;
-        constraint.anchorB = b2RotateVector(joint.bodyB.rotation, b2Sub(joint.localAnchorB, joint.bodyB.localCenter));
-        constraint.linearSoftness = b2MakeSoftness(joint.mouseHertz, joint.mouseDampingRatio, h);
-        constraint.angularSoftness = b2MakeSoftness(0.5f, 0.1f, h);
+        constraint.anchorB.set(b2RotateVector(joint.bodyB.rotation, b2Sub(joint.localAnchorB, joint.bodyB.localCenter)));
+        b2MakeSoftness(constraint.linearSoftness, joint.mouseHertz, joint.mouseDampingRatio, h);
+        b2MakeSoftness(constraint.angularSoftness, 0.5f, 0.1f, h);
 
         b2Vec2 rB = constraint.anchorB;
         b2Mat22 k = new b2Mat22();
@@ -11828,7 +12253,7 @@ public final class B2 {
         k.cy.x = k.cx.y;
         k.cy.y = constraint.invMassB + constraint.invIB * rB.x * rB.x;
         constraint.linearMass = b2GetInverse22(k);
-        constraint.deltaCenter = b2Sub(joint.bodyB.center, joint.mouseTarget);
+        constraint.deltaCenter.set(b2Sub(joint.bodyB.center, joint.mouseTarget));
 
         if (!enableWarmStarting) {
             joint.mouseLinearImpulse = b2Vec2_zero.copy();
@@ -11896,17 +12321,20 @@ public final class B2 {
     }
 
     private static WeldConstraint b2PrepareWeldConstraint(JointSlot joint,
-                                                          java.util.IdentityHashMap<BodySlot, Integer> stateIndices,
                                                           float h,
                                                           float invH,
                                                           boolean enableWarmStarting) {
-        int indexA = stateIndices.getOrDefault(joint.bodyA, B2_NULL_INDEX);
-        int indexB = stateIndices.getOrDefault(joint.bodyB, B2_NULL_INDEX);
+        int indexA = joint.bodyA.solverIndex;
+        int indexB = joint.bodyB.solverIndex;
         if (indexA == B2_NULL_INDEX && indexB == B2_NULL_INDEX) {
             return null;
         }
 
-        WeldConstraint constraint = new WeldConstraint();
+        WeldConstraint constraint = (WeldConstraint) joint.solverConstraint;
+        if (constraint == null) {
+            constraint = new WeldConstraint();
+            joint.solverConstraint = constraint;
+        }
         constraint.joint = joint;
         constraint.indexA = indexA;
         constraint.indexB = indexB;
@@ -11914,20 +12342,23 @@ public final class B2 {
         constraint.invMassB = joint.bodyB.type == b2_dynamicBody ? joint.bodyB.invMass : 0.0f;
         constraint.invIA = joint.bodyA.type == b2_dynamicBody ? joint.bodyA.invInertia : 0.0f;
         constraint.invIB = joint.bodyB.type == b2_dynamicBody ? joint.bodyB.invInertia : 0.0f;
-        constraint.anchorA = b2RotateVector(joint.bodyA.rotation, b2Sub(joint.localAnchorA, joint.bodyA.localCenter));
-        constraint.anchorB = b2RotateVector(joint.bodyB.rotation, b2Sub(joint.localAnchorB, joint.bodyB.localCenter));
-        constraint.deltaCenter = b2Sub(joint.bodyB.center, joint.bodyA.center);
+        constraint.anchorA.set(b2RotateVector(joint.bodyA.rotation, b2Sub(joint.localAnchorA, joint.bodyA.localCenter)));
+        constraint.anchorB.set(b2RotateVector(joint.bodyB.rotation, b2Sub(joint.localAnchorB, joint.bodyB.localCenter)));
+        constraint.deltaCenter.set(b2Sub(joint.bodyB.center, joint.bodyA.center));
         constraint.deltaAngle = b2UnwindAngle(b2RelativeAngle(joint.bodyB.rotation, joint.bodyA.rotation) - joint.referenceAngle);
         float ka = constraint.invIA + constraint.invIB;
         constraint.axialMass = ka > 0.0f ? 1.0f / ka : 0.0f;
         float hertz = b2MinFloat(joint.constraintHertz, 0.25f * invH);
-        Softness constraintSoftness = b2MakeSoftness(hertz, joint.constraintDampingRatio, h);
-        constraint.linearSoftness = joint.weldLinearHertz == 0.0f
-            ? constraintSoftness
-            : b2MakeSoftness(joint.weldLinearHertz, joint.weldLinearDampingRatio, h);
-        constraint.angularSoftness = joint.weldAngularHertz == 0.0f
-            ? constraintSoftness
-            : b2MakeSoftness(joint.weldAngularHertz, joint.weldAngularDampingRatio, h);
+        if (joint.weldLinearHertz == 0.0f) {
+            b2MakeSoftness(constraint.linearSoftness, hertz, joint.constraintDampingRatio, h);
+        } else {
+            b2MakeSoftness(constraint.linearSoftness, joint.weldLinearHertz, joint.weldLinearDampingRatio, h);
+        }
+        if (joint.weldAngularHertz == 0.0f) {
+            b2MakeSoftness(constraint.angularSoftness, hertz, joint.constraintDampingRatio, h);
+        } else {
+            b2MakeSoftness(constraint.angularSoftness, joint.weldAngularHertz, joint.weldAngularDampingRatio, h);
+        }
 
         if (!enableWarmStarting) {
             joint.weldLinearImpulse = b2Vec2_zero.copy();
@@ -12042,17 +12473,20 @@ public final class B2 {
     }
 
     private static PrismaticConstraint b2PreparePrismaticConstraint(JointSlot joint,
-                                                                    java.util.IdentityHashMap<BodySlot, Integer> stateIndices,
                                                                     float h,
                                                                     float invH,
                                                                     boolean enableWarmStarting) {
-        int indexA = stateIndices.getOrDefault(joint.bodyA, B2_NULL_INDEX);
-        int indexB = stateIndices.getOrDefault(joint.bodyB, B2_NULL_INDEX);
+        int indexA = joint.bodyA.solverIndex;
+        int indexB = joint.bodyB.solverIndex;
         if (indexA == B2_NULL_INDEX && indexB == B2_NULL_INDEX) {
             return null;
         }
 
-        PrismaticConstraint constraint = new PrismaticConstraint();
+        PrismaticConstraint constraint = (PrismaticConstraint) joint.solverConstraint;
+        if (constraint == null) {
+            constraint = new PrismaticConstraint();
+            joint.solverConstraint = constraint;
+        }
         constraint.joint = joint;
         constraint.indexA = indexA;
         constraint.indexB = indexB;
@@ -12060,10 +12494,10 @@ public final class B2 {
         constraint.invMassB = joint.bodyB.type == b2_dynamicBody ? joint.bodyB.invMass : 0.0f;
         constraint.invIA = joint.bodyA.type == b2_dynamicBody ? joint.bodyA.invInertia : 0.0f;
         constraint.invIB = joint.bodyB.type == b2_dynamicBody ? joint.bodyB.invInertia : 0.0f;
-        constraint.anchorA = b2RotateVector(joint.bodyA.rotation, b2Sub(joint.localAnchorA, joint.bodyA.localCenter));
-        constraint.anchorB = b2RotateVector(joint.bodyB.rotation, b2Sub(joint.localAnchorB, joint.bodyB.localCenter));
-        constraint.axisA = b2RotateVector(joint.bodyA.rotation, joint.localAxisA);
-        constraint.deltaCenter = b2Sub(joint.bodyB.center, joint.bodyA.center);
+        constraint.anchorA.set(b2RotateVector(joint.bodyA.rotation, b2Sub(joint.localAnchorA, joint.bodyA.localCenter)));
+        constraint.anchorB.set(b2RotateVector(joint.bodyB.rotation, b2Sub(joint.localAnchorB, joint.bodyB.localCenter)));
+        constraint.axisA.set(b2RotateVector(joint.bodyA.rotation, joint.localAxisA));
+        constraint.deltaCenter.set(b2Sub(joint.bodyB.center, joint.bodyA.center));
         constraint.deltaAngle = b2UnwindAngle(b2RelativeAngle(joint.bodyB.rotation, joint.bodyA.rotation) - joint.referenceAngle);
 
         b2Vec2 d = b2Add(constraint.deltaCenter, b2Sub(constraint.anchorB, constraint.anchorA));
@@ -12071,9 +12505,9 @@ public final class B2 {
         float a2 = b2Cross(constraint.anchorB, constraint.axisA);
         float k = constraint.invMassA + constraint.invMassB + constraint.invIA * a1 * a1 + constraint.invIB * a2 * a2;
         constraint.axialMass = k > 0.0f ? 1.0f / k : 0.0f;
-        constraint.springSoftness = b2MakeSoftness(joint.prismaticHertz, joint.prismaticDampingRatio, h);
+        b2MakeSoftness(constraint.springSoftness, joint.prismaticHertz, joint.prismaticDampingRatio, h);
         float hertz = b2MinFloat(joint.constraintHertz, 0.25f * invH);
-        constraint.constraintSoftness = b2MakeSoftness(hertz, joint.constraintDampingRatio, h);
+        b2MakeSoftness(constraint.constraintSoftness, hertz, joint.constraintDampingRatio, h);
 
         if (!enableWarmStarting) {
             joint.prismaticImpulse = b2Vec2_zero.copy();
@@ -12303,17 +12737,22 @@ public final class B2 {
     }
 
     private static RevoluteConstraint b2PrepareRevoluteConstraint(JointSlot joint,
-                                                                  java.util.IdentityHashMap<BodySlot, Integer> stateIndices,
                                                                   float h,
                                                                   float invH,
                                                                   boolean enableWarmStarting) {
-        int indexA = stateIndices.getOrDefault(joint.bodyA, B2_NULL_INDEX);
-        int indexB = stateIndices.getOrDefault(joint.bodyB, B2_NULL_INDEX);
+        int indexA = joint.bodyA.solverIndex;
+        int indexB = joint.bodyB.solverIndex;
         if (indexA == B2_NULL_INDEX && indexB == B2_NULL_INDEX) {
             return null;
         }
 
-        RevoluteConstraint constraint = new RevoluteConstraint();
+        RevoluteConstraint constraint = (RevoluteConstraint) joint.solverConstraint;
+        if (constraint == null) {
+            constraint = new RevoluteConstraint();
+            joint.solverConstraint = constraint;
+        }
+        SolverScratch scratch = SOLVER_SCRATCH.get();
+        int mark = scratch.mark();
         constraint.joint = joint;
         constraint.indexA = indexA;
         constraint.indexB = indexB;
@@ -12321,57 +12760,63 @@ public final class B2 {
         constraint.invMassB = joint.bodyB.type == b2_dynamicBody ? joint.bodyB.invMass : 0.0f;
         constraint.invIA = joint.bodyA.type == b2_dynamicBody ? joint.bodyA.invInertia : 0.0f;
         constraint.invIB = joint.bodyB.type == b2_dynamicBody ? joint.bodyB.invInertia : 0.0f;
-        constraint.anchorA = b2RotateVector(joint.bodyA.rotation, b2Sub(joint.localAnchorA, joint.bodyA.localCenter));
-        constraint.anchorB = b2RotateVector(joint.bodyB.rotation, b2Sub(joint.localAnchorB, joint.bodyB.localCenter));
-        constraint.deltaCenter = b2Sub(joint.bodyB.center, joint.bodyA.center);
+        constraint.anchorA.set(scratch.rotate(joint.bodyA.rotation,
+            scratch.sub(joint.localAnchorA, joint.bodyA.localCenter)));
+        constraint.anchorB.set(scratch.rotate(joint.bodyB.rotation,
+            scratch.sub(joint.localAnchorB, joint.bodyB.localCenter)));
+        constraint.deltaCenter.set(scratch.sub(joint.bodyB.center, joint.bodyA.center));
         constraint.deltaAngle = b2RelativeAngle(joint.bodyB.rotation, joint.bodyA.rotation);
         float k = constraint.invIA + constraint.invIB;
         constraint.axialMass = k > 0.0f ? 1.0f / k : 0.0f;
-        constraint.springSoftness = b2MakeSoftness(joint.revoluteHertz, joint.revoluteDampingRatio, h);
+        b2MakeSoftness(constraint.springSoftness, joint.revoluteHertz, joint.revoluteDampingRatio, h);
         float hertz = b2MinFloat(joint.constraintHertz, 0.25f * invH);
-        constraint.constraintSoftness = b2MakeSoftness(hertz, joint.constraintDampingRatio, h);
+        b2MakeSoftness(constraint.constraintSoftness, hertz, joint.constraintDampingRatio, h);
 
         if (!enableWarmStarting) {
-            joint.revoluteLinearImpulse = b2Vec2_zero.copy();
+            joint.revoluteLinearImpulse.set(0.0f, 0.0f);
             joint.revoluteSpringImpulse = 0.0f;
             joint.revoluteMotorImpulse = 0.0f;
             joint.revoluteLowerImpulse = 0.0f;
             joint.revoluteUpperImpulse = 0.0f;
         }
+        scratch.release(mark);
         return constraint;
     }
 
     private static void b2WarmStartRevoluteJoints(java.util.List<RevoluteConstraint> constraints,
                                                   java.util.ArrayList<SolverBodyState> states) {
+        SolverScratch scratch = SOLVER_SCRATCH.get();
         for (RevoluteConstraint constraint : constraints) {
+            int mark = scratch.mark();
             SolverBodyState stateA = constraint.indexA == B2_NULL_INDEX ? null : states.get(constraint.indexA);
             SolverBodyState stateB = constraint.indexB == B2_NULL_INDEX ? null : states.get(constraint.indexB);
-            b2Vec2 vA = stateA != null ? stateA.linearVelocity : b2Vec2_zero.copy();
+            b2Vec2 vA = stateA != null ? stateA.linearVelocity : scratch.zero();
             float wA = stateA != null ? stateA.angularVelocity : 0.0f;
             b2Rot dqA = stateA != null ? stateA.deltaRotation : b2Rot_identity;
-            b2Vec2 vB = stateB != null ? stateB.linearVelocity : b2Vec2_zero.copy();
+            b2Vec2 vB = stateB != null ? stateB.linearVelocity : scratch.zero();
             float wB = stateB != null ? stateB.angularVelocity : 0.0f;
             b2Rot dqB = stateB != null ? stateB.deltaRotation : b2Rot_identity;
             JointSlot joint = constraint.joint;
 
-            b2Vec2 rA = b2RotateVector(dqA, constraint.anchorA);
-            b2Vec2 rB = b2RotateVector(dqB, constraint.anchorB);
+            b2Vec2 rA = scratch.rotate(dqA, constraint.anchorA);
+            b2Vec2 rB = scratch.rotate(dqB, constraint.anchorB);
             float axialImpulse = joint.revoluteSpringImpulse + joint.revoluteMotorImpulse +
                 joint.revoluteLowerImpulse - joint.revoluteUpperImpulse;
 
-            vA = b2MulSub(vA, constraint.invMassA, joint.revoluteLinearImpulse);
+            vA = scratch.mulSub(vA, constraint.invMassA, joint.revoluteLinearImpulse);
             wA -= constraint.invIA * (b2Cross(rA, joint.revoluteLinearImpulse) + axialImpulse);
-            vB = b2MulAdd(vB, constraint.invMassB, joint.revoluteLinearImpulse);
+            vB = scratch.mulAdd(vB, constraint.invMassB, joint.revoluteLinearImpulse);
             wB += constraint.invIB * (b2Cross(rB, joint.revoluteLinearImpulse) + axialImpulse);
 
             if (stateA != null) {
-                stateA.linearVelocity = vA;
+                stateA.linearVelocity.set(vA);
                 stateA.angularVelocity = wA;
             }
             if (stateB != null) {
-                stateB.linearVelocity = vB;
+                stateB.linearVelocity.set(vB);
                 stateB.angularVelocity = wB;
             }
+            scratch.release(mark);
         }
     }
 
@@ -12380,14 +12825,16 @@ public final class B2 {
                                               float h,
                                               float invH,
                                               boolean useBias) {
+        SolverScratch scratch = SOLVER_SCRATCH.get();
         for (RevoluteConstraint constraint : constraints) {
+            int mark = scratch.mark();
             SolverBodyState stateA = constraint.indexA == B2_NULL_INDEX ? null : states.get(constraint.indexA);
             SolverBodyState stateB = constraint.indexB == B2_NULL_INDEX ? null : states.get(constraint.indexB);
-            b2Vec2 vA = stateA != null ? stateA.linearVelocity : b2Vec2_zero.copy();
+            b2Vec2 vA = stateA != null ? stateA.linearVelocity : scratch.zero();
             float wA = stateA != null ? stateA.angularVelocity : 0.0f;
             b2Rot dqA = stateA != null ? stateA.deltaRotation : b2Rot_identity;
             b2Vec2 dpA = stateA != null ? stateA.deltaPosition : b2Vec2_zero;
-            b2Vec2 vB = stateB != null ? stateB.linearVelocity : b2Vec2_zero.copy();
+            b2Vec2 vB = stateB != null ? stateB.linearVelocity : scratch.zero();
             float wB = stateB != null ? stateB.angularVelocity : 0.0f;
             b2Rot dqB = stateB != null ? stateB.deltaRotation : b2Rot_identity;
             b2Vec2 dpB = stateB != null ? stateB.deltaPosition : b2Vec2_zero;
@@ -12459,58 +12906,64 @@ public final class B2 {
                 wB -= constraint.invIB * impulse;
             }
 
-            b2Vec2 rA = b2RotateVector(dqA, constraint.anchorA);
-            b2Vec2 rB = b2RotateVector(dqB, constraint.anchorB);
-            b2Vec2 cDot = b2Sub(b2Add(vB, b2CrossSV(wB, rB)), b2Add(vA, b2CrossSV(wA, rA)));
-            b2Vec2 bias = b2Vec2_zero.copy();
+            b2Vec2 rA = scratch.rotate(dqA, constraint.anchorA);
+            b2Vec2 rB = scratch.rotate(dqB, constraint.anchorB);
+            b2Vec2 cDot = scratch.sub(scratch.add(vB, scratch.cross(wB, rB)),
+                scratch.add(vA, scratch.cross(wA, rA)));
+            b2Vec2 bias = scratch.zero();
             float massScale = 1.0f;
             float impulseScale = 0.0f;
             if (useBias) {
-                b2Vec2 separation = b2Add(b2Add(b2Sub(dpB, dpA), b2Sub(rB, rA)), constraint.deltaCenter);
-                bias = b2MulSV(constraint.constraintSoftness.biasRate, separation);
+                b2Vec2 separation = scratch.add(scratch.add(scratch.sub(dpB, dpA), scratch.sub(rB, rA)),
+                    constraint.deltaCenter);
+                bias = scratch.mul(constraint.constraintSoftness.biasRate, separation);
                 massScale = constraint.constraintSoftness.massScale;
                 impulseScale = constraint.constraintSoftness.impulseScale;
             }
 
-            b2Mat22 k = new b2Mat22();
+            b2Mat22 k = scratch.matrix();
             k.cx.x = constraint.invMassA + constraint.invMassB + rA.y * rA.y * constraint.invIA + rB.y * rB.y * constraint.invIB;
             k.cy.x = -rA.y * rA.x * constraint.invIA - rB.y * rB.x * constraint.invIB;
             k.cx.y = k.cy.x;
             k.cy.y = constraint.invMassA + constraint.invMassB + rA.x * rA.x * constraint.invIA + rB.x * rB.x * constraint.invIB;
-            b2Vec2 b = b2Solve22(k, b2Add(cDot, bias));
-            b2Vec2 impulse = new b2Vec2(
+            b2Vec2 b = scratch.solve22(k, scratch.add(cDot, bias));
+            b2Vec2 impulse = scratch.vec().set(
                 -massScale * b.x - impulseScale * joint.revoluteLinearImpulse.x,
                 -massScale * b.y - impulseScale * joint.revoluteLinearImpulse.y);
-            joint.revoluteLinearImpulse = b2Add(joint.revoluteLinearImpulse, impulse);
+            joint.revoluteLinearImpulse.set(scratch.add(joint.revoluteLinearImpulse, impulse));
 
-            vA = b2MulSub(vA, constraint.invMassA, impulse);
+            vA = scratch.mulSub(vA, constraint.invMassA, impulse);
             wA -= constraint.invIA * b2Cross(rA, impulse);
-            vB = b2MulAdd(vB, constraint.invMassB, impulse);
+            vB = scratch.mulAdd(vB, constraint.invMassB, impulse);
             wB += constraint.invIB * b2Cross(rB, impulse);
 
             if (stateA != null) {
-                stateA.linearVelocity = vA;
+                stateA.linearVelocity.set(vA);
                 stateA.angularVelocity = wA;
             }
             if (stateB != null) {
-                stateB.linearVelocity = vB;
+                stateB.linearVelocity.set(vB);
                 stateB.angularVelocity = wB;
             }
+            scratch.release(mark);
         }
     }
 
     private static WheelConstraint b2PrepareWheelConstraint(JointSlot joint,
-                                                            java.util.IdentityHashMap<BodySlot, Integer> stateIndices,
                                                             float h,
                                                             float invH,
                                                             boolean enableWarmStarting) {
-        int indexA = stateIndices.getOrDefault(joint.bodyA, B2_NULL_INDEX);
-        int indexB = stateIndices.getOrDefault(joint.bodyB, B2_NULL_INDEX);
+        int indexA = joint.bodyA.solverIndex;
+        int indexB = joint.bodyB.solverIndex;
         if (indexA == B2_NULL_INDEX && indexB == B2_NULL_INDEX) {
             return null;
         }
 
-        WheelConstraint constraint = new WheelConstraint();
+        WheelConstraint constraint = (WheelConstraint) joint.solverConstraint;
+        if (constraint == null) {
+            constraint = new WheelConstraint();
+            joint.solverConstraint = constraint;
+        }
         constraint.joint = joint;
         constraint.indexA = indexA;
         constraint.indexB = indexB;
@@ -12518,11 +12971,11 @@ public final class B2 {
         constraint.invMassB = joint.bodyB.type == b2_dynamicBody ? joint.bodyB.invMass : 0.0f;
         constraint.invIA = joint.bodyA.type == b2_dynamicBody ? joint.bodyA.invInertia : 0.0f;
         constraint.invIB = joint.bodyB.type == b2_dynamicBody ? joint.bodyB.invInertia : 0.0f;
-        constraint.anchorA = b2RotateVector(joint.bodyA.rotation, b2Sub(joint.localAnchorA, joint.bodyA.localCenter));
-        constraint.anchorB = b2RotateVector(joint.bodyB.rotation, b2Sub(joint.localAnchorB, joint.bodyB.localCenter));
-        constraint.axisA = b2RotateVector(joint.bodyA.rotation, joint.localAxisA);
-        joint.wheelAxisA = constraint.axisA.copy();
-        constraint.deltaCenter = b2Sub(joint.bodyB.center, joint.bodyA.center);
+        constraint.anchorA.set(b2RotateVector(joint.bodyA.rotation, b2Sub(joint.localAnchorA, joint.bodyA.localCenter)));
+        constraint.anchorB.set(b2RotateVector(joint.bodyB.rotation, b2Sub(joint.localAnchorB, joint.bodyB.localCenter)));
+        constraint.axisA.set(b2RotateVector(joint.bodyA.rotation, joint.localAxisA));
+        joint.wheelAxisA.set(constraint.axisA);
+        constraint.deltaCenter.set(b2Sub(joint.bodyB.center, joint.bodyA.center));
 
         b2Vec2 d = b2Add(constraint.deltaCenter, b2Sub(constraint.anchorB, constraint.anchorA));
         b2Vec2 perpA = b2LeftPerp(constraint.axisA);
@@ -12535,12 +12988,12 @@ public final class B2 {
         float a2 = b2Cross(constraint.anchorB, constraint.axisA);
         float ka = constraint.invMassA + constraint.invMassB + constraint.invIA * a1 * a1 + constraint.invIB * a2 * a2;
         constraint.axialMass = ka > 0.0f ? 1.0f / ka : 0.0f;
-        constraint.springSoftness = b2MakeSoftness(joint.wheelHertz, joint.wheelDampingRatio, h);
+        b2MakeSoftness(constraint.springSoftness, joint.wheelHertz, joint.wheelDampingRatio, h);
 
         float km = constraint.invIA + constraint.invIB;
         constraint.motorMass = km > 0.0f ? 1.0f / km : 0.0f;
         float hertz = b2MinFloat(joint.constraintHertz, 0.25f * invH);
-        constraint.constraintSoftness = b2MakeSoftness(hertz, joint.constraintDampingRatio, h);
+        b2MakeSoftness(constraint.constraintSoftness, hertz, joint.constraintDampingRatio, h);
 
         if (!enableWarmStarting) {
             joint.wheelPerpImpulse = 0.0f;
@@ -12754,21 +13207,22 @@ public final class B2 {
     }
 
     private static ContactConstraint b2PrepareContactConstraint(ContactSlot contact,
-                                                               java.util.IdentityHashMap<BodySlot, Integer> stateIndices,
-                                                               Softness contactSoftness,
-                                                               Softness staticSoftness) {
+                                                                Softness contactSoftness,
+                                                                Softness staticSoftness) {
         int pointCount = contact.manifold.pointCount;
         if (pointCount == 0) {
             return null;
         }
-        ContactConstraint constraint = new ContactConstraint();
+        ContactConstraint constraint = contact.solverConstraint;
         constraint.contact = contact;
-        constraint.indexA = stateIndices.getOrDefault(contact.shapeA.body, B2_NULL_INDEX);
-        constraint.indexB = stateIndices.getOrDefault(contact.shapeB.body, B2_NULL_INDEX);
+        constraint.indexA = contact.shapeA.body.solverIndex;
+        constraint.indexB = contact.shapeB.body.solverIndex;
         if (constraint.indexA == B2_NULL_INDEX && constraint.indexB == B2_NULL_INDEX) {
             return null;
         }
-        constraint.normal = contact.manifold.normal.copy();
+        SolverScratch scratch = SOLVER_SCRATCH.get();
+        int mark = scratch.mark();
+        constraint.normal.set(contact.manifold.normal);
         constraint.friction = contact.friction;
         constraint.restitution = contact.restitution;
         constraint.rollingResistance = contact.rollingResistance;
@@ -12780,11 +13234,16 @@ public final class B2 {
         constraint.invIA = contact.shapeA.body.type == b2_dynamicBody ? contact.shapeA.body.invInertia : 0.0f;
         constraint.invMassB = contact.shapeB.body.type == b2_dynamicBody ? contact.shapeB.body.invMass : 0.0f;
         constraint.invIB = contact.shapeB.body.type == b2_dynamicBody ? contact.shapeB.body.invInertia : 0.0f;
-        constraint.softness = constraint.indexA == B2_NULL_INDEX || constraint.indexB == B2_NULL_INDEX ? staticSoftness : contactSoftness;
+        Softness sourceSoftness = constraint.indexA == B2_NULL_INDEX || constraint.indexB == B2_NULL_INDEX
+            ? staticSoftness
+            : contactSoftness;
+        constraint.softness.biasRate = sourceSoftness.biasRate;
+        constraint.softness.massScale = sourceSoftness.massScale;
+        constraint.softness.impulseScale = sourceSoftness.impulseScale;
         float kRolling = constraint.invIA + constraint.invIB;
         constraint.rollingMass = kRolling > 0.0f ? 1.0f / kRolling : 0.0f;
 
-        b2Vec2 tangent = b2RightPerp(constraint.normal);
+        b2Vec2 tangent = scratch.rightPerp(constraint.normal);
         b2Vec2 vA = contact.shapeA.body.linearVelocity;
         float wA = contact.shapeA.body.angularVelocity;
         b2Vec2 vB = contact.shapeB.body.linearVelocity;
@@ -12795,9 +13254,9 @@ public final class B2 {
             cp.normalImpulse = warmStartScale * mp.normalImpulse;
             cp.tangentImpulse = warmStartScale * mp.tangentImpulse;
             cp.totalNormalImpulse = 0.0f;
-            cp.anchorA = mp.anchorA.copy();
-            cp.anchorB = mp.anchorB.copy();
-            cp.baseSeparation = mp.separation - b2Dot(b2Sub(cp.anchorB, cp.anchorA), constraint.normal);
+            cp.anchorA.set(mp.anchorA);
+            cp.anchorB.set(mp.anchorB);
+            cp.baseSeparation = mp.separation - b2Dot(scratch.sub(cp.anchorB, cp.anchorA), constraint.normal);
             float rnA = b2Cross(cp.anchorA, constraint.normal);
             float rnB = b2Cross(cp.anchorB, constraint.normal);
             float kNormal = constraint.invMassA + constraint.invMassB + constraint.invIA * rnA * rnA + constraint.invIB * rnB * rnB;
@@ -12806,10 +13265,11 @@ public final class B2 {
             float rtB = b2Cross(cp.anchorB, tangent);
             float kTangent = constraint.invMassA + constraint.invMassB + constraint.invIA * rtA * rtA + constraint.invIB * rtB * rtB;
             cp.tangentMass = kTangent > 0.0f ? 1.0f / kTangent : 0.0f;
-            b2Vec2 vrA = b2Add(vA, b2CrossSV(wA, cp.anchorA));
-            b2Vec2 vrB = b2Add(vB, b2CrossSV(wB, cp.anchorB));
-            cp.relativeVelocity = b2Dot(constraint.normal, b2Sub(vrB, vrA));
+            b2Vec2 vrA = scratch.add(vA, scratch.cross(wA, cp.anchorA));
+            b2Vec2 vrB = scratch.add(vB, scratch.cross(wB, cp.anchorB));
+            cp.relativeVelocity = b2Dot(constraint.normal, scratch.sub(vrB, vrA));
         }
+        scratch.release(mark);
         return constraint;
     }
 
@@ -12858,7 +13318,13 @@ public final class B2 {
     }
 
     private static Softness b2MakeSoftness(float hertz, float dampingRatio, float h) {
-        Softness softness = new Softness();
+        return b2MakeSoftness(new Softness(), hertz, dampingRatio, h);
+    }
+
+    private static Softness b2MakeSoftness(Softness softness, float hertz, float dampingRatio, float h) {
+        softness.biasRate = 0.0f;
+        softness.massScale = 0.0f;
+        softness.impulseScale = 0.0f;
         if (hertz == 0.0f) {
             return softness;
         }
@@ -12874,35 +13340,38 @@ public final class B2 {
 
     private static void b2WarmStartContacts(java.util.List<ContactConstraint> constraints,
                                             java.util.ArrayList<SolverBodyState> states) {
+        SolverScratch scratch = SOLVER_SCRATCH.get();
         for (ContactConstraint constraint : constraints) {
+            int mark = scratch.mark();
             SolverBodyState stateA = constraint.indexA == B2_NULL_INDEX ? null : states.get(constraint.indexA);
             SolverBodyState stateB = constraint.indexB == B2_NULL_INDEX ? null : states.get(constraint.indexB);
-            b2Vec2 vA = stateA != null ? stateA.linearVelocity : b2Vec2_zero.copy();
+            b2Vec2 vA = stateA != null ? stateA.linearVelocity : scratch.zero();
             float wA = stateA != null ? stateA.angularVelocity : 0.0f;
-            b2Vec2 vB = stateB != null ? stateB.linearVelocity : b2Vec2_zero.copy();
+            b2Vec2 vB = stateB != null ? stateB.linearVelocity : scratch.zero();
             float wB = stateB != null ? stateB.angularVelocity : 0.0f;
 
             b2Vec2 normal = constraint.normal;
-            b2Vec2 tangent = b2RightPerp(normal);
+            b2Vec2 tangent = scratch.rightPerp(normal);
             for (int i = 0; i < constraint.pointCount; ++i) {
                 ContactConstraintPoint cp = constraint.points[i];
-                b2Vec2 p = b2Add(b2MulSV(cp.normalImpulse, normal), b2MulSV(cp.tangentImpulse, tangent));
-                vA = b2MulAdd(vA, -constraint.invMassA, p);
+                b2Vec2 p = scratch.add(scratch.mul(cp.normalImpulse, normal), scratch.mul(cp.tangentImpulse, tangent));
+                vA = scratch.mulAdd(vA, -constraint.invMassA, p);
                 wA -= constraint.invIA * b2Cross(cp.anchorA, p);
-                vB = b2MulAdd(vB, constraint.invMassB, p);
+                vB = scratch.mulAdd(vB, constraint.invMassB, p);
                 wB += constraint.invIB * b2Cross(cp.anchorB, p);
             }
             wA -= constraint.invIA * constraint.rollingImpulse;
             wB += constraint.invIB * constraint.rollingImpulse;
 
             if (stateA != null) {
-                stateA.linearVelocity = vA;
+                stateA.linearVelocity.set(vA);
                 stateA.angularVelocity = wA;
             }
             if (stateB != null) {
-                stateB.linearVelocity = vB;
+                stateB.linearVelocity.set(vB);
                 stateB.angularVelocity = wB;
             }
+            scratch.release(mark);
         }
     }
 
@@ -12912,27 +13381,30 @@ public final class B2 {
                                         float pushout,
                                         boolean useBias,
                                         boolean scalarOverflow) {
+        SolverScratch scratch = SOLVER_SCRATCH.get();
         for (ContactConstraint constraint : constraints) {
+            int mark = scratch.mark();
             SolverBodyState stateA = constraint.indexA == B2_NULL_INDEX ? null : states.get(constraint.indexA);
             SolverBodyState stateB = constraint.indexB == B2_NULL_INDEX ? null : states.get(constraint.indexB);
-            b2Vec2 vA = stateA != null ? stateA.linearVelocity : b2Vec2_zero.copy();
+            b2Vec2 vA = stateA != null ? stateA.linearVelocity : scratch.zero();
             float wA = stateA != null ? stateA.angularVelocity : 0.0f;
             b2Rot dqA = stateA != null ? stateA.deltaRotation : b2Rot_identity;
             b2Vec2 dpA = stateA != null ? stateA.deltaPosition : b2Vec2_zero;
-            b2Vec2 vB = stateB != null ? stateB.linearVelocity : b2Vec2_zero.copy();
+            b2Vec2 vB = stateB != null ? stateB.linearVelocity : scratch.zero();
             float wB = stateB != null ? stateB.angularVelocity : 0.0f;
             b2Rot dqB = stateB != null ? stateB.deltaRotation : b2Rot_identity;
             b2Vec2 dpB = stateB != null ? stateB.deltaPosition : b2Vec2_zero;
 
-            b2Vec2 dp = b2Sub(dpB, dpA);
+            b2Vec2 dp = scratch.sub(dpB, dpA);
             b2Vec2 normal = constraint.normal;
-            b2Vec2 tangent = b2RightPerp(normal);
+            b2Vec2 tangent = scratch.rightPerp(normal);
             Softness softness = constraint.softness;
             float totalNormalImpulse = 0.0f;
 
             for (int i = 0; i < constraint.pointCount; ++i) {
                 ContactConstraintPoint cp = constraint.points[i];
-                b2Vec2 ds = b2Add(dp, b2Sub(b2RotateVector(dqB, cp.anchorB), b2RotateVector(dqA, cp.anchorA)));
+                b2Vec2 ds = scratch.add(dp,
+                    scratch.sub(scratch.rotate(dqB, cp.anchorB), scratch.rotate(dqA, cp.anchorA)));
                 float separation = cp.baseSeparation + b2Dot(ds, normal);
                 float velocityBias = 0.0f;
                 float massScale = 1.0f;
@@ -12945,9 +13417,9 @@ public final class B2 {
                     impulseScale = softness.impulseScale;
                 }
 
-                b2Vec2 vrA = b2Add(vA, b2CrossSV(wA, cp.anchorA));
-                b2Vec2 vrB = b2Add(vB, b2CrossSV(wB, cp.anchorB));
-                float vn = b2Dot(b2Sub(vrB, vrA), normal);
+                b2Vec2 vrA = scratch.add(vA, scratch.cross(wA, cp.anchorA));
+                b2Vec2 vrB = scratch.add(vB, scratch.cross(wB, cp.anchorB));
+                float vn = b2Dot(scratch.sub(vrB, vrA), normal);
                 float impulseDelta;
                 float newImpulse;
                 if (scalarOverflow) {
@@ -12964,18 +13436,18 @@ public final class B2 {
                 cp.totalNormalImpulse += newImpulse;
                 totalNormalImpulse += newImpulse;
 
-                b2Vec2 p = b2MulSV(impulse, normal);
-                vA = b2MulSub(vA, constraint.invMassA, p);
+                b2Vec2 p = scratch.mul(impulse, normal);
+                vA = scratch.mulSub(vA, constraint.invMassA, p);
                 wA -= constraint.invIA * b2Cross(cp.anchorA, p);
-                vB = b2MulAdd(vB, constraint.invMassB, p);
+                vB = scratch.mulAdd(vB, constraint.invMassB, p);
                 wB += constraint.invIB * b2Cross(cp.anchorB, p);
             }
 
             for (int i = 0; i < constraint.pointCount; ++i) {
                 ContactConstraintPoint cp = constraint.points[i];
-                b2Vec2 vrB = b2Add(vB, b2CrossSV(wB, cp.anchorB));
-                b2Vec2 vrA = b2Add(vA, b2CrossSV(wA, cp.anchorA));
-                float vt = b2Dot(b2Sub(vrB, vrA), tangent) - constraint.tangentSpeed;
+                b2Vec2 vrB = scratch.add(vB, scratch.cross(wB, cp.anchorB));
+                b2Vec2 vrA = scratch.add(vA, scratch.cross(wA, cp.anchorA));
+                float vt = b2Dot(scratch.sub(vrB, vrA), tangent) - constraint.tangentSpeed;
                 float maxFriction = constraint.friction * cp.normalImpulse;
                 float newImpulse = scalarOverflow
                     ? b2ClampFloat(cp.tangentImpulse + cp.tangentMass * (-vt), -maxFriction, maxFriction)
@@ -12985,10 +13457,10 @@ public final class B2 {
                 }
                 float impulse = newImpulse - cp.tangentImpulse;
                 cp.tangentImpulse = newImpulse;
-                b2Vec2 p = b2MulSV(impulse, tangent);
-                vA = b2MulSub(vA, constraint.invMassA, p);
+                b2Vec2 p = scratch.mul(impulse, tangent);
+                vA = scratch.mulSub(vA, constraint.invMassA, p);
                 wA -= constraint.invIA * b2Cross(cp.anchorA, p);
-                vB = b2MulAdd(vB, constraint.invMassB, p);
+                vB = scratch.mulAdd(vB, constraint.invMassB, p);
                 wB += constraint.invIB * b2Cross(cp.anchorB, p);
             }
 
@@ -13004,13 +13476,14 @@ public final class B2 {
             wB += constraint.invIB * deltaLambda;
 
             if (stateA != null) {
-                stateA.linearVelocity = vA;
+                stateA.linearVelocity.set(vA);
                 stateA.angularVelocity = wA;
             }
             if (stateB != null) {
-                stateB.linearVelocity = vB;
+                stateB.linearVelocity.set(vB);
                 stateB.angularVelocity = wB;
             }
+            scratch.release(mark);
         }
     }
 
@@ -13018,15 +13491,17 @@ public final class B2 {
                                            java.util.ArrayList<SolverBodyState> states,
                                            float threshold,
                                            boolean scalarOverflow) {
+        SolverScratch scratch = SOLVER_SCRATCH.get();
         for (ContactConstraint constraint : constraints) {
             if (constraint.restitution == 0.0f) {
                 continue;
             }
+            int mark = scratch.mark();
             SolverBodyState stateA = constraint.indexA == B2_NULL_INDEX ? null : states.get(constraint.indexA);
             SolverBodyState stateB = constraint.indexB == B2_NULL_INDEX ? null : states.get(constraint.indexB);
-            b2Vec2 vA = stateA != null ? stateA.linearVelocity : b2Vec2_zero.copy();
+            b2Vec2 vA = stateA != null ? stateA.linearVelocity : scratch.zero();
             float wA = stateA != null ? stateA.angularVelocity : 0.0f;
-            b2Vec2 vB = stateB != null ? stateB.linearVelocity : b2Vec2_zero.copy();
+            b2Vec2 vB = stateB != null ? stateB.linearVelocity : scratch.zero();
             float wB = stateB != null ? stateB.angularVelocity : 0.0f;
             b2Vec2 normal = constraint.normal;
             for (int i = 0; i < constraint.pointCount; ++i) {
@@ -13037,9 +13512,9 @@ public final class B2 {
                 if (aboveThreshold || cp.totalNormalImpulse == 0.0f) {
                     continue;
                 }
-                b2Vec2 vrB = b2Add(vB, b2CrossSV(wB, cp.anchorB));
-                b2Vec2 vrA = b2Add(vA, b2CrossSV(wA, cp.anchorA));
-                float vn = b2Dot(b2Sub(vrB, vrA), normal);
+                b2Vec2 vrB = scratch.add(vB, scratch.cross(wB, cp.anchorB));
+                b2Vec2 vrA = scratch.add(vA, scratch.cross(wA, cp.anchorA));
+                float vn = b2Dot(scratch.sub(vrB, vrA), normal);
                 float impulse;
                 float newImpulse;
                 if (scalarOverflow) {
@@ -13054,20 +13529,21 @@ public final class B2 {
                 if (scalarOverflow) {
                     cp.totalNormalImpulse += impulse;
                 }
-                b2Vec2 p = b2MulSV(impulse, normal);
-                vA = b2MulSub(vA, constraint.invMassA, p);
+                b2Vec2 p = scratch.mul(impulse, normal);
+                vA = scratch.mulSub(vA, constraint.invMassA, p);
                 wA -= constraint.invIA * b2Cross(cp.anchorA, p);
-                vB = b2MulAdd(vB, constraint.invMassB, p);
+                vB = scratch.mulAdd(vB, constraint.invMassB, p);
                 wB += constraint.invIB * b2Cross(cp.anchorB, p);
             }
             if (stateA != null) {
-                stateA.linearVelocity = vA;
+                stateA.linearVelocity.set(vA);
                 stateA.angularVelocity = wA;
             }
             if (stateB != null) {
-                stateB.linearVelocity = vB;
+                stateB.linearVelocity.set(vB);
                 stateB.angularVelocity = wB;
             }
+            scratch.release(mark);
         }
     }
 
@@ -13085,7 +13561,8 @@ public final class B2 {
     }
 
     private static void b2UpdateContactHitEvents(WorldSlot world, java.util.ArrayList<ContactConstraint> constraints) {
-        java.util.ArrayList<b2ContactHitEvent> hitEvents = new java.util.ArrayList<>();
+        java.util.ArrayList<b2ContactHitEvent> hitEvents = world.contactHitEventsScratch;
+        hitEvents.clear();
         float threshold = world.def.hitEventThreshold;
         for (ContactConstraint constraint : constraints) {
             ContactSlot contact = constraint.contact;
@@ -13115,7 +13592,8 @@ public final class B2 {
             }
         }
 
-        world.contactEvents.hitEvents = hitEvents.toArray(new b2ContactHitEvent[0]);
+        world.contactEvents.hitEvents = hitEvents.isEmpty()
+            ? EMPTY_CONTACT_HIT_EVENTS : hitEvents.toArray(new b2ContactHitEvent[hitEvents.size()]);
         world.contactEvents.hitCount = hitEvents.size();
     }
 
@@ -13277,9 +13755,27 @@ public final class B2 {
     }
 
     private static void updateSensorEvents(WorldSlot world) {
+        if (world.sensorOverlaps.isEmpty() && world.pendingSensorEndEvents.isEmpty()) {
+            boolean hasActiveSensor = false;
+            for (int i = 0; i < world.shapes.size(); ++i) {
+                ShapeSlot shape = world.shapes.get(i);
+                if (shape != null && shape.alive && shape.def.isSensor && shape.def.enableSensorEvents
+                    && shape.body.enabled) {
+                    hasActiveSensor = true;
+                    break;
+                }
+            }
+            if (!hasActiveSensor) {
+                return;
+            }
+        }
+
         java.util.HashMap<Integer, SensorOverlapState> current = new java.util.HashMap<>();
-        java.util.ArrayList<b2SensorBeginTouchEvent> begins = new java.util.ArrayList<>();
-        java.util.ArrayList<b2SensorEndTouchEvent> ends = new java.util.ArrayList<>(world.pendingSensorEndEvents);
+        java.util.ArrayList<b2SensorBeginTouchEvent> begins = world.sensorBeginEventsScratch;
+        java.util.ArrayList<b2SensorEndTouchEvent> ends = world.sensorEndEventsScratch;
+        begins.clear();
+        ends.clear();
+        ends.addAll(world.pendingSensorEndEvents);
         world.pendingSensorEndEvents.clear();
 
         java.util.TreeSet<Integer> sensorIndices = new java.util.TreeSet<>(world.sensorOverlaps.keySet());
@@ -13332,9 +13828,10 @@ public final class B2 {
 
         world.sensorOverlaps.clear();
         world.sensorOverlaps.putAll(current);
-        world.sensorEvents = new b2SensorEvents();
-        world.sensorEvents.beginEvents = begins.toArray(new b2SensorBeginTouchEvent[0]);
-        world.sensorEvents.endEvents = ends.toArray(new b2SensorEndTouchEvent[0]);
+        world.sensorEvents.beginEvents = begins.isEmpty()
+            ? EMPTY_SENSOR_BEGIN_EVENTS : begins.toArray(new b2SensorBeginTouchEvent[begins.size()]);
+        world.sensorEvents.endEvents = ends.isEmpty()
+            ? EMPTY_SENSOR_END_EVENTS : ends.toArray(new b2SensorEndTouchEvent[ends.size()]);
         world.sensorEvents.beginCount = begins.size();
         world.sensorEvents.endCount = ends.size();
     }

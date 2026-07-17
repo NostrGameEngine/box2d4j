@@ -61,6 +61,15 @@ Left-drag manipulates dynamic bodies or the active collision query. Debug draw
 toggles cover shapes, joints, contacts, AABBs, and constraint graph colors.
 Samples without a persistent `b2World` render a live geometric snapshot.
 
+The debugger runs each sample and its Box2D world on a dedicated simulation
+thread. That thread captures debug geometry and counters into a three-buffer
+`latest frame wins` exchange; the jMonkeyEngine render loop only uploads the
+newest completed batch and never calls `b2World_Step`, `b2World_Draw`, or live
+world queries. Slow rendering can drop intermediate debug frames, but it does
+not stall physics. Play, pause, single-step, speed changes, pointer input, and
+draw-option refreshes are coordinated by the simulation clock without making
+the render thread wait for a physics step.
+
 World-based samples continue stepping indefinitely in the debugger after their
 finite headless parity horizon. The 59 interactive v3.1.1 samples expose their
 upstream actions, toggles, choices, numeric controls, and keyboard bindings in
@@ -138,13 +147,13 @@ final class ExecutorTaskScheduler implements B2TaskScheduler {
         if (itemCount <= 0) {
             return null;
         }
-        if (workerCount == 1) {
+        int range = Math.max(1, minRange);
+        int taskCount = Math.min(workerCount, Math.max(1, itemCount / range));
+        if (workerCount == 1 || taskCount == 1) {
             task.invoke(0, itemCount, 0, taskContext);
             return null;
         }
 
-        int range = Math.max(1, minRange);
-        int taskCount = Math.min(workerCount, Math.max(1, itemCount / range));
         List<Future<?>> futures = new ArrayList<>(taskCount);
         int base = itemCount / taskCount;
         int remainder = itemCount - base * taskCount;
@@ -235,6 +244,44 @@ half the available processors, capped at eight workers. Override it with:
 ```bash
 ./gradlew runDebugger -PdebuggerWorkers=4
 ```
+
+## Allocation profiling
+
+The measured audit and remaining hotspot list are in
+[`PERFORMANCE.md`](PERFORMANCE.md).
+
+The core reuses per-world solver states, joint/contact constraints, graph
+colors, dynamic-tree query/rebuild stacks, and thread-local narrow-phase and
+solver scratch objects. Scratch values use an internal mark/release discipline
+and are copied before they enter persistent or public state, so each Box2D task
+worker receives independent temporary storage without adding an executor to
+the core artifact.
+
+The primary performance suite uses JMH 1.37 with isolated forks, a negative
+control, and the JMH `gc` profiler. It covers all 16 upstream benchmark scenes,
+Large World, public collision entry points, dynamic-tree traversal, debug
+capture, and the viewer-owned scheduler at 1/2/4/8 workers:
+
+```bash
+./gradlew jmh
+```
+
+Results are written to `build/reports/jmh/results.txt` and `results.json`.
+Use `-PjmhIncludes='.*DynamicTreeBenchmark.*'` to select a benchmark family or
+`-PjmhProfiler=jfr` to create per-fork Flight Recorder captures. The lighter
+`./gradlew profileAllocations` task remains available for long, fixed-step
+Tumbler and Large Pyramid allocation checks.
+
+On the optimization worktree, a 1,200-step Bridge run with a 256 MB G1 heap
+dropped from 14 to 3 young collections. These are measured JVM allocation
+figures, not a zero-allocation guarantee: collision manifold construction,
+active event snapshots, and selected CCD paths remain the largest opportunities
+for future work.
+
+The final Java 11 JMH audit measures an empty world step at approximately
+`0.004 B/op` (measurement floor), dynamic-tree query/ray/shape traversal at 24
+B/op for their public result, and documents the remaining scene, collision,
+debug-draw, event, and scheduler costs in `PERFORMANCE.md`.
 
 ## Build
 

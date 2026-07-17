@@ -505,6 +505,26 @@ Audit date: 2026-07-12.
   control, a motor-speed stepper for Benchmark/Spinner, and Gear Lift's Motor,
   Max Torque, and Speed controls with upstream `A`/`D` key holds. Headless
   `run()` behavior and output remain unchanged.
+- The graphical session is non-blocking with respect to jMonkeyEngine. A
+  dedicated simulation thread owns step, debug draw, and counter capture, then
+  publishes reusable batches through a three-frame `latest frame wins`
+  exchange. The render loop only uploads completed primitive buffers; it never
+  locks or traverses a live Box2D world. Pausing, stepping, pacing, and paused
+  draw-option refreshes are handled by `SimulationClock` on the simulation
+  thread. Intermediate debug frames are deliberately dropped if rendering is
+  slower than physics.
+- Solver body state, typed joint/contact constraints, constraint-color lists,
+  and softness records are reused per world or per owning slot. Thread-local
+  mark/release scratch covers hot contact/revolute math, polygon collision,
+  dynamic-tree query/ray/shape traversal, and rebuild traversal. A 1,200-step Bridge profile with
+  a 256 MB G1 heap improved from 14 to 3 young collections. The repeatable
+  JMH 1.37 matrix profiles all 16 upstream Benchmark scenes, Large World,
+  collision APIs, tree operations, debug capture, and 1/2/4/8-worker stepping.
+  Tree ray cast and shape cast now allocate only their 24-byte public result in
+  the measured steady state. Per-world profile/event output reuse and empty
+  pipeline fast paths reduced the Java 11 JMH empty-world baseline from 984
+  B/step to approximately 0.004 B/step. Collision manifold/active-event construction and
+  selected CCD and all-diagnostics debug-draw paths remain allocation work.
 - C parity probes that compile the vendored Box2D C sources and compare
   allocator behavior, selected math outputs, id packing/unpacking, bitset and
   hash-set behavior, shape unit helpers, AABB collision helpers, distance
@@ -551,7 +571,7 @@ Audit date: 2026-07-12.
 
 ## Verification
 
-- `./gradlew unitTest --rerun-tasks` currently runs 39 tests in 21 suites; all
+- `./gradlew unitTest --rerun-tasks` currently runs 42 tests in 23 suites; all
   pass with zero skips, failures, or errors.
 - `./gradlew parityTest --rerun-tasks` currently runs 168 tests in 154 suites;
   all pass with zero skips, failures, or errors. On the current worktree it
@@ -575,11 +595,14 @@ Audit date: 2026-07-12.
   pick, mouse-joint target update, and release cleanup. The temporary ground
   body now uses `b2DefaultBodyDef()` so its definition cookie is valid and a
   failed drag cannot terminate the sample session or clear the debug draw.
-- `SimulationFrameGateTest` verifies that duplicate UI advance requests cannot
-  leak a permit into the next frame. The debugger reads and draws a world only
-  while its simulation thread is waiting, and the status bar uses the counters
-  captured with that frame instead of traversing live world state during a
-  concurrent step.
+- `SimulationClockTest` covers paused refresh and single-step wakeups.
+  `LatestFrameExchangeTest` verifies that 100 unconsumed publications collapse
+  to the newest frame without blocking or exhausting the three reusable
+  buffers. The status bar consumes counters captured with that frame instead
+  of traversing live world state.
+- World/Large World was rendered automatically after the asynchronous viewer
+  change and then run interactively for more than 20 seconds with four task
+  workers, without a locked-world assertion, deadlock, or render failure.
 - The headless suite contains 111 entry points: all 110 active upstream
   `RegisterSample` creators plus the standalone HelloWorld tutorial. The
   disabled experimental `Mover2` block under `#if 0` is excluded from this

@@ -19,8 +19,6 @@ import com.jme3.scene.Node;
 import com.jme3.scene.shape.Quad;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.FrameBuffer;
-import org.box2d4j.b2Counters;
-import org.box2d4j.b2WorldId;
 import org.box2d4j.samples.SampleCatalog;
 import org.box2d4j.samples.SampleRuntime;
 import org.lwjgl.opengl.GL11;
@@ -35,10 +33,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
-import static org.box2d4j.B2.b2World_GetAwakeBodyCount;
-import static org.box2d4j.B2.b2World_GetCounters;
-import static org.box2d4j.B2.b2World_IsValid;
 
 public final class Box2D4JDebugger extends SimpleApplication {
     private static final float SIDEBAR_WIDTH = 360.0f;
@@ -81,6 +75,7 @@ public final class Box2D4JDebugger extends SimpleApplication {
     private BitmapFont font;
     private JmeDebugRenderer debugRenderer;
     private SampleSession session;
+    private DebugFrame lastFrame;
     private WorldDrawBatch lastBatch;
     private BitmapText statsText;
     private BitmapText stateText;
@@ -112,6 +107,9 @@ public final class Box2D4JDebugger extends SimpleApplication {
     private int workerCount = DebuggerTaskScheduler.defaultWorkerCount();
     private HitTarget pressedTarget;
     private int controlOffset;
+    private boolean statusDirty = true;
+    private String renderedState = "";
+    private Throwable renderedError;
 
     public static void main(String[] args) {
         Box2D4JDebugger app = new Box2D4JDebugger();
@@ -193,6 +191,7 @@ public final class Box2D4JDebugger extends SimpleApplication {
         }
 
         if (session != null) {
+            session.setCaptureSettings(drawOptions, 3.0f / view.pixelsPerMeter);
             Boolean sampleDrawBounds = session.drawBounds();
             if (sampleDrawBounds != null && drawOptions.bounds != sampleDrawBounds) {
                 drawOptions.bounds = sampleDrawBounds;
@@ -208,7 +207,6 @@ public final class Box2D4JDebugger extends SimpleApplication {
             }
             updateStatus();
             updateCameraTarget();
-            session.advance(timePerFrame);
         }
         updateScreenshot();
         updateTooltip();
@@ -217,6 +215,8 @@ public final class Box2D4JDebugger extends SimpleApplication {
     @Override
     public void destroy() {
         if (session != null) {
+            session.releaseFrame(lastFrame);
+            lastFrame = null;
             session.close();
             session = null;
         }
@@ -224,62 +224,78 @@ public final class Box2D4JDebugger extends SimpleApplication {
     }
 
     private void renderSession(long version) {
-        b2WorldId worldId = session.worldId();
-        if (worldId != null && b2World_IsValid(worldId)) {
-            lastBatch = debugRenderer.capture(worldId, drawOptions, view);
+        DebugFrame nextFrame = session.pollLatestFrame();
+        if (nextFrame != null) {
+            session.releaseFrame(lastFrame);
+            lastFrame = nextFrame;
+            lastBatch = nextFrame.batch;
             resultSnapshot = false;
-            b2Counters counters = b2World_GetCounters(worldId);
-            lastStepCount = session.stepCount();
-            lastBodyCount = counters.bodyCount;
-            lastShapeCount = counters.shapeCount;
-            lastContactCount = counters.contactCount;
-            lastJointCount = counters.jointCount;
-            lastAwakeBodyCount = b2World_GetAwakeBodyCount(worldId);
+            lastStepCount = nextFrame.stepCount;
+            lastBodyCount = nextFrame.bodyCount;
+            lastShapeCount = nextFrame.shapeCount;
+            lastContactCount = nextFrame.contactCount;
+            lastJointCount = nextFrame.jointCount;
+            lastAwakeBodyCount = nextFrame.awakeBodyCount;
+            statusDirty = true;
             if (autoFitPending && lastBatch.bounds.isValid()) {
                 view.fit(lastBatch.bounds, contentWidth(), viewportHeight - TOOLBAR_HEIGHT - STATUS_HEIGHT);
                 autoFitPending = false;
             }
             debugRenderer.upload(lastBatch, view, contentWidth(), viewportHeight);
             renderDirty = false;
-        } else if (session.result() != null) {
+            renderedVersion = nextFrame.version;
+        } else if (session.result() != null && session.worldId() == null) {
+            session.releaseFrame(lastFrame);
+            lastFrame = null;
             WorldDrawBatch resultBatch = SampleResultDraw.capture(session.result());
             if (resultBatch != null) {
                 lastBatch = resultBatch;
                 resultSnapshot = true;
+                statusDirty = true;
                 if (autoFitPending && lastBatch.bounds.isValid()) {
                     view.fit(lastBatch.bounds, contentWidth(), viewportHeight - TOOLBAR_HEIGHT - STATUS_HEIGHT);
                     autoFitPending = false;
                 }
                 debugRenderer.upload(lastBatch, view, contentWidth(), viewportHeight);
                 renderDirty = false;
+                renderedVersion = version;
             }
-        } else {
+        } else if (lastBatch == null) {
             debugRenderer.clear();
-            lastBatch = null;
         }
-        renderedVersion = version;
     }
 
     private void updateStatus() {
         String state;
-        if (session.error() != null) {
-            state = "ERROR  " + safeMessage(session.error());
-            stateText.setColor(RED);
+        ColorRGBA stateColor;
+        Throwable sessionError = session.error();
+        if (sessionError != null) {
+            state = sessionError == renderedError ? renderedState : "ERROR  " + safeMessage(sessionError);
+            stateColor = RED;
         } else if (session.isFinished()) {
             state = "COMPLETE";
-            stateText.setColor(GREEN);
+            stateColor = GREEN;
         } else if (session.isFinalFrame()) {
             state = "FINAL FRAME";
-            stateText.setColor(AMBER);
+            stateColor = AMBER;
         } else if (session.isPlaying()) {
             state = "RUNNING";
-            stateText.setColor(GREEN);
+            stateColor = GREEN;
         } else {
             state = "PAUSED";
-            stateText.setColor(AMBER);
+            stateColor = AMBER;
         }
-        stateText.setText(state);
+        if (!state.equals(renderedState) || sessionError != renderedError) {
+            renderedError = sessionError;
+            renderedState = state;
+            stateText.setText(state);
+            stateText.setColor(stateColor);
+        }
 
+        if (!statusDirty) {
+            return;
+        }
+        statusDirty = false;
         if (lastBatch != null && resultSnapshot) {
             statsText.setText("Result snapshot   No persistent b2World");
         } else if (lastBatch != null) {
@@ -471,6 +487,8 @@ public final class Box2D4JDebugger extends SimpleApplication {
 
     private void startSample(int index) {
         if (session != null) {
+            session.releaseFrame(lastFrame);
+            lastFrame = null;
             session.close();
         }
         selectedSample = Math.max(0, Math.min(SampleCatalog.entries().size() - 1, index));
@@ -487,6 +505,9 @@ public final class Box2D4JDebugger extends SimpleApplication {
         autoFitPending = true;
         renderDirty = true;
         uiDirty = true;
+        statusDirty = true;
+        renderedState = "";
+        renderedError = null;
         debugRenderer.clear();
     }
 
@@ -547,6 +568,9 @@ public final class Box2D4JDebugger extends SimpleApplication {
             14.0f, MUTED, 20.0f);
         stateText = addText("", 14.0f, 8.0f, 14.0f, GREEN, 20.0f);
         statsText = addText("", 132.0f, 8.0f, 14.0f, TEXT, 20.0f);
+        statusDirty = true;
+        renderedState = "";
+        renderedError = null;
 
         addText("box2d4j", contentWidth + 18.0f, viewportHeight - 32.0f, 22.0f, TEXT, 20.0f);
         addText("SAMPLE DEBUGGER", contentWidth + 18.0f, viewportHeight - 54.0f, 12.0f, CYAN, 20.0f);

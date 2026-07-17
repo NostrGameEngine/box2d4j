@@ -12,7 +12,9 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.util.BufferUtils;
-import org.box2d4j.b2WorldId;
+
+import java.nio.FloatBuffer;
+import java.util.ArrayList;
 
 final class JmeDebugRenderer {
     private final Mesh fillMesh = new Mesh();
@@ -21,6 +23,9 @@ final class JmeDebugRenderer {
     private final Geometry lineGeometry = new Geometry("Box2D outlines", lineMesh);
     private final Node labelNode = new Node("Box2D labels");
     private final BitmapFont font;
+    private final MeshScratch fillScratch = new MeshScratch();
+    private final MeshScratch lineScratch = new MeshScratch();
+    private final ArrayList<BitmapText> labelTexts = new ArrayList<>();
 
     JmeDebugRenderer(AssetManager assetManager) {
         font = assetManager.loadFont("Interface/Fonts/Default.fnt");
@@ -47,57 +52,77 @@ final class JmeDebugRenderer {
         return labelNode;
     }
 
-    WorldDrawBatch capture(b2WorldId worldId, WorldDrawBatch.DrawOptions options, ViewTransform view) {
-        return WorldDrawBatch.capture(worldId, options, 3.0f / view.pixelsPerMeter);
-    }
-
     void upload(WorldDrawBatch batch, ViewTransform view, float contentWidth, float viewportHeight) {
         uploadMesh(fillMesh, fillGeometry, batch.fillVertices, batch.fillColors, view, contentWidth, viewportHeight,
-            0.48f);
+            0.48f, fillScratch);
         uploadMesh(lineMesh, lineGeometry, batch.lineVertices, batch.lineColors, view, contentWidth, viewportHeight,
-            0.96f);
-        labelNode.detachAllChildren();
-        for (WorldDrawBatch.Label label : batch.labels) {
-            BitmapText text = new BitmapText(font);
+            0.96f, lineScratch);
+        int labelCount = batch.labelCount();
+        for (int i = 0; i < labelCount; ++i) {
+            WorldDrawBatch.Label label = batch.labels.get(i);
+            BitmapText text;
+            if (i == labelTexts.size()) {
+                text = new BitmapText(font);
+                labelTexts.add(text);
+                labelNode.attachChild(text);
+            } else {
+                text = labelTexts.get(i);
+            }
+            text.setCullHint(Spatial.CullHint.Never);
             text.setText(label.text);
             text.setSize(12.0f);
-            text.setColor(toColor(label.color));
+            ColorRGBA labelColor = text.getColor();
+            labelColor.set(
+                ((label.color >>> 16) & 0xFF) / 255.0f,
+                ((label.color >>> 8) & 0xFF) / 255.0f,
+                (label.color & 0xFF) / 255.0f,
+                1.0f);
+            text.setColor(labelColor);
             text.setLocalTranslation(
                 0.5f * contentWidth + (label.x - view.centerX) * view.pixelsPerMeter,
                 0.5f * viewportHeight + (label.y - view.centerY) * view.pixelsPerMeter,
                 3.0f);
-            labelNode.attachChild(text);
+        }
+        for (int i = labelCount; i < labelTexts.size(); ++i) {
+            labelTexts.get(i).setCullHint(Spatial.CullHint.Always);
         }
     }
 
     void clear() {
         fillGeometry.setCullHint(Spatial.CullHint.Always);
         lineGeometry.setCullHint(Spatial.CullHint.Always);
-        labelNode.detachAllChildren();
+        for (BitmapText text : labelTexts) {
+            text.setCullHint(Spatial.CullHint.Always);
+        }
     }
 
     private static void uploadMesh(Mesh mesh, Geometry geometry, WorldDrawBatch.FloatList vertices,
                                    WorldDrawBatch.IntList colors, ViewTransform view, float contentWidth,
-                                   float viewportHeight, float alpha) {
+                                   float viewportHeight, float alpha, MeshScratch scratch) {
         int vertexCount = vertices.size() / 2;
         if (vertexCount == 0) {
             geometry.setCullHint(Spatial.CullHint.Always);
             return;
         }
-        float[] positions = new float[vertexCount * 3];
-        float[] rgba = new float[vertexCount * 4];
+        scratch.ensure(vertexCount);
+        FloatBuffer positions = scratch.positions;
+        FloatBuffer rgba = scratch.colors;
+        positions.clear();
+        rgba.clear();
         for (int i = 0; i < vertexCount; ++i) {
             float worldX = vertices.get(2 * i);
             float worldY = vertices.get(2 * i + 1);
-            positions[3 * i] = 0.5f * contentWidth + (worldX - view.centerX) * view.pixelsPerMeter;
-            positions[3 * i + 1] = 0.5f * viewportHeight + (worldY - view.centerY) * view.pixelsPerMeter;
-            positions[3 * i + 2] = 0.0f;
+            positions.put(0.5f * contentWidth + (worldX - view.centerX) * view.pixelsPerMeter);
+            positions.put(0.5f * viewportHeight + (worldY - view.centerY) * view.pixelsPerMeter);
+            positions.put(0.0f);
             int color = colors.get(i);
-            rgba[4 * i] = ((color >>> 16) & 0xFF) / 255.0f;
-            rgba[4 * i + 1] = ((color >>> 8) & 0xFF) / 255.0f;
-            rgba[4 * i + 2] = (color & 0xFF) / 255.0f;
-            rgba[4 * i + 3] = alpha;
+            rgba.put(((color >>> 16) & 0xFF) / 255.0f);
+            rgba.put(((color >>> 8) & 0xFF) / 255.0f);
+            rgba.put((color & 0xFF) / 255.0f);
+            rgba.put(alpha);
         }
+        positions.flip();
+        rgba.flip();
         updateBuffer(mesh, VertexBuffer.Type.Position, 3, positions);
         updateBuffer(mesh, VertexBuffer.Type.Color, 4, rgba);
         mesh.setStreamed();
@@ -106,12 +131,28 @@ final class JmeDebugRenderer {
         geometry.setCullHint(Spatial.CullHint.Never);
     }
 
-    private static void updateBuffer(Mesh mesh, VertexBuffer.Type type, int components, float[] values) {
+    private static void updateBuffer(Mesh mesh, VertexBuffer.Type type, int components, FloatBuffer values) {
         VertexBuffer buffer = mesh.getBuffer(type);
         if (buffer == null) {
-            mesh.setBuffer(type, components, BufferUtils.createFloatBuffer(values));
+            mesh.setBuffer(type, components, values);
         } else {
-            buffer.updateData(BufferUtils.createFloatBuffer(values));
+            buffer.updateData(values);
+        }
+    }
+
+    private static final class MeshScratch {
+        FloatBuffer positions = BufferUtils.createFloatBuffer(3 * 1024);
+        FloatBuffer colors = BufferUtils.createFloatBuffer(4 * 1024);
+
+        void ensure(int vertexCount) {
+            if (positions.capacity() < 3 * vertexCount) {
+                int capacity = Math.max(3 * vertexCount, positions.capacity() + positions.capacity() / 2);
+                positions = BufferUtils.createFloatBuffer(capacity);
+            }
+            if (colors.capacity() < 4 * vertexCount) {
+                int capacity = Math.max(4 * vertexCount, colors.capacity() + colors.capacity() / 2);
+                colors = BufferUtils.createFloatBuffer(capacity);
+            }
         }
     }
 
@@ -123,14 +164,6 @@ final class JmeDebugRenderer {
             material.getAdditionalRenderState().setDepthWrite(false);
         }
         return material;
-    }
-
-    private static ColorRGBA toColor(int color) {
-        return new ColorRGBA(
-            ((color >>> 16) & 0xFF) / 255.0f,
-            ((color >>> 8) & 0xFF) / 255.0f,
-            (color & 0xFF) / 255.0f,
-            1.0f);
     }
 
     static final class ViewTransform {

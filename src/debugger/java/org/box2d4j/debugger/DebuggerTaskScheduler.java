@@ -55,7 +55,7 @@ final class DebuggerTaskScheduler implements B2TaskScheduler, AutoCloseable {
         }
         int range = Math.max(1, minRange);
         int taskCount = Math.min(workerCount, Math.max(1, itemCount / range));
-        if (workerCount == 1) {
+        if (workerCount == 1 || taskCount == 1) {
             task.invoke(0, itemCount, 0, taskContext);
             return null;
         }
