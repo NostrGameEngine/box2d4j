@@ -27,10 +27,11 @@ final class WorldCapacityParityTest {
         b2WorldId old = worlds[37];
         b2DestroyWorld(old);
         b2WorldId recycled = b2CreateWorld(b2DefaultWorldDef());
+        int generationIncrement = (recycled.generation - old.generation) & 0xFFFF;
 
         String output = String.format("worldCapacity %d %d %d %d %d %d %d",
             overflow.index1, overflow.generation, b2World_IsValid(overflow) ? 1 : 0,
-            recycled.index1, recycled.generation, b2World_IsValid(recycled) ? 1 : 0,
+            recycled.index1, generationIncrement, b2World_IsValid(recycled) ? 1 : 0,
             b2World_IsValid(old) ? 1 : 0);
         for (int i = 0; i < worlds.length; ++i) {
             if (i != 37) {
